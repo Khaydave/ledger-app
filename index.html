@@ -26,11 +26,11 @@
   window.__firestore = { db, doc, getDoc, setDoc, updateDoc };
   window.dispatchEvent(new Event('firebase-ready'));
 </script>
-
 <style>
   :root {
     --bg: #FBF8F3;
     --surface: #FFFFFF;
+    --surface-hover: #F5F1E9;
     --ink: #1F2A24;
     --ink-soft: #5B6B62;
     --ink-faint: #9AA69C;
@@ -43,6 +43,7 @@
     --danger-tint: #F7E1DD;
     --border: #E7E0D2;
     --radius: 14px;
+    --sidebar-w: 220px;
   }
   * { box-sizing: border-box; }
   body {
@@ -60,8 +61,9 @@
     flex-direction: column;
   }
   h1, h2, h3 { font-family: 'Space Grotesk', sans-serif; margin: 0; }
-  .screen { display: none; flex: 1; padding: 20px 18px 100px; }
-  .screen.active { display: block; }
+  .screen { display: none; flex: 1; }
+  .screen.active { display: flex; flex-direction: column; flex: 1; }
+  .content { padding: 20px 18px 100px; flex: 1; }
 
   /* ONBOARDING */
   #onboarding.active { display: flex; }
@@ -106,11 +108,15 @@
     padding: 14px 20px;
     cursor: pointer;
     width: 100%;
+    transition: background 0.15s, transform 0.1s;
   }
   .btn-primary { background: var(--primary); color: #fff; }
-  .btn-primary:active { background: var(--primary-dark); }
+  .btn-primary:hover { background: var(--primary-dark); }
+  .btn-primary:active { transform: scale(0.98); }
   .btn-ghost { background: transparent; color: var(--primary); border: 1.5px solid var(--primary-tint); }
+  .btn-ghost:hover { background: var(--primary-tint); }
   .btn-danger-ghost { background: transparent; color: var(--danger); border: 1.5px solid var(--danger-tint); }
+  .btn-danger-ghost:hover { background: var(--danger-tint); }
   .hint { font-size: 12px; color: var(--ink-faint); margin-top: 18px; line-height: 1.6; max-width: 280px; }
   .hint b { color: var(--ink-soft); }
 
@@ -126,14 +132,19 @@
     width: 34px; height: 34px; border-radius: 9px;
     display: flex; align-items: center; justify-content: center;
     font-size: 15px; color: var(--ink-soft); cursor: pointer;
+    transition: background 0.15s;
   }
+  .icon-btn:hover { background: var(--surface-hover); color: var(--ink); }
+  .icon-btn.small { width: 30px; height: 30px; font-size: 13px; }
 
   /* DASHBOARD */
   .stat-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px; }
+  .stat-row.three { grid-template-columns: 1fr 1fr 1fr; }
   .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; }
   .stat-card .label { font-size: 12px; color: var(--ink-soft); margin-bottom: 6px; }
-  .stat-card .value { font-family: 'Space Grotesk'; font-size: 22px; font-weight: 600; }
+  .stat-card .value { font-family: 'Space Grotesk'; font-size: 20px; font-weight: 600; }
   .stat-card .value.danger { color: var(--danger); }
+  .stat-card .sub { font-size: 11px; color: var(--ink-faint); margin-top: 3px; }
 
   .section-title { font-size: 13px; font-weight: 600; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.04em; margin: 22px 0 10px; }
 
@@ -142,8 +153,12 @@
     background: var(--primary); color: #fff; border: none; border-radius: var(--radius);
     padding: 16px 10px; font-family: 'Space Grotesk'; font-weight: 600; font-size: 14px;
     display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer;
+    transition: transform 0.1s, background 0.15s;
   }
+  .quick-btn:hover { background: var(--primary-dark); }
+  .quick-btn:active { transform: scale(0.97); }
   .quick-btn.secondary { background: var(--accent-tint); color: var(--primary-dark); }
+  .quick-btn.secondary:hover { background: #F3DDAE; }
   .quick-btn .qicon { font-size: 20px; }
 
   .empty-state {
@@ -151,34 +166,53 @@
     background: var(--surface); border: 1px dashed var(--border); border-radius: var(--radius);
   }
 
+  .search-box { position: relative; margin-bottom: 14px; }
+  .search-box input { padding-left: 36px; }
+  .search-box .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--ink-faint); font-size: 14px; }
+
   /* LIST ITEMS */
   .list-item {
     background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
     padding: 13px 15px; margin-bottom: 9px; display: flex; align-items: center; justify-content: space-between;
+    transition: box-shadow 0.15s;
   }
+  .list-item:hover { box-shadow: 0 2px 10px rgba(31,42,36,0.06); }
   .list-item .li-main { flex: 1; min-width: 0; }
   .list-item .li-title { font-size: 15px; font-weight: 500; margin-bottom: 3px; }
   .list-item .li-sub { font-size: 12.5px; color: var(--ink-soft); }
-  .li-tag { font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 6px; white-space: nowrap; margin-left: 8px; }
+  .li-right { display: flex; align-items: center; gap: 8px; }
+  .li-tag { font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 6px; white-space: nowrap; }
   .li-tag.low { background: var(--danger-tint); color: var(--danger); }
   .li-tag.ok { background: var(--primary-tint); color: var(--primary); }
   .li-tag.owe { background: var(--danger-tint); color: var(--danger); }
   .li-tag.paid { background: var(--primary-tint); color: var(--primary); }
+  .li-tag.pending { background: var(--accent-tint); color: #8a5a11; }
+  .li-actions { display: flex; gap: 4px; }
 
-  /* BOTTOM NAV */
+  .period-toggle { display: flex; gap: 6px; margin-bottom: 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 4px; }
+  .period-toggle button {
+    flex: 1; background: none; border: none; padding: 8px 6px; border-radius: 7px; cursor: pointer;
+    font-family: 'Inter'; font-size: 13px; font-weight: 500; color: var(--ink-soft);
+  }
+  .period-toggle button.active { background: var(--primary); color: #fff; }
+
+  /* BOTTOM NAV (mobile) */
   .navbar {
     position: sticky; bottom: 0; left: 0; right: 0;
     background: var(--surface); border-top: 1px solid var(--border);
-    display: flex; padding: 8px 6px calc(8px + env(safe-area-inset-bottom));
-    max-width: 460px; margin: 0 auto; width: 100%;
+    display: flex; padding: 8px 4px calc(8px + env(safe-area-inset-bottom));
+    width: 100%;
   }
   .navbar button {
     flex: 1; background: none; border: none; display: flex; flex-direction: column;
-    align-items: center; gap: 3px; padding: 8px 4px; cursor: pointer;
-    color: var(--ink-faint); font-family: 'Inter'; font-size: 11px; font-weight: 500;
+    align-items: center; gap: 3px; padding: 8px 2px; cursor: pointer;
+    color: var(--ink-faint); font-family: 'Inter'; font-size: 10.5px; font-weight: 500;
   }
   .navbar button.active { color: var(--primary); }
-  .navbar .nicon { font-size: 19px; }
+  .navbar .nicon { font-size: 18px; }
+
+  /* SIDEBAR (desktop) */
+  .sidebar { display: none; }
 
   /* MODAL */
   .modal-overlay {
@@ -189,11 +223,17 @@
   .modal-sheet {
     background: var(--bg); width: 100%; max-width: 460px; border-radius: 20px 20px 0 0;
     padding: 22px 20px calc(22px + env(safe-area-inset-bottom)); max-height: 86vh; overflow-y: auto;
+    position: relative;
   }
   .modal-sheet h2 { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
   .modal-sub { font-size: 13px; color: var(--ink-soft); margin-bottom: 18px; }
   .modal-actions { display: flex; gap: 10px; margin-top: 18px; }
   .modal-close { position: absolute; top: 18px; right: 18px; }
+  .product-pick-list { max-height: 180px; overflow-y: auto; border: 1px solid var(--border); border-radius: 10px; margin-top: -4px; margin-bottom: 14px; }
+  .product-pick-item { padding: 11px 14px; cursor: pointer; font-size: 14px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; }
+  .product-pick-item:last-child { border-bottom: none; }
+  .product-pick-item:hover, .product-pick-item.selected { background: var(--primary-tint); }
+  .product-pick-item .ppi-sub { color: var(--ink-faint); font-size: 12px; }
 
   .toast {
     position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
@@ -201,6 +241,38 @@
     border-radius: 20px; z-index: 60; opacity: 0; transition: opacity 0.25s; pointer-events: none;
   }
   .toast.show { opacity: 1; }
+
+  /* DESKTOP LAYOUT */
+  @media (min-width: 860px) {
+    #app { max-width: 1080px; }
+    #mainScreen.active { flex-direction: row; }
+    .sidebar {
+      display: flex; flex-direction: column;
+      width: var(--sidebar-w); flex-shrink: 0;
+      background: var(--surface); border-right: 1px solid var(--border);
+      padding: 20px 14px; min-height: 100vh; position: sticky; top: 0;
+    }
+    .sidebar .brand { display: flex; align-items: center; gap: 10px; padding: 4px 8px 24px; }
+    .sidebar .brand .mark { width: 32px; height: 32px; border-radius: 9px; margin: 0; }
+    .sidebar .brand .mark span { font-size: 14px; }
+    .sidebar .brand-name { font-family: 'Space Grotesk'; font-weight: 600; font-size: 16px; }
+    .sidebar button {
+      display: flex; align-items: center; gap: 12px; background: none; border: none;
+      padding: 11px 12px; border-radius: 10px; font-family: 'Inter'; font-size: 14px; font-weight: 500;
+      color: var(--ink-soft); cursor: pointer; text-align: left; margin-bottom: 2px;
+    }
+    .sidebar button:hover { background: var(--surface-hover); color: var(--ink); }
+    .sidebar button.active { background: var(--primary-tint); color: var(--primary); }
+    .sidebar .nicon { font-size: 17px; width: 20px; text-align: center; }
+    .navbar { display: none; }
+    .content { padding: 32px 40px 40px; max-width: 760px; }
+    .stat-row.three { grid-template-columns: 1fr 1fr 1fr; }
+    .stat-card .value { font-size: 24px; }
+    .quick-actions { grid-template-columns: repeat(4, 1fr); }
+    .modal-overlay { align-items: center; }
+    .modal-sheet { max-width: 420px; border-radius: 18px; }
+    .topbar { padding: 24px 40px 0; }
+  }
 </style>
 </head>
 <body>
@@ -210,7 +282,7 @@
   <div id="onboarding" class="screen active">
     <div class="mark"><span>L</span></div>
     <h1>Ledger</h1>
-    <p>Track stock and who owes you, right from your phone. No notebook, no spreadsheet.</p>
+    <p>Track stock, orders, and who owes you &mdash; right from your phone or computer.</p>
 
     <div class="field-group">
       <label for="shopCodeInput">Shop code</label>
@@ -221,98 +293,184 @@
       <input id="shopPasswordInput" type="password" placeholder="At least 4 characters" autocomplete="off">
     </div>
     <button class="btn btn-primary" id="continueBtn" onclick="enterShop()">Continue</button>
-    <p class="hint" id="onboardHint"><b>New here?</b> Pick any shop code and password — we'll create your ledger the first time you continue. Use the same code and password every time after that to get back into it.</p>
+    <p class="hint"><b>New here?</b> Pick any shop code and password &mdash; we'll create your ledger the first time you continue. Use the same code and password every time after that to get back into it.</p>
   </div>
 
-
   <div id="mainScreen" class="screen">
-    <div class="topbar">
-      <div class="shopname">Ledger for <b id="shopNameLabel"></b></div>
-      <div class="icon-btn" onclick="switchShop()">&#8635;</div>
+
+    <div class="sidebar">
+      <div class="brand">
+        <div class="mark"><span>L</span></div>
+        <div class="brand-name">Ledger</div>
+      </div>
+      <button class="nav-btn active" data-tab="home" onclick="showTab('home')"><span class="nicon">&#8962;</span>Home</button>
+      <button class="nav-btn" data-tab="stock" onclick="showTab('stock')"><span class="nicon">&#128230;</span>Stock</button>
+      <button class="nav-btn" data-tab="sales" onclick="showTab('sales')"><span class="nicon">&#128200;</span>Sales</button>
+      <button class="nav-btn" data-tab="orders" onclick="showTab('orders')"><span class="nicon">&#128203;</span>Orders</button>
+      <button class="nav-btn" data-tab="debts" onclick="showTab('debts')"><span class="nicon">&#128179;</span>Debts</button>
+      <div style="flex:1;"></div>
+      <button onclick="switchShop()"><span class="nicon">&#8635;</span>Switch shop</button>
     </div>
 
-    <div id="tab-home" class="tabpanel">
-      <div style="padding: 6px 0 0;">
-        <div class="stat-row">
-          <div class="stat-card">
-            <div class="label">Items in stock</div>
-            <div class="value" id="statItems">0</div>
+    <div style="flex:1; display:flex; flex-direction:column; min-width:0;">
+      <div class="topbar">
+        <div class="shopname">Ledger for <b id="shopNameLabel"></b></div>
+        <div class="icon-btn" onclick="switchShop()" id="mobileSwitchBtn">&#8635;</div>
+      </div>
+
+      <div class="content">
+        <div id="tab-home" class="tabpanel">
+          <div class="stat-row three">
+            <div class="stat-card">
+              <div class="label">Items in stock</div>
+              <div class="value" id="statItems">0</div>
+            </div>
+            <div class="stat-card">
+              <div class="label">Pending orders</div>
+              <div class="value" id="statOrders">&#8358;0</div>
+              <div class="sub" id="statOrdersCount">0 orders</div>
+            </div>
+            <div class="stat-card">
+              <div class="label">Sales this week</div>
+              <div class="value" id="statSalesWeek">&#8358;0</div>
+            </div>
           </div>
-          <div class="stat-card">
+
+          <div class="quick-actions">
+            <button class="quick-btn" onclick="openModal('saleModal')"><span class="qicon">&#43;</span>Log a sale</button>
+            <button class="quick-btn secondary" onclick="openModal('stockModal')"><span class="qicon">&#128230;</span>Add stock</button>
+            <button class="quick-btn" style="background: var(--accent); color: var(--primary-dark);" onclick="openModal('orderModal')"><span class="qicon">&#128203;</span>Log an order</button>
+            <button class="quick-btn secondary" onclick="openModal('debtModal')"><span class="qicon">&#128179;</span>Add debt</button>
+          </div>
+
+          <div class="section-title">Running low</div>
+          <div id="lowStockList"></div>
+
+          <div class="section-title">Recent sales</div>
+          <div id="recentSalesList"></div>
+        </div>
+
+        <div id="tab-stock" class="tabpanel" style="display:none;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin: 6px 0 14px;">
+            <h2 style="font-size:18px;">Your stock</h2>
+            <button class="icon-btn" onclick="openModal('stockModal')">&#43;</button>
+          </div>
+          <div class="search-box">
+            <span class="search-icon">&#128269;</span>
+            <input id="stockSearchInput" placeholder="Search stock..." oninput="renderStockList()">
+          </div>
+          <div id="stockList"></div>
+        </div>
+
+        <div id="tab-sales" class="tabpanel" style="display:none;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin: 6px 0 14px;">
+            <h2 style="font-size:18px;">Sales</h2>
+            <button class="icon-btn" onclick="openModal('saleModal')">&#43;</button>
+          </div>
+          <div class="period-toggle">
+            <button id="period-week" class="active" onclick="setSalesPeriod('week')">This week</button>
+            <button id="period-month" onclick="setSalesPeriod('month')">This month</button>
+            <button id="period-year" onclick="setSalesPeriod('year')">This year</button>
+          </div>
+          <div class="stat-card" style="margin-bottom:16px;">
+            <div class="label" id="salesPeriodLabel">Total sales &mdash; this week</div>
+            <div class="value" id="statSalesTotal">&#8358;0</div>
+            <div class="sub" id="statSalesCount">0 sales</div>
+          </div>
+          <div id="salesList"></div>
+        </div>
+
+        <div id="tab-orders" class="tabpanel" style="display:none;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin: 6px 0 14px;">
+            <h2 style="font-size:18px;">Orders</h2>
+            <button class="icon-btn" onclick="openModal('orderModal')">&#43;</button>
+          </div>
+          <div class="stat-card" style="margin-bottom:16px;">
+            <div class="label">Pending order value</div>
+            <div class="value" id="statOrdersTotal">&#8358;0</div>
+            <div class="sub" id="statOrdersTotalCount">0 pending orders</div>
+          </div>
+          <div id="ordersList"></div>
+        </div>
+
+        <div id="tab-debts" class="tabpanel" style="display:none;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin: 6px 0 14px;">
+            <h2 style="font-size:18px;">Customer debts</h2>
+            <button class="icon-btn" onclick="openModal('debtModal')">&#43;</button>
+          </div>
+          <div class="stat-card" style="margin-bottom:16px;">
             <div class="label">Owed to you</div>
             <div class="value danger" id="statOwed">&#8358;0</div>
           </div>
+          <div id="debtList"></div>
         </div>
-
-        <div class="quick-actions">
-          <button class="quick-btn" onclick="openModal('saleModal')"><span class="qicon">&#43;</span>Log a sale</button>
-          <button class="quick-btn secondary" onclick="openModal('stockModal')"><span class="qicon">&#128230;</span>Add stock</button>
-        </div>
-
-        <div class="section-title">Running low</div>
-        <div id="lowStockList"></div>
-
-        <div class="section-title">Recent sales</div>
-        <div id="recentSalesList"></div>
       </div>
-    </div>
 
-    <div id="tab-stock" class="tabpanel" style="display:none;">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin: 6px 0 14px;">
-        <h2 style="font-size:18px;">Your stock</h2>
-        <button class="icon-btn" onclick="openModal('stockModal')">&#43;</button>
+      <div class="navbar">
+        <button class="nav-btn active" data-tab="home" onclick="showTab('home')"><span class="nicon">&#8962;</span>Home</button>
+        <button class="nav-btn" data-tab="stock" onclick="showTab('stock')"><span class="nicon">&#128230;</span>Stock</button>
+        <button class="nav-btn" data-tab="sales" onclick="showTab('sales')"><span class="nicon">&#128200;</span>Sales</button>
+        <button class="nav-btn" data-tab="orders" onclick="showTab('orders')"><span class="nicon">&#128203;</span>Orders</button>
+        <button class="nav-btn" data-tab="debts" onclick="showTab('debts')"><span class="nicon">&#128179;</span>Debts</button>
       </div>
-      <div id="stockList"></div>
-    </div>
-
-    <div id="tab-debts" class="tabpanel" style="display:none;">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin: 6px 0 14px;">
-        <h2 style="font-size:18px;">Customer debts</h2>
-        <button class="icon-btn" onclick="openModal('debtModal')">&#43;</button>
-      </div>
-      <div id="debtList"></div>
-    </div>
-
-    <div class="navbar">
-      <button id="nav-home" class="active" onclick="showTab('home')">
-        <span class="nicon">&#8962;</span>Home
-      </button>
-      <button id="nav-stock" onclick="showTab('stock')">
-        <span class="nicon">&#128230;</span>Stock
-      </button>
-      <button id="nav-debts" onclick="showTab('debts')">
-        <span class="nicon">&#128179;</span>Debts
-      </button>
     </div>
   </div>
 
 </div>
 
 <div class="modal-overlay" id="stockModal">
-  <div class="modal-sheet" style="position:relative;">
+  <div class="modal-sheet">
     <div class="icon-btn modal-close" onclick="closeModal('stockModal')">&#10005;</div>
-    <h2>Add stock</h2>
-    <div class="modal-sub">Add a new item, or add more of one you already have.</div>
+    <h2 id="stockModalTitle">Add stock</h2>
+    <div class="modal-sub" id="stockModalSub">Add a new item, or add more of one you already have.</div>
+    <input type="hidden" id="stockEditId" value="">
     <div class="field-group"><label>Item name</label><input id="stockName" placeholder="e.g. Blue ankara dress"></div>
     <div class="field-group"><label>Quantity</label><input id="stockQty" type="number" inputmode="numeric" placeholder="e.g. 10"></div>
     <div class="field-group"><label>Price per item (&#8358;)</label><input id="stockPrice" type="number" inputmode="numeric" placeholder="e.g. 8500"></div>
-    <div class="modal-actions"><button class="btn btn-primary" onclick="submitStock()">Save item</button></div>
+    <div class="modal-actions">
+      <button class="btn btn-danger-ghost" id="stockDeleteBtn" style="display:none;" onclick="deleteStock()">Delete</button>
+      <button class="btn btn-primary" id="stockSaveBtn" onclick="submitStock()">Save item</button>
+    </div>
   </div>
 </div>
 
 <div class="modal-overlay" id="saleModal">
-  <div class="modal-sheet" style="position:relative;">
+  <div class="modal-sheet">
     <div class="icon-btn modal-close" onclick="closeModal('saleModal')">&#10005;</div>
-    <h2>Log a sale</h2>
+    <h2 id="saleModalTitle">Log a sale</h2>
     <div class="modal-sub">This reduces the item's stock automatically.</div>
-    <div class="field-group"><label>Item</label><select id="saleProduct"></select></div>
+    <input type="hidden" id="saleEditId" value="">
+    <input type="hidden" id="saleSelectedProduct" value="">
+    <div class="field-group">
+      <label>Item</label>
+      <div class="search-box">
+        <span class="search-icon">&#128269;</span>
+        <input id="saleSearchInput" placeholder="Search item to sell..." oninput="renderSaleProductPicker()" onfocus="renderSaleProductPicker()">
+      </div>
+      <div class="product-pick-list" id="saleProductPicker"></div>
+    </div>
     <div class="field-group"><label>Quantity sold</label><input id="saleQty" type="number" inputmode="numeric" value="1"></div>
-    <div class="modal-actions"><button class="btn btn-primary" onclick="submitSale()">Log sale</button></div>
+    <div class="modal-actions">
+      <button class="btn btn-danger-ghost" id="saleDeleteBtn" style="display:none;" onclick="deleteSale()">Delete</button>
+      <button class="btn btn-primary" id="saleSaveBtn" onclick="submitSale()">Log sale</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="orderModal">
+  <div class="modal-sheet">
+    <div class="icon-btn modal-close" onclick="closeModal('orderModal')">&#10005;</div>
+    <h2>Log an order</h2>
+    <div class="modal-sub">For orders a customer has placed but you haven't fulfilled or been paid for yet.</div>
+    <div class="field-group"><label>Customer name</label><input id="orderCustomer" placeholder="e.g. Blessing"></div>
+    <div class="field-group"><label>What did they order?</label><input id="orderDescription" placeholder="e.g. 2 skincare sets"></div>
+    <div class="field-group"><label>Order value (&#8358;)</label><input id="orderAmount" type="number" inputmode="numeric" placeholder="e.g. 12000"></div>
+    <div class="modal-actions"><button class="btn btn-primary" onclick="submitOrder()">Save order</button></div>
   </div>
 </div>
 
 <div class="modal-overlay" id="debtModal">
-  <div class="modal-sheet" style="position:relative;">
+  <div class="modal-sheet">
     <div class="icon-btn modal-close" onclick="closeModal('debtModal')">&#10005;</div>
     <h2>Add a debt</h2>
     <div class="modal-sub">Track a customer who paid later, or hasn't paid yet.</div>
@@ -327,8 +485,10 @@
 <script>
 let shopCode = null;
 let shopDocRef = null;
-let state = { products: [], sales: [], debts: [] };
+let state = { products: [], sales: [], debts: [], orders: [] };
 let fbReady = false;
+let salesPeriod = 'week';
+let saleSelectedProductId = null;
 
 window.addEventListener('firebase-ready', () => { fbReady = true; });
 
@@ -377,8 +537,8 @@ async function enterShop() {
     const pwHash = await hashPassword(password);
 
     if (!snap.exists()) {
-      await setDoc(ref, { passwordHash: pwHash, products: [], sales: [], debts: [] });
-      state = { products: [], sales: [], debts: [] };
+      await setDoc(ref, { passwordHash: pwHash, products: [], sales: [], debts: [], orders: [] });
+      state = { products: [], sales: [], debts: [], orders: [] };
       toast('Ledger created');
     } else {
       const data = snap.data();
@@ -391,7 +551,8 @@ async function enterShop() {
       state = {
         products: data.products || [],
         sales: data.sales || [],
-        debts: data.debts || []
+        debts: data.debts || [],
+        orders: data.orders || []
       };
     }
 
@@ -420,14 +581,40 @@ function switchShop() {
 }
 
 function showTab(name) {
-  ['home', 'stock', 'debts'].forEach(t => {
+  ['home', 'stock', 'sales', 'orders', 'debts'].forEach(t => {
     document.getElementById('tab-' + t).style.display = t === name ? 'block' : 'none';
-    document.getElementById('nav-' + t).classList.toggle('active', t === name);
   });
+  document.querySelectorAll('.nav-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.tab === name);
+  });
+  if (name === 'stock') renderStockList();
+  if (name === 'sales') renderSalesTab();
+  if (name === 'orders') renderOrdersList();
+  if (name === 'debts') renderDebtList();
 }
 
 function openModal(id) {
-  if (id === 'saleModal') populateSaleProducts();
+  if (id === 'saleModal') {
+    document.getElementById('saleEditId').value = '';
+    document.getElementById('saleSelectedProduct').value = '';
+    document.getElementById('saleSearchInput').value = '';
+    document.getElementById('saleQty').value = 1;
+    document.getElementById('saleModalTitle').textContent = 'Log a sale';
+    document.getElementById('saleSaveBtn').textContent = 'Log sale';
+    document.getElementById('saleDeleteBtn').style.display = 'none';
+    saleSelectedProductId = null;
+    renderSaleProductPicker();
+  }
+  if (id === 'stockModal') {
+    document.getElementById('stockEditId').value = '';
+    document.getElementById('stockName').value = '';
+    document.getElementById('stockQty').value = '';
+    document.getElementById('stockPrice').value = '';
+    document.getElementById('stockModalTitle').textContent = 'Add stock';
+    document.getElementById('stockModalSub').textContent = "Add a new item, or add more of one you already have.";
+    document.getElementById('stockSaveBtn').textContent = 'Save item';
+    document.getElementById('stockDeleteBtn').style.display = 'none';
+  }
   document.getElementById(id).classList.add('active');
 }
 function closeModal(id) {
@@ -435,21 +622,44 @@ function closeModal(id) {
 }
 
 function fmtMoney(n) {
-  return '\u20a6' + Number(n).toLocaleString('en-NG');
+  return '\u20a6' + Number(n || 0).toLocaleString('en-NG');
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
 }
 
 function renderAll() {
   renderDashboard();
   renderStockList();
+  renderSalesTab();
+  renderOrdersList();
   renderDebtList();
+}
+
+function periodStartDate(period) {
+  const d = new Date();
+  if (period === 'week') d.setDate(d.getDate() - 7);
+  else if (period === 'month') d.setDate(d.getDate() - 30);
+  else if (period === 'year') d.setDate(d.getDate() - 365);
+  return d;
 }
 
 function renderDashboard() {
   const totalItems = state.products.reduce((s, p) => s + Number(p.qty), 0);
   document.getElementById('statItems').textContent = totalItems;
 
-  const totalOwed = state.debts.filter(d => !d.paid).reduce((s, d) => s + Number(d.amount), 0);
-  document.getElementById('statOwed').textContent = fmtMoney(totalOwed);
+  const pendingOrders = state.orders.filter(o => !o.fulfilled);
+  const pendingTotal = pendingOrders.reduce((s, o) => s + Number(o.amount), 0);
+  document.getElementById('statOrders').textContent = fmtMoney(pendingTotal);
+  document.getElementById('statOrdersCount').textContent = pendingOrders.length + (pendingOrders.length === 1 ? ' order' : ' orders');
+
+  const weekStart = periodStartDate('week');
+  const weekSales = state.sales.filter(s => new Date(s.date) >= weekStart);
+  const weekTotal = weekSales.reduce((s, x) => s + Number(x.total), 0);
+  document.getElementById('statSalesWeek').textContent = fmtMoney(weekTotal);
 
   const lowStock = state.products.filter(p => Number(p.qty) <= 2);
   const lowEl = document.getElementById('lowStockList');
@@ -484,96 +694,295 @@ function renderDashboard() {
 
 function renderStockList() {
   const el = document.getElementById('stockList');
+  const query = (document.getElementById('stockSearchInput')?.value || '').trim().toLowerCase();
+  const filtered = query ? state.products.filter(p => p.name.toLowerCase().includes(query)) : state.products;
+
   if (state.products.length === 0) {
     el.innerHTML = '<div class="empty-state">No items yet. Tap + to add your first one.</div>';
     return;
   }
-  el.innerHTML = state.products.map(p => {
+  if (filtered.length === 0) {
+    el.innerHTML = '<div class="empty-state">No items match your search.</div>';
+    return;
+  }
+  el.innerHTML = filtered.map(p => {
     const low = Number(p.qty) <= 2;
     return `
-      <div class="list-item">
+      <div class="list-item" onclick="editStock('${p.id}')" style="cursor:pointer;">
         <div class="li-main">
           <div class="li-title">${escapeHtml(p.name)}</div>
           <div class="li-sub">${fmtMoney(p.price)} each</div>
         </div>
-        <div class="li-tag ${low ? 'low' : 'ok'}">${p.qty} in stock</div>
+        <div class="li-right">
+          <div class="li-tag ${low ? 'low' : 'ok'}">${p.qty} in stock</div>
+        </div>
       </div>`;
   }).join('');
 }
 
+function setSalesPeriod(period) {
+  salesPeriod = period;
+  ['week', 'month', 'year'].forEach(p => {
+    document.getElementById('period-' + p).classList.toggle('active', p === period);
+  });
+  renderSalesTab();
+}
+
+function renderSalesTab() {
+  const start = periodStartDate(salesPeriod);
+  const filtered = state.sales.filter(s => new Date(s.date) >= start);
+  const total = filtered.reduce((s, x) => s + Number(x.total), 0);
+  const label = salesPeriod === 'week' ? 'this week' : salesPeriod === 'month' ? 'this month' : 'this year';
+
+  document.getElementById('salesPeriodLabel').textContent = 'Total sales \u2014 ' + label;
+  document.getElementById('statSalesTotal').textContent = fmtMoney(total);
+  document.getElementById('statSalesCount').textContent = filtered.length + (filtered.length === 1 ? ' sale' : ' sales');
+
+  const el = document.getElementById('salesList');
+  if (filtered.length === 0) {
+    el.innerHTML = '<div class="empty-state">No sales in this period.</div>';
+    return;
+  }
+  el.innerHTML = [...filtered].reverse().map(s => `
+    <div class="list-item" onclick="editSale('${s.id}')" style="cursor:pointer;">
+      <div class="li-main">
+        <div class="li-title">${escapeHtml(s.productName)}</div>
+        <div class="li-sub">${s.qty} sold &middot; ${new Date(s.date).toLocaleDateString()}</div>
+      </div>
+      <div class="li-right">
+        <div class="li-tag ok">${fmtMoney(s.total)}</div>
+      </div>
+    </div>`).join('');
+}
+
+function renderOrdersList() {
+  const pending = state.orders.filter(o => !o.fulfilled);
+  const total = pending.reduce((s, o) => s + Number(o.amount), 0);
+  document.getElementById('statOrdersTotal').textContent = fmtMoney(total);
+  document.getElementById('statOrdersTotalCount').textContent = pending.length + (pending.length === 1 ? ' pending order' : ' pending orders');
+
+  const el = document.getElementById('ordersList');
+  if (state.orders.length === 0) {
+    el.innerHTML = '<div class="empty-state">No orders logged. Tap + to add one.</div>';
+    return;
+  }
+  el.innerHTML = [...state.orders].reverse().map(o => `
+    <div class="list-item">
+      <div class="li-main" onclick="toggleOrderFulfilled('${o.id}')" style="cursor:pointer;">
+        <div class="li-title">${escapeHtml(o.customer)}</div>
+        <div class="li-sub">${escapeHtml(o.description || '')} &middot; tap to ${o.fulfilled ? 'mark pending' : 'mark fulfilled'}</div>
+      </div>
+      <div class="li-right">
+        <div class="li-tag ${o.fulfilled ? 'ok' : 'pending'}">${o.fulfilled ? 'Fulfilled' : fmtMoney(o.amount)}</div>
+        <div class="li-actions">
+          <div class="icon-btn small" onclick="event.stopPropagation(); deleteOrder('${o.id}')">&#128465;</div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
 function renderDebtList() {
+  const totalOwed = state.debts.filter(d => !d.paid).reduce((s, d) => s + Number(d.amount), 0);
+  document.getElementById('statOwed').textContent = fmtMoney(totalOwed);
+
   const el = document.getElementById('debtList');
   if (state.debts.length === 0) {
     el.innerHTML = '<div class="empty-state">No debts logged. Tap + to add one.</div>';
     return;
   }
   el.innerHTML = [...state.debts].reverse().map(d => `
-    <div class="list-item" onclick="togglePaid('${d.id}')" style="cursor:pointer;">
-      <div class="li-main">
+    <div class="list-item">
+      <div class="li-main" onclick="togglePaid('${d.id}')" style="cursor:pointer;">
         <div class="li-title">${escapeHtml(d.customer)}</div>
         <div class="li-sub">${new Date(d.date).toLocaleDateString()} &middot; tap to ${d.paid ? 'mark unpaid' : 'mark paid'}</div>
       </div>
-      <div class="li-tag ${d.paid ? 'paid' : 'owe'}">${d.paid ? 'Paid' : fmtMoney(d.amount)}</div>
+      <div class="li-right">
+        <div class="li-tag ${d.paid ? 'paid' : 'owe'}">${d.paid ? 'Paid' : fmtMoney(d.amount)}</div>
+        <div class="li-actions">
+          <div class="icon-btn small" onclick="event.stopPropagation(); deleteDebt('${d.id}')">&#128465;</div>
+        </div>
+      </div>
     </div>`).join('');
 }
 
-function populateSaleProducts() {
-  const sel = document.getElementById('saleProduct');
+function renderSaleProductPicker() {
+  const query = document.getElementById('saleSearchInput').value.trim().toLowerCase();
+  const el = document.getElementById('saleProductPicker');
+  const list = query ? state.products.filter(p => p.name.toLowerCase().includes(query)) : state.products;
+
   if (state.products.length === 0) {
-    sel.innerHTML = '<option value="">Add stock first</option>';
+    el.innerHTML = '<div class="product-pick-item" style="color:var(--ink-faint);">Add stock first</div>';
     return;
   }
-  sel.innerHTML = state.products.map(p => `<option value="${p.id}">${escapeHtml(p.name)} (${p.qty} left)</option>`).join('');
+  if (list.length === 0) {
+    el.innerHTML = '<div class="product-pick-item" style="color:var(--ink-faint);">No matches</div>';
+    return;
+  }
+  el.innerHTML = list.map(p => `
+    <div class="product-pick-item ${p.id === saleSelectedProductId ? 'selected' : ''}" onclick="selectSaleProduct('${p.id}')">
+      <span>${escapeHtml(p.name)}</span>
+      <span class="ppi-sub">${p.qty} left</span>
+    </div>`).join('');
+}
+
+function selectSaleProduct(id) {
+  saleSelectedProductId = id;
+  document.getElementById('saleSelectedProduct').value = id;
+  const p = state.products.find(x => x.id === id);
+  document.getElementById('saleSearchInput').value = p ? p.name : '';
+  renderSaleProductPicker();
+  document.getElementById('saleQty').focus();
 }
 
 async function submitStock() {
+  const editId = document.getElementById('stockEditId').value;
   const name = document.getElementById('stockName').value.trim();
   const qty = Number(document.getElementById('stockQty').value);
   const price = Number(document.getElementById('stockPrice').value);
-  if (!name || !qty || qty <= 0) { toast('Fill in the item name and quantity'); return; }
+  if (!name || qty === '' || isNaN(qty) || qty < 0) { toast('Fill in the item name and quantity'); return; }
 
-  const existing = state.products.find(p => p.name.toLowerCase() === name.toLowerCase());
-  if (existing) {
-    existing.qty = Number(existing.qty) + qty;
-    if (price) existing.price = price;
+  if (editId) {
+    const item = state.products.find(p => p.id === editId);
+    if (item) { item.name = name; item.qty = qty; item.price = price || 0; }
   } else {
-    state.products.push({ id: crypto.randomUUID(), name, qty, price: price || 0 });
+    const existing = state.products.find(p => p.name.toLowerCase() === name.toLowerCase());
+    if (existing) {
+      existing.qty = Number(existing.qty) + qty;
+      if (price) existing.price = price;
+    } else {
+      state.products.push({ id: crypto.randomUUID(), name, qty, price: price || 0 });
+    }
   }
   await saveState('products');
-  document.getElementById('stockName').value = '';
-  document.getElementById('stockQty').value = '';
-  document.getElementById('stockPrice').value = '';
   closeModal('stockModal');
   renderAll();
   toast('Stock saved');
 }
 
+function editStock(id) {
+  const p = state.products.find(x => x.id === id);
+  if (!p) return;
+  openModal('stockModal');
+  document.getElementById('stockEditId').value = id;
+  document.getElementById('stockName').value = p.name;
+  document.getElementById('stockQty').value = p.qty;
+  document.getElementById('stockPrice').value = p.price;
+  document.getElementById('stockModalTitle').textContent = 'Edit stock item';
+  document.getElementById('stockModalSub').textContent = 'Update the details, or delete this item entirely.';
+  document.getElementById('stockSaveBtn').textContent = 'Save changes';
+  document.getElementById('stockDeleteBtn').style.display = 'block';
+}
+
+async function deleteStock() {
+  const editId = document.getElementById('stockEditId').value;
+  if (!editId) return;
+  state.products = state.products.filter(p => p.id !== editId);
+  await saveState('products');
+  closeModal('stockModal');
+  renderAll();
+  toast('Item deleted');
+}
+
 async function submitSale() {
-  const pid = document.getElementById('saleProduct').value;
+  const editId = document.getElementById('saleEditId').value;
+  const pid = document.getElementById('saleSelectedProduct').value || saleSelectedProductId;
   const qty = Number(document.getElementById('saleQty').value);
-  if (!pid) { toast('Add stock first'); return; }
+  if (!pid) { toast('Search and select an item first'); return; }
   if (!qty || qty <= 0) { toast('Enter a quantity'); return; }
 
   const product = state.products.find(p => p.id === pid);
-  if (!product) return;
-  if (qty > Number(product.qty)) { toast('Not enough stock for that'); return; }
+  if (!product) { toast('That item no longer exists'); return; }
 
-  product.qty = Number(product.qty) - qty;
-  state.sales.push({
-    id: crypto.randomUUID(),
-    productId: pid,
-    productName: product.name,
-    qty,
-    total: qty * Number(product.price),
-    date: new Date().toISOString()
-  });
+  if (editId) {
+    const sale = state.sales.find(s => s.id === editId);
+    if (!sale) return;
+    const oldQty = Number(sale.qty);
+    const diff = qty - oldQty;
+    if (diff > 0 && diff > Number(product.qty)) { toast('Not enough stock for that increase'); return; }
+    product.qty = Number(product.qty) - diff;
+    sale.qty = qty;
+    sale.total = qty * Number(product.price);
+  } else {
+    if (qty > Number(product.qty)) { toast('Not enough stock for that'); return; }
+    product.qty = Number(product.qty) - qty;
+    state.sales.push({
+      id: crypto.randomUUID(),
+      productId: pid,
+      productName: product.name,
+      qty,
+      total: qty * Number(product.price),
+      date: new Date().toISOString()
+    });
+  }
 
   await saveState('products');
   await saveState('sales');
-  document.getElementById('saleQty').value = 1;
   closeModal('saleModal');
   renderAll();
-  toast('Sale logged');
+  toast(editId ? 'Sale updated' : 'Sale logged');
+}
+
+function editSale(id) {
+  const sale = state.sales.find(s => s.id === id);
+  if (!sale) return;
+  openModal('saleModal');
+  document.getElementById('saleEditId').value = id;
+  document.getElementById('saleSelectedProduct').value = sale.productId;
+  saleSelectedProductId = sale.productId;
+  document.getElementById('saleSearchInput').value = sale.productName;
+  document.getElementById('saleQty').value = sale.qty;
+  document.getElementById('saleModalTitle').textContent = 'Edit sale';
+  document.getElementById('saleSaveBtn').textContent = 'Save changes';
+  document.getElementById('saleDeleteBtn').style.display = 'block';
+  renderSaleProductPicker();
+}
+
+async function deleteSale() {
+  const editId = document.getElementById('saleEditId').value;
+  if (!editId) return;
+  const sale = state.sales.find(s => s.id === editId);
+  if (sale) {
+    const product = state.products.find(p => p.id === sale.productId);
+    if (product) product.qty = Number(product.qty) + Number(sale.qty);
+  }
+  state.sales = state.sales.filter(s => s.id !== editId);
+  await saveState('products');
+  await saveState('sales');
+  closeModal('saleModal');
+  renderAll();
+  toast('Sale deleted, stock restored');
+}
+
+async function submitOrder() {
+  const customer = document.getElementById('orderCustomer').value.trim();
+  const description = document.getElementById('orderDescription').value.trim();
+  const amount = Number(document.getElementById('orderAmount').value);
+  if (!customer || !amount || amount <= 0) { toast('Fill in the customer and order value'); return; }
+
+  state.orders.push({ id: crypto.randomUUID(), customer, description, amount, fulfilled: false, date: new Date().toISOString() });
+  await saveState('orders');
+  document.getElementById('orderCustomer').value = '';
+  document.getElementById('orderDescription').value = '';
+  document.getElementById('orderAmount').value = '';
+  closeModal('orderModal');
+  renderAll();
+  toast('Order saved');
+}
+
+async function toggleOrderFulfilled(id) {
+  const order = state.orders.find(o => o.id === id);
+  if (!order) return;
+  order.fulfilled = !order.fulfilled;
+  await saveState('orders');
+  renderAll();
+  toast(order.fulfilled ? 'Marked as fulfilled' : 'Marked as pending');
+}
+
+async function deleteOrder(id) {
+  state.orders = state.orders.filter(o => o.id !== id);
+  await saveState('orders');
+  renderAll();
+  toast('Order deleted');
 }
 
 async function submitDebt() {
@@ -599,10 +1008,11 @@ async function togglePaid(id) {
   toast(debt.paid ? 'Marked as paid' : 'Marked as unpaid');
 }
 
-function escapeHtml(str) {
-  const div = document.createElement('div');
-  div.textContent = str;
-  return div.innerHTML;
+async function deleteDebt(id) {
+  state.debts = state.debts.filter(d => d.id !== id);
+  await saveState('debts');
+  renderAll();
+  toast('Debt deleted');
 }
 
 document.getElementById('shopCodeInput').addEventListener('keydown', e => {
@@ -610,6 +1020,17 @@ document.getElementById('shopCodeInput').addEventListener('keydown', e => {
 });
 document.getElementById('shopPasswordInput').addEventListener('keydown', e => {
   if (e.key === 'Enter') enterShop();
+});
+document.getElementById('saleQty').addEventListener('keydown', e => {
+  if (e.key === 'Enter') { e.preventDefault(); submitSale(); }
+});
+document.getElementById('saleSearchInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    const query = e.target.value.trim().toLowerCase();
+    const match = state.products.find(p => p.name.toLowerCase().includes(query));
+    if (match) { selectSaleProduct(match.id); }
+  }
 });
 </script>
 
