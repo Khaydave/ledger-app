@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Ledger</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAR3tCbl3YsQnkJFEy012en38ZsMPJoBCU",
+    authDomain: "theledger-app.firebaseapp.com",
+    projectId: "theledger-app",
+    storageBucket: "theledger-app.firebasestorage.app",
+    messagingSenderId: "517404006435",
+    appId: "1:517404006435:web:548e1469072db1a8603996",
+    measurementId: "G-KEFWF7N4RW"
+  };
+
+  const fbApp = initializeApp(firebaseConfig);
+  const db = getFirestore(fbApp);
+
+  window.__firestore = { db, doc, getDoc, setDoc, updateDoc };
+  window.dispatchEvent(new Event('firebase-ready'));
+</script>
+
+<style>
+  :root {
+    --bg: #FBF8F3;
+    --surface: #FFFFFF;
+    --ink: #1F2A24;
+    --ink-soft: #5B6B62;
+    --ink-faint: #9AA69C;
+    --primary: #1F4B43;
+    --primary-dark: #163530;
+    --primary-tint: #E4EDE9;
+    --accent: #E8A33D;
+    --accent-tint: #FBEBD3;
+    --danger: #C6503F;
+    --danger-tint: #F7E1DD;
+    --border: #E7E0D2;
+    --radius: 14px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Inter', -apple-system, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+  }
+  #app {
+    max-width: 460px;
+    margin: 0 auto;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  h1, h2, h3 { font-family: 'Space Grotesk', sans-serif; margin: 0; }
+  .screen { display: none; flex: 1; padding: 20px 18px 100px; }
+  .screen.active { display: block; }
+
+  /* ONBOARDING */
+  #onboarding.active { display: flex; }
+  #onboarding {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 32px 28px;
+    text-align: center;
+    min-height: 100vh;
+  }
+  .mark {
+    width: 56px; height: 56px;
+    background: var(--primary);
+    border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 20px;
+  }
+  .mark span { color: var(--accent-tint); font-family: 'Space Grotesk'; font-weight: 700; font-size: 22px; }
+  #onboarding h1 { font-size: 24px; font-weight: 600; margin-bottom: 8px; }
+  #onboarding p { color: var(--ink-soft); font-size: 14px; line-height: 1.6; margin-bottom: 28px; max-width: 300px; }
+  .field-group { width: 100%; max-width: 280px; text-align: left; margin-bottom: 14px; }
+  label { font-size: 12px; color: var(--ink-soft); font-weight: 500; display: block; margin-bottom: 6px; }
+  input, select {
+    width: 100%;
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    padding: 13px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+    color: var(--ink);
+    outline: none;
+  }
+  input:focus, select:focus { border-color: var(--primary); }
+  .btn {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    border: none;
+    border-radius: 10px;
+    padding: 14px 20px;
+    cursor: pointer;
+    width: 100%;
+  }
+  .btn-primary { background: var(--primary); color: #fff; }
+  .btn-primary:active { background: var(--primary-dark); }
+  .btn-ghost { background: transparent; color: var(--primary); border: 1.5px solid var(--primary-tint); }
+  .btn-danger-ghost { background: transparent; color: var(--danger); border: 1.5px solid var(--danger-tint); }
+  .hint { font-size: 12px; color: var(--ink-faint); margin-top: 18px; line-height: 1.6; max-width: 280px; }
+  .hint b { color: var(--ink-soft); }
+
+  /* HEADER */
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 18px 4px;
+  }
+  .topbar .shopname { font-size: 13px; color: var(--ink-soft); font-weight: 500; }
+  .topbar .shopname b { color: var(--ink); }
+  .icon-btn {
+    background: var(--surface); border: 1.5px solid var(--border);
+    width: 34px; height: 34px; border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; color: var(--ink-soft); cursor: pointer;
+  }
+
+  /* DASHBOARD */
+  .stat-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px; }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; }
+  .stat-card .label { font-size: 12px; color: var(--ink-soft); margin-bottom: 6px; }
+  .stat-card .value { font-family: 'Space Grotesk'; font-size: 22px; font-weight: 600; }
+  .stat-card .value.danger { color: var(--danger); }
+
+  .section-title { font-size: 13px; font-weight: 600; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.04em; margin: 22px 0 10px; }
+
+  .quick-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
+  .quick-btn {
+    background: var(--primary); color: #fff; border: none; border-radius: var(--radius);
+    padding: 16px 10px; font-family: 'Space Grotesk'; font-weight: 600; font-size: 14px;
+    display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer;
+  }
+  .quick-btn.secondary { background: var(--accent-tint); color: var(--primary-dark); }
+  .quick-btn .qicon { font-size: 20px; }
+
+  .empty-state {
+    text-align: center; padding: 30px 16px; color: var(--ink-faint); font-size: 13px;
+    background: var(--surface); border: 1px dashed var(--border); border-radius: var(--radius);
+  }
+
+  /* LIST ITEMS */
+  .list-item {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 13px 15px; margin-bottom: 9px; display: flex; align-items: center; justify-content: space-between;
+  }
+  .list-item .li-main { flex: 1; min-width: 0; }
+  .list-item .li-title { font-size: 15px; font-weight: 500; margin-bottom: 3px; }
+  .list-item .li-sub { font-size: 12.5px; color: var(--ink-soft); }
+  .li-tag { font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 6px; white-space: nowrap; margin-left: 8px; }
+  .li-tag.low { background: var(--danger-tint); color: var(--danger); }
+  .li-tag.ok { background: var(--primary-tint); color: var(--primary); }
+  .li-tag.owe { background: var(--danger-tint); color: var(--danger); }
+  .li-tag.paid { background: var(--primary-tint); color: var(--primary); }
+
+  /* BOTTOM NAV */
+  .navbar {
+    position: sticky; bottom: 0; left: 0; right: 0;
+    background: var(--surface); border-top: 1px solid var(--border);
+    display: flex; padding: 8px 6px calc(8px + env(safe-area-inset-bottom));
+    max-width: 460px; margin: 0 auto; width: 100%;
+  }
+  .navbar button {
+    flex: 1; background: none; border: none; display: flex; flex-direction: column;
+    align-items: center; gap: 3px; padding: 8px 4px; cursor: pointer;
+    color: var(--ink-faint); font-family: 'Inter'; font-size: 11px; font-weight: 500;
+  }
+  .navbar button.active { color: var(--primary); }
+  .navbar .nicon { font-size: 19px; }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(20,20,15,0.42);
+    align-items: flex-end; justify-content: center; z-index: 50;
+  }
+  .modal-overlay.active { display: flex; }
+  .modal-sheet {
+    background: var(--bg); width: 100%; max-width: 460px; border-radius: 20px 20px 0 0;
+    padding: 22px 20px calc(22px + env(safe-area-inset-bottom)); max-height: 86vh; overflow-y: auto;
+  }
+  .modal-sheet h2 { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+  .modal-sub { font-size: 13px; color: var(--ink-soft); margin-bottom: 18px; }
+  .modal-actions { display: flex; gap: 10px; margin-top: 18px; }
+  .modal-close { position: absolute; top: 18px; right: 18px; }
+
+  .toast {
+    position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
+    background: var(--ink); color: #fff; font-size: 13px; padding: 10px 18px;
+    border-radius: 20px; z-index: 60; opacity: 0; transition: opacity 0.25s; pointer-events: none;
+  }
+  .toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+
+<div id="app">
+
+  <div id="onboarding" class="screen active">
+    <div class="mark"><span>L</span></div>
+    <h1>Ledger</h1>
+    <p>Track stock and who owes you, right from your phone. No notebook, no spreadsheet.</p>
+
+    <div class="field-group">
+      <label for="shopCodeInput">Shop code</label>
+      <input id="shopCodeInput" type="text" placeholder="e.g. ada-thrift-01" autocomplete="off" autocapitalize="off">
+    </div>
+    <div class="field-group">
+      <label for="shopPasswordInput">Password</label>
+      <input id="shopPasswordInput" type="password" placeholder="At least 4 characters" autocomplete="off">
+    </div>
+    <button class="btn btn-primary" id="continueBtn" onclick="enterShop()">Continue</button>
+    <p class="hint" id="onboardHint"><b>New here?</b> Pick any shop code and password — we'll create your ledger the first time you continue. Use the same code and password every time after that to get back into it.</p>
+  </div>
+
+
+  <div id="mainScreen" class="screen">
+    <div class="topbar">
+      <div class="shopname">Ledger for <b id="shopNameLabel"></b></div>
+      <div class="icon-btn" onclick="switchShop()">&#8635;</div>
+    </div>
+
+    <div id="tab-home" class="tabpanel">
+      <div style="padding: 6px 0 0;">
+        <div class="stat-row">
+          <div class="stat-card">
+            <div class="label">Items in stock</div>
+            <div class="value" id="statItems">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">Owed to you</div>
+            <div class="value danger" id="statOwed">&#8358;0</div>
+          </div>
+        </div>
+
+        <div class="quick-actions">
+          <button class="quick-btn" onclick="openModal('saleModal')"><span class="qicon">&#43;</span>Log a sale</button>
+          <button class="quick-btn secondary" onclick="openModal('stockModal')"><span class="qicon">&#128230;</span>Add stock</button>
+        </div>
+
+        <div class="section-title">Running low</div>
+        <div id="lowStockList"></div>
+
+        <div class="section-title">Recent sales</div>
+        <div id="recentSalesList"></div>
+      </div>
+    </div>
+
+    <div id="tab-stock" class="tabpanel" style="display:none;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin: 6px 0 14px;">
+        <h2 style="font-size:18px;">Your stock</h2>
+        <button class="icon-btn" onclick="openModal('stockModal')">&#43;</button>
+      </div>
+      <div id="stockList"></div>
+    </div>
+
+    <div id="tab-debts" class="tabpanel" style="display:none;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin: 6px 0 14px;">
+        <h2 style="font-size:18px;">Customer debts</h2>
+        <button class="icon-btn" onclick="openModal('debtModal')">&#43;</button>
+      </div>
+      <div id="debtList"></div>
+    </div>
+
+    <div class="navbar">
+      <button id="nav-home" class="active" onclick="showTab('home')">
+        <span class="nicon">&#8962;</span>Home
+      </button>
+      <button id="nav-stock" onclick="showTab('stock')">
+        <span class="nicon">&#128230;</span>Stock
+      </button>
+      <button id="nav-debts" onclick="showTab('debts')">
+        <span class="nicon">&#128179;</span>Debts
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<div class="modal-overlay" id="stockModal">
+  <div class="modal-sheet" style="position:relative;">
+    <div class="icon-btn modal-close" onclick="closeModal('stockModal')">&#10005;</div>
+    <h2>Add stock</h2>
+    <div class="modal-sub">Add a new item, or add more of one you already have.</div>
+    <div class="field-group"><label>Item name</label><input id="stockName" placeholder="e.g. Blue ankara dress"></div>
+    <div class="field-group"><label>Quantity</label><input id="stockQty" type="number" inputmode="numeric" placeholder="e.g. 10"></div>
+    <div class="field-group"><label>Price per item (&#8358;)</label><input id="stockPrice" type="number" inputmode="numeric" placeholder="e.g. 8500"></div>
+    <div class="modal-actions"><button class="btn btn-primary" onclick="submitStock()">Save item</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="saleModal">
+  <div class="modal-sheet" style="position:relative;">
+    <div class="icon-btn modal-close" onclick="closeModal('saleModal')">&#10005;</div>
+    <h2>Log a sale</h2>
+    <div class="modal-sub">This reduces the item's stock automatically.</div>
+    <div class="field-group"><label>Item</label><select id="saleProduct"></select></div>
+    <div class="field-group"><label>Quantity sold</label><input id="saleQty" type="number" inputmode="numeric" value="1"></div>
+    <div class="modal-actions"><button class="btn btn-primary" onclick="submitSale()">Log sale</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="debtModal">
+  <div class="modal-sheet" style="position:relative;">
+    <div class="icon-btn modal-close" onclick="closeModal('debtModal')">&#10005;</div>
+    <h2>Add a debt</h2>
+    <div class="modal-sub">Track a customer who paid later, or hasn't paid yet.</div>
+    <div class="field-group"><label>Customer name</label><input id="debtName" placeholder="e.g. Blessing"></div>
+    <div class="field-group"><label>Amount owed (&#8358;)</label><input id="debtAmount" type="number" inputmode="numeric" placeholder="e.g. 5000"></div>
+    <div class="modal-actions"><button class="btn btn-primary" onclick="submitDebt()">Save</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let shopCode = null;
+let shopDocRef = null;
+let state = { products: [], sales: [], debts: [] };
+let fbReady = false;
+
+window.addEventListener('firebase-ready', () => { fbReady = true; });
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 1800);
+}
+
+async function hashPassword(pw) {
+  const enc = new TextEncoder().encode(pw);
+  const hashBuf = await crypto.subtle.digest('SHA-256', enc);
+  return Array.from(new Uint8Array(hashBuf)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function waitForFirebase() {
+  if (fbReady) return;
+  await new Promise(resolve => window.addEventListener('firebase-ready', resolve, { once: true }));
+}
+
+async function saveState(part) {
+  const { updateDoc } = window.__firestore;
+  try {
+    await updateDoc(shopDocRef, { [part]: state[part] });
+  } catch (e) {
+    toast("Couldn't save. Check your connection.");
+  }
+}
+
+async function enterShop() {
+  const code = document.getElementById('shopCodeInput').value.trim().toLowerCase().replace(/\s+/g, '-');
+  const password = document.getElementById('shopPasswordInput').value;
+  if (!code) { toast('Enter a shop code'); return; }
+  if (!password || password.length < 4) { toast('Password needs at least 4 characters'); return; }
+
+  const btn = document.getElementById('continueBtn');
+  btn.disabled = true;
+  btn.textContent = 'Checking...';
+
+  try {
+    await waitForFirebase();
+    const { db, doc, getDoc, setDoc } = window.__firestore;
+    const ref = doc(db, 'shops', code);
+    const snap = await getDoc(ref);
+    const pwHash = await hashPassword(password);
+
+    if (!snap.exists()) {
+      await setDoc(ref, { passwordHash: pwHash, products: [], sales: [], debts: [] });
+      state = { products: [], sales: [], debts: [] };
+      toast('Ledger created');
+    } else {
+      const data = snap.data();
+      if (data.passwordHash !== pwHash) {
+        toast('Wrong password for that shop code');
+        btn.disabled = false;
+        btn.textContent = 'Continue';
+        return;
+      }
+      state = {
+        products: data.products || [],
+        sales: data.sales || [],
+        debts: data.debts || []
+      };
+    }
+
+    shopCode = code;
+    shopDocRef = ref;
+    document.getElementById('shopNameLabel').textContent = shopCode;
+    document.getElementById('onboarding').classList.remove('active');
+    document.getElementById('mainScreen').classList.add('active');
+    document.getElementById('shopPasswordInput').value = '';
+    renderAll();
+  } catch (e) {
+    toast("Couldn't connect. Check your internet and try again.");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Continue';
+  }
+}
+
+function switchShop() {
+  document.getElementById('mainScreen').classList.remove('active');
+  document.getElementById('onboarding').classList.add('active');
+  document.getElementById('shopCodeInput').value = '';
+  document.getElementById('shopPasswordInput').value = '';
+  shopCode = null;
+  shopDocRef = null;
+}
+
+function showTab(name) {
+  ['home', 'stock', 'debts'].forEach(t => {
+    document.getElementById('tab-' + t).style.display = t === name ? 'block' : 'none';
+    document.getElementById('nav-' + t).classList.toggle('active', t === name);
+  });
+}
+
+function openModal(id) {
+  if (id === 'saleModal') populateSaleProducts();
+  document.getElementById(id).classList.add('active');
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('active');
+}
+
+function fmtMoney(n) {
+  return '\u20a6' + Number(n).toLocaleString('en-NG');
+}
+
+function renderAll() {
+  renderDashboard();
+  renderStockList();
+  renderDebtList();
+}
+
+function renderDashboard() {
+  const totalItems = state.products.reduce((s, p) => s + Number(p.qty), 0);
+  document.getElementById('statItems').textContent = totalItems;
+
+  const totalOwed = state.debts.filter(d => !d.paid).reduce((s, d) => s + Number(d.amount), 0);
+  document.getElementById('statOwed').textContent = fmtMoney(totalOwed);
+
+  const lowStock = state.products.filter(p => Number(p.qty) <= 2);
+  const lowEl = document.getElementById('lowStockList');
+  if (lowStock.length === 0) {
+    lowEl.innerHTML = '<div class="empty-state">Nothing running low right now.</div>';
+  } else {
+    lowEl.innerHTML = lowStock.map(p => `
+      <div class="list-item">
+        <div class="li-main">
+          <div class="li-title">${escapeHtml(p.name)}</div>
+          <div class="li-sub">${fmtMoney(p.price)} each</div>
+        </div>
+        <div class="li-tag low">${p.qty} left</div>
+      </div>`).join('');
+  }
+
+  const recent = [...state.sales].reverse().slice(0, 5);
+  const recEl = document.getElementById('recentSalesList');
+  if (recent.length === 0) {
+    recEl.innerHTML = '<div class="empty-state">No sales logged yet.</div>';
+  } else {
+    recEl.innerHTML = recent.map(s => `
+      <div class="list-item">
+        <div class="li-main">
+          <div class="li-title">${escapeHtml(s.productName)}</div>
+          <div class="li-sub">${s.qty} sold &middot; ${new Date(s.date).toLocaleDateString()}</div>
+        </div>
+        <div class="li-tag ok">${fmtMoney(s.total)}</div>
+      </div>`).join('');
+  }
+}
+
+function renderStockList() {
+  const el = document.getElementById('stockList');
+  if (state.products.length === 0) {
+    el.innerHTML = '<div class="empty-state">No items yet. Tap + to add your first one.</div>';
+    return;
+  }
+  el.innerHTML = state.products.map(p => {
+    const low = Number(p.qty) <= 2;
+    return `
+      <div class="list-item">
+        <div class="li-main">
+          <div class="li-title">${escapeHtml(p.name)}</div>
+          <div class="li-sub">${fmtMoney(p.price)} each</div>
+        </div>
+        <div class="li-tag ${low ? 'low' : 'ok'}">${p.qty} in stock</div>
+      </div>`;
+  }).join('');
+}
+
+function renderDebtList() {
+  const el = document.getElementById('debtList');
+  if (state.debts.length === 0) {
+    el.innerHTML = '<div class="empty-state">No debts logged. Tap + to add one.</div>';
+    return;
+  }
+  el.innerHTML = [...state.debts].reverse().map(d => `
+    <div class="list-item" onclick="togglePaid('${d.id}')" style="cursor:pointer;">
+      <div class="li-main">
+        <div class="li-title">${escapeHtml(d.customer)}</div>
+        <div class="li-sub">${new Date(d.date).toLocaleDateString()} &middot; tap to ${d.paid ? 'mark unpaid' : 'mark paid'}</div>
+      </div>
+      <div class="li-tag ${d.paid ? 'paid' : 'owe'}">${d.paid ? 'Paid' : fmtMoney(d.amount)}</div>
+    </div>`).join('');
+}
+
+function populateSaleProducts() {
+  const sel = document.getElementById('saleProduct');
+  if (state.products.length === 0) {
+    sel.innerHTML = '<option value="">Add stock first</option>';
+    return;
+  }
+  sel.innerHTML = state.products.map(p => `<option value="${p.id}">${escapeHtml(p.name)} (${p.qty} left)</option>`).join('');
+}
+
+async function submitStock() {
+  const name = document.getElementById('stockName').value.trim();
+  const qty = Number(document.getElementById('stockQty').value);
+  const price = Number(document.getElementById('stockPrice').value);
+  if (!name || !qty || qty <= 0) { toast('Fill in the item name and quantity'); return; }
+
+  const existing = state.products.find(p => p.name.toLowerCase() === name.toLowerCase());
+  if (existing) {
+    existing.qty = Number(existing.qty) + qty;
+    if (price) existing.price = price;
+  } else {
+    state.products.push({ id: crypto.randomUUID(), name, qty, price: price || 0 });
+  }
+  await saveState('products');
+  document.getElementById('stockName').value = '';
+  document.getElementById('stockQty').value = '';
+  document.getElementById('stockPrice').value = '';
+  closeModal('stockModal');
+  renderAll();
+  toast('Stock saved');
+}
+
+async function submitSale() {
+  const pid = document.getElementById('saleProduct').value;
+  const qty = Number(document.getElementById('saleQty').value);
+  if (!pid) { toast('Add stock first'); return; }
+  if (!qty || qty <= 0) { toast('Enter a quantity'); return; }
+
+  const product = state.products.find(p => p.id === pid);
+  if (!product) return;
+  if (qty > Number(product.qty)) { toast('Not enough stock for that'); return; }
+
+  product.qty = Number(product.qty) - qty;
+  state.sales.push({
+    id: crypto.randomUUID(),
+    productId: pid,
+    productName: product.name,
+    qty,
+    total: qty * Number(product.price),
+    date: new Date().toISOString()
+  });
+
+  await saveState('products');
+  await saveState('sales');
+  document.getElementById('saleQty').value = 1;
+  closeModal('saleModal');
+  renderAll();
+  toast('Sale logged');
+}
+
+async function submitDebt() {
+  const customer = document.getElementById('debtName').value.trim();
+  const amount = Number(document.getElementById('debtAmount').value);
+  if (!customer || !amount || amount <= 0) { toast('Fill in the customer and amount'); return; }
+
+  state.debts.push({ id: crypto.randomUUID(), customer, amount, paid: false, date: new Date().toISOString() });
+  await saveState('debts');
+  document.getElementById('debtName').value = '';
+  document.getElementById('debtAmount').value = '';
+  closeModal('debtModal');
+  renderAll();
+  toast('Debt saved');
+}
+
+async function togglePaid(id) {
+  const debt = state.debts.find(d => d.id === id);
+  if (!debt) return;
+  debt.paid = !debt.paid;
+  await saveState('debts');
+  renderAll();
+  toast(debt.paid ? 'Marked as paid' : 'Marked as unpaid');
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+document.getElementById('shopCodeInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('shopPasswordInput').focus();
+});
+document.getElementById('shopPasswordInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') enterShop();
+});
+</script>
+
+</body>
+</html>
