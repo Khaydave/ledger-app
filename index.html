@@ -26,6 +26,7 @@
   window.__firestore = { db, doc, getDoc, setDoc, updateDoc };
   window.dispatchEvent(new Event('firebase-ready'));
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
   :root {
     --bg: #FBF8F3;
@@ -138,6 +139,7 @@
   .avatar-upload { width: 84px; height: 84px; border-radius: 50%; margin: 0 auto 16px; }
   .avatar-upload span { font-size: 26px; }
   .topbar-actions { display: flex; gap: 8px; align-items: center; }
+  #onboarding .btn { max-width: 280px; }
 
   /* HEADER */
   .topbar {
@@ -424,7 +426,10 @@
         <div id="tab-stock" class="tabpanel" style="display:none;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin: 6px 0 14px;">
             <h2 style="font-size:18px;">Your stock</h2>
-            <button class="icon-btn" onclick="openModal('stockModal')">&#43;</button>
+            <div style="display:flex; gap:8px;">
+              <button class="icon-btn" onclick="openCatalogueModal()" title="Build catalogue">&#128196;</button>
+              <button class="icon-btn" onclick="openModal('stockModal')">&#43;</button>
+            </div>
           </div>
           <div class="search-box">
             <span class="search-icon">&#128269;</span>
@@ -439,6 +444,7 @@
             <button class="icon-btn" onclick="openModal('saleModal')">&#43;</button>
           </div>
           <div class="period-toggle">
+            <button id="period-day" onclick="setSalesPeriod('day')">Today</button>
             <button id="period-week" class="active" onclick="setSalesPeriod('week')">This week</button>
             <button id="period-month" onclick="setSalesPeriod('month')">This month</button>
             <button id="period-year" onclick="setSalesPeriod('year')">This year</button>
@@ -553,9 +559,9 @@
 
 <div class="modal-overlay" id="profileModal">
   <div class="modal-sheet">
-    <div class="icon-btn modal-close" onclick="closeModal('profileModal')">&#10005;</div>
-    <h2>Your profile</h2>
-    <div class="modal-sub">This is just for you &mdash; helps keep things personal if you run more than one shop.</div>
+    <div class="icon-btn modal-close" id="profileModalClose" onclick="closeModal('profileModal')">&#10005;</div>
+    <h2 id="profileModalTitle">Your profile</h2>
+    <div class="modal-sub" id="profileModalSub">This is just for you &mdash; helps keep things personal if you run more than one shop.</div>
 
     <div class="avatar-circle avatar-upload" id="profileAvatarPreview" onclick="document.getElementById('profilePicInput').click()"><span>&#128247;</span></div>
     <input type="file" id="profilePicInput" accept="image/*" style="display:none;" onchange="handleProfilePicUpload(event)">
@@ -569,6 +575,34 @@
     <p class="hint">Your phone number or email helps confirm it's you if you ever need account support.</p>
 
     <div class="modal-actions"><button class="btn btn-primary" onclick="saveProfile()">Save profile</button></div>
+
+    <div id="profileStoresSection" style="margin-top:26px; padding-top:20px; border-top:1px solid var(--border);">
+      <div class="section-title" style="margin-top:0;">Your stores on this device</div>
+      <div id="profileStoresList"></div>
+      <button class="btn btn-ghost" style="margin-top:8px;" onclick="closeModal('profileModal'); switchShop();">+ Add or switch to another store</button>
+      <p class="hint">This list is remembered only on this phone or computer &mdash; it won't show up if you open Ledger on a different device. You'll still need each store's password to switch into it.</p>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="catalogueModal">
+  <div class="modal-sheet" style="max-width: 480px;">
+    <div class="icon-btn modal-close" onclick="closeModal('catalogueModal')">&#10005;</div>
+    <h2>Build your catalogue</h2>
+    <div class="modal-sub">Pick what to include, then export it to share with customers on WhatsApp or Instagram.</div>
+
+    <div class="field-group"><label>Caption (optional)</label><input id="catalogueNote" placeholder="e.g. New arrivals this week!"></div>
+
+    <div class="section-title" style="margin-top:12px;">Select items to include</div>
+    <div id="catalogueItemPicker" style="max-height:220px; overflow-y:auto; border:1px solid var(--border); border-radius:10px; margin-bottom:16px;"></div>
+
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="saveCatalogue()">Save selection</button>
+      <button class="btn btn-primary" onclick="exportCatalogueImage()">Export as image</button>
+    </div>
+    <button class="btn btn-ghost" style="margin-top:10px;" onclick="copyCatalogueText()">Copy as text instead</button>
+
+    <div id="catalogueRenderTarget" style="position:absolute; left:-9999px; top:0;"></div>
   </div>
 </div>
 
@@ -578,13 +612,14 @@
 <script>
 let shopCode = null;
 let shopDocRef = null;
-let state = { products: [], sales: [], debts: [], orders: [], profile: {} };
+let state = { products: [], sales: [], debts: [], orders: [], profile: {}, catalogue: {} };
 let fbReady = false;
 let salesPeriod = 'week';
 let saleSelectedProductId = null;
 let authMode = 'login';
 let forgotShopRef = null;
 let forgotSecretAnswerHash = null;
+let profileMandatory = false;
 
 window.addEventListener('firebase-ready', () => { fbReady = true; });
 
@@ -668,9 +703,10 @@ async function enterShop() {
         passwordHash: pwHash,
         secretQuestion, secretAnswerHash,
         products: [], sales: [], debts: [], orders: [],
-        profile: {}
+        profile: {}, catalogue: {}
       });
-      state = { products: [], sales: [], debts: [], orders: [], profile: {} };
+      state = { products: [], sales: [], debts: [], orders: [], profile: {}, catalogue: {} };
+      profileMandatory = true;
       toast('Ledger created');
     } else {
       if (!snap.exists()) {
@@ -689,8 +725,10 @@ async function enterShop() {
         sales: data.sales || [],
         debts: data.debts || [],
         orders: data.orders || [],
-        profile: data.profile || {}
+        profile: data.profile || {},
+        catalogue: data.catalogue || {}
       };
+      profileMandatory = false;
     }
 
     shopCode = code;
@@ -700,6 +738,11 @@ async function enterShop() {
     document.getElementById('shopPasswordInput').value = '';
     updateShopHeader();
     renderAll();
+    rememberShopOnDevice(code);
+
+    if (profileMandatory) {
+      openProfileModal(true);
+    }
   } catch (e) {
     toast("Couldn't connect. Check your internet and try again.");
   } finally {
@@ -771,7 +814,7 @@ async function forgotResetPassword() {
   }
 }
 
-function openProfileModal() {
+function openProfileModal(mandatory) {
   const p = state.profile || {};
   document.getElementById('profileName').value = p.name || '';
   document.getElementById('profileShopName').value = p.shopName || '';
@@ -780,6 +823,16 @@ function openProfileModal() {
   document.getElementById('profileEmail').value = p.email || '';
   const preview = document.getElementById('profileAvatarPreview');
   preview.innerHTML = p.profilePic ? `<img src="${p.profilePic}">` : '<span>&#128247;</span>';
+  delete preview.dataset.pending;
+
+  document.getElementById('profileModalClose').style.display = mandatory ? 'none' : 'flex';
+  document.getElementById('profileModalTitle').textContent = mandatory ? 'Finish setting up your shop' : 'Your profile';
+  document.getElementById('profileModalSub').textContent = mandatory
+    ? "Before you start logging stock and sales, tell us a bit about your shop. Name, shop name, and location are required."
+    : "This is just for you \u2014 helps keep things personal if you run more than one shop.";
+  document.getElementById('profileStoresSection').style.display = mandatory ? 'none' : 'block';
+
+  if (!mandatory) renderProfileStoresList();
   openModal('profileModal');
 }
 
@@ -808,20 +861,79 @@ function handleProfilePicUpload(event) {
 }
 
 async function saveProfile() {
+  const name = document.getElementById('profileName').value.trim();
+  const shopNameVal = document.getElementById('profileShopName').value.trim();
+  const location = document.getElementById('profileLocation').value.trim();
+
+  if (profileMandatory && (!name || !shopNameVal || !location)) {
+    toast('Please fill in your name, shop name, and location to continue');
+    return;
+  }
+
   const preview = document.getElementById('profileAvatarPreview');
   const pendingPic = preview.dataset.pending;
   state.profile = {
-    name: document.getElementById('profileName').value.trim(),
-    shopName: document.getElementById('profileShopName').value.trim(),
-    location: document.getElementById('profileLocation').value.trim(),
+    name,
+    shopName: shopNameVal,
+    location,
     phone: document.getElementById('profilePhone').value.trim(),
     email: document.getElementById('profileEmail').value.trim(),
     profilePic: pendingPic || (state.profile ? state.profile.profilePic : null) || null
   };
   await saveState('profile');
   updateShopHeader();
+  rememberShopOnDevice(shopCode);
+
+  if (profileMandatory) {
+    profileMandatory = false;
+    document.getElementById('profileModalClose').style.display = 'flex';
+    document.getElementById('profileStoresSection').style.display = 'block';
+  }
+
   closeModal('profileModal');
   toast('Profile saved');
+}
+
+function getKnownShops() {
+  try {
+    return JSON.parse(localStorage.getItem('ledger_known_shops') || '[]');
+  } catch (e) {
+    return [];
+  }
+}
+
+function rememberShopOnDevice(code) {
+  try {
+    let shops = getKnownShops();
+    shops = shops.filter(s => s.code !== code);
+    shops.unshift({ code, shopName: (state.profile && state.profile.shopName) || code, lastUsed: Date.now() });
+    localStorage.setItem('ledger_known_shops', JSON.stringify(shops.slice(0, 10)));
+  } catch (e) { /* localStorage unavailable, skip silently */ }
+}
+
+function renderProfileStoresList() {
+  const el = document.getElementById('profileStoresList');
+  const shops = getKnownShops().filter(s => s.code !== shopCode);
+  if (shops.length === 0) {
+    el.innerHTML = '<div class="empty-state">No other stores remembered on this device yet.</div>';
+    return;
+  }
+  el.innerHTML = shops.map(s => `
+    <div class="list-item" style="cursor:pointer;" onclick="switchToKnownShop('${s.code}')">
+      <div class="li-main">
+        <div class="li-title">${escapeHtml(s.shopName)}</div>
+        <div class="li-sub">${escapeHtml(s.code)}</div>
+      </div>
+      <div class="li-tag ok">Switch</div>
+    </div>`).join('');
+}
+
+function switchToKnownShop(code) {
+  closeModal('profileModal');
+  switchShop();
+  document.getElementById('shopCodeInput').value = code;
+  setAuthMode('login');
+  document.getElementById('shopPasswordInput').focus();
 }
 
 function switchShop() {
@@ -894,6 +1006,7 @@ function renderAll() {
 
 function periodStartDate(period) {
   const d = new Date();
+  if (period === 'day') { d.setHours(0, 0, 0, 0); return d; }
   if (period === 'week') d.setDate(d.getDate() - 7);
   else if (period === 'month') d.setDate(d.getDate() - 30);
   else if (period === 'year') d.setDate(d.getDate() - 365);
@@ -975,7 +1088,7 @@ function renderStockList() {
 
 function setSalesPeriod(period) {
   salesPeriod = period;
-  ['week', 'month', 'year'].forEach(p => {
+  ['day', 'week', 'month', 'year'].forEach(p => {
     document.getElementById('period-' + p).classList.toggle('active', p === period);
   });
   renderSalesTab();
@@ -985,7 +1098,7 @@ function renderSalesTab() {
   const start = periodStartDate(salesPeriod);
   const filtered = state.sales.filter(s => new Date(s.date) >= start);
   const total = filtered.reduce((s, x) => s + Number(x.total), 0);
-  const label = salesPeriod === 'week' ? 'this week' : salesPeriod === 'month' ? 'this month' : 'this year';
+  const label = salesPeriod === 'day' ? 'today' : salesPeriod === 'week' ? 'this week' : salesPeriod === 'month' ? 'this month' : 'this year';
 
   document.getElementById('salesPeriodLabel').textContent = 'Total sales \u2014 ' + label;
   document.getElementById('statSalesTotal').textContent = fmtMoney(total);
@@ -1268,6 +1381,103 @@ async function deleteDebt(id) {
   toast('Debt deleted');
 }
 
+function openCatalogueModal() {
+  const cat = state.catalogue || {};
+  document.getElementById('catalogueNote').value = cat.note || '';
+  renderCataloguePicker(cat.includedIds || []);
+  openModal('catalogueModal');
+}
+
+function renderCataloguePicker(includedIds) {
+  const el = document.getElementById('catalogueItemPicker');
+  if (state.products.length === 0) {
+    el.innerHTML = '<div class="product-pick-item" style="color:var(--ink-faint);">Add some stock first</div>';
+    return;
+  }
+  el.innerHTML = state.products.map(p => `
+    <label class="product-pick-item" style="cursor:pointer;">
+      <span><input type="checkbox" class="catalogue-check" value="${p.id}" ${includedIds.includes(p.id) ? 'checked' : ''} style="width:auto; margin-right:8px;">${escapeHtml(p.name)}</span>
+      <span class="ppi-sub">${fmtMoney(p.price)}</span>
+    </label>`).join('');
+}
+
+function getSelectedCatalogueIds() {
+  return Array.from(document.querySelectorAll('.catalogue-check:checked')).map(el => el.value);
+}
+
+async function saveCatalogue() {
+  state.catalogue = {
+    note: document.getElementById('catalogueNote').value.trim(),
+    includedIds: getSelectedCatalogueIds()
+  };
+  await saveState('catalogue');
+  toast('Catalogue selection saved');
+}
+
+function buildCatalogueItems() {
+  const includedIds = getSelectedCatalogueIds();
+  return state.products.filter(p => includedIds.includes(p.id));
+}
+
+async function exportCatalogueImage() {
+  const items = buildCatalogueItems();
+  if (items.length === 0) { toast('Select at least one item first'); return; }
+  await saveCatalogue();
+
+  const shopDisplayName = (state.profile && state.profile.shopName) ? state.profile.shopName : shopCode;
+  const note = document.getElementById('catalogueNote').value.trim();
+  const pic = state.profile && state.profile.profilePic;
+
+  const target = document.getElementById('catalogueRenderTarget');
+  target.innerHTML = `
+    <div style="width:420px; background:#FBF8F3; font-family: 'Inter', sans-serif; padding:28px; border-radius:16px;">
+      <div style="display:flex; align-items:center; gap:12px; margin-bottom:4px;">
+        ${pic ? `<img src="${pic}" style="width:44px;height:44px;border-radius:50%;object-fit:cover;">` : ''}
+        <div style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:20px; color:#1F4B43;">${escapeHtml(shopDisplayName)}</div>
+      </div>
+      ${note ? `<div style="font-size:13px; color:#5B6B62; margin:6px 0 18px;">${escapeHtml(note)}</div>` : '<div style="margin-bottom:14px;"></div>'}
+      ${items.map(p => `
+        <div style="display:flex; justify-content:space-between; padding:12px 0; border-bottom:1px solid #E7E0D2;">
+          <span style="font-size:14.5px; color:#1F2A24;">${escapeHtml(p.name)}</span>
+          <span style="font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:14.5px; color:#1F4B43;">${fmtMoney(p.price)}</span>
+        </div>`).join('')}
+      <div style="text-align:center; font-size:11px; color:#9AA69C; margin-top:18px;">Made with Ledger</div>
+    </div>`;
+
+  try {
+    const canvas = await html2canvas(target.firstElementChild, { scale: 2, backgroundColor: '#FBF8F3' });
+    const link = document.createElement('a');
+    link.download = (shopCode || 'catalogue') + '-catalogue.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    toast('Catalogue image downloaded');
+  } catch (e) {
+    toast("Couldn't generate the image. Try 'Copy as text' instead.");
+  } finally {
+    target.innerHTML = '';
+  }
+}
+
+async function copyCatalogueText() {
+  const items = buildCatalogueItems();
+  if (items.length === 0) { toast('Select at least one item first'); return; }
+  await saveCatalogue();
+
+  const shopDisplayName = (state.profile && state.profile.shopName) ? state.profile.shopName : shopCode;
+  const note = document.getElementById('catalogueNote').value.trim();
+  let text = `*${shopDisplayName}*\n`;
+  if (note) text += note + '\n';
+  text += '\n';
+  items.forEach(p => { text += `${p.name} \u2014 ${fmtMoney(p.price)}\n`; });
+
+  try {
+    await navigator.clipboard.writeText(text);
+    toast('Catalogue copied \u2014 paste it into WhatsApp or Instagram');
+  } catch (e) {
+    toast("Couldn't copy automatically. Select and copy the text manually.");
+  }
+}
+
 document.getElementById('shopCodeInput').addEventListener('keydown', e => {
   if (e.key === 'Enter') document.getElementById('shopPasswordInput').focus();
 });
@@ -1285,6 +1495,22 @@ document.getElementById('saleSearchInput').addEventListener('keydown', e => {
     if (match) { selectSaleProduct(match.id); }
   }
 });
+
+function bindEnter(ids, fn) {
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); fn(); } });
+  });
+}
+
+bindEnter(['signupConfirmPassword', 'secretAnswerInput'], enterShop);
+bindEnter(['stockName', 'stockQty', 'stockPrice'], submitStock);
+bindEnter(['debtName', 'debtAmount'], submitDebt);
+bindEnter(['orderCustomer', 'orderDescription', 'orderAmount'], submitOrder);
+bindEnter(['profileName', 'profileShopName', 'profileLocation', 'profilePhone', 'profileEmail'], saveProfile);
+bindEnter(['forgotShopCode'], forgotFindShop);
+bindEnter(['forgotAnswer', 'forgotNewPassword'], forgotResetPassword);
+bindEnter(['catalogueNote'], saveCatalogue);
 </script>
 
 </body>
