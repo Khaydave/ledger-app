@@ -426,9 +426,14 @@
           <div style="display:flex; justify-content:space-between; align-items:center; margin: 6px 0 14px;">
             <h2 style="font-size:18px;">Your stock</h2>
             <div style="display:flex; gap:8px;">
+              <button class="icon-btn" onclick="openRestockModal()" title="Order from wholesaler">&#128722;</button>
               <button class="icon-btn" onclick="openCatalogueModal()" title="Build catalogue">&#128196;</button>
               <button class="icon-btn" onclick="openModal('stockModal')">&#43;</button>
             </div>
+          </div>
+          <div class="stat-card" style="margin-bottom:14px;">
+            <div class="label">Total stock value</div>
+            <div class="value" id="statStockValue">&#8358;0</div>
           </div>
           <div class="search-box">
             <span class="search-icon">&#128269;</span>
@@ -573,6 +578,9 @@
     <div class="field-group"><label>Email</label><input id="profileEmail" type="email" placeholder="e.g. ada@example.com"></div>
     <p class="hint">Your phone number or email helps confirm it's you if you ever need account support.</p>
 
+    <div class="field-group"><label>Currency</label><select id="currencySelect"></select></div>
+    <p class="hint">This changes how amounts are shown everywhere in your ledger.</p>
+
     <div class="modal-actions"><button class="btn btn-primary" onclick="saveProfile()">Save profile</button></div>
 
     <div id="profileStoresSection" style="margin-top:26px; padding-top:20px; border-top:1px solid var(--border);">
@@ -605,13 +613,42 @@
   </div>
 </div>
 
+<div class="modal-overlay" id="restockModal">
+  <div class="modal-sheet" style="max-width: 480px;">
+    <div class="icon-btn modal-close" onclick="closeModal('restockModal')">&#10005;</div>
+    <h2>Order from wholesaler</h2>
+    <div class="modal-sub">Pick items and quantities you want to restock, then send the list to your wholesaler.</div>
+
+    <div class="field-group"><label>Note (optional)</label><input id="restockNote" placeholder="e.g. Please deliver by Friday"></div>
+
+    <div class="section-title" style="margin-top:12px;">Reorder existing items</div>
+    <div id="restockStockPicker" style="max-height:180px; overflow-y:auto; border:1px solid var(--border); border-radius:10px; margin-bottom:16px;"></div>
+
+    <div class="section-title">Add a new item to order</div>
+    <div style="display:flex; gap:8px; margin-bottom:8px;">
+      <input id="restockNewItemName" placeholder="Item name" style="flex:2;">
+      <input id="restockNewItemQty" type="number" inputmode="numeric" placeholder="Qty" style="flex:1;">
+      <button class="icon-btn" onclick="addRestockCustomItem()">&#43;</button>
+    </div>
+    <div id="restockCustomList" style="margin-bottom:16px;"></div>
+
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="saveRestockList()">Save list</button>
+      <button class="btn btn-primary" onclick="exportRestockImage()">Export as image</button>
+    </div>
+    <button class="btn btn-ghost" style="margin-top:10px;" onclick="copyRestockText()">Copy as text instead</button>
+
+    <div id="restockRenderTarget" style="position:absolute; left:-9999px; top:0;"></div>
+  </div>
+</div>
+
 
 <div class="toast" id="toast"></div>
 
 <script>
 let shopCode = null;
 let shopDocRef = null;
-let state = { products: [], sales: [], debts: [], orders: [], profile: {}, catalogue: {} };
+let state = { products: [], sales: [], debts: [], orders: [], profile: {}, catalogue: {}, restock: {}, settings: {} };
 let fbReady = false;
 let salesPeriod = 'week';
 let saleSelectedProductId = null;
@@ -619,6 +656,10 @@ let authMode = 'login';
 let forgotShopRef = null;
 let forgotSecretAnswerHash = null;
 let profileMandatory = false;
+const SESSION_KEY = 'ledger_session';
+
+const MAJOR_CURRENCIES = ['USD', 'EUR', 'GBP', 'NGN'];
+const OTHER_CURRENCIES = ['AUD', 'CAD', 'CHF', 'CNY', 'GHS', 'INR', 'JPY', 'KES', 'XOF', 'XAF', 'ZAR', 'EGP', 'MAD', 'RWF', 'TZS', 'UGX', 'AED', 'SAR', 'BRL', 'MXN', 'SEK', 'NOK', 'DKK', 'PLN', 'TRY', 'SGD', 'HKD', 'NZD'];
 
 window.addEventListener('firebase-ready', () => { fbReady = true; });
 
@@ -702,9 +743,9 @@ async function enterShop() {
         passwordHash: pwHash,
         secretQuestion, secretAnswerHash,
         products: [], sales: [], debts: [], orders: [],
-        profile: {}, catalogue: {}
+        profile: {}, catalogue: {}, restock: {}, settings: { currency: 'NGN' }
       });
-      state = { products: [], sales: [], debts: [], orders: [], profile: {}, catalogue: {} };
+      state = { products: [], sales: [], debts: [], orders: [], profile: {}, catalogue: {}, restock: {}, settings: { currency: 'NGN' } };
       profileMandatory = true;
       toast('Ledger created');
     } else {
@@ -725,18 +766,17 @@ async function enterShop() {
         debts: data.debts || [],
         orders: data.orders || [],
         profile: data.profile || {},
-        catalogue: data.catalogue || {}
+        catalogue: data.catalogue || {},
+        restock: data.restock || {},
+        settings: data.settings || { currency: 'NGN' }
       };
       profileMandatory = false;
     }
 
     shopCode = code;
     shopDocRef = ref;
-    document.getElementById('onboarding').classList.remove('active');
-    document.getElementById('mainScreen').classList.add('active');
-    document.getElementById('shopPasswordInput').value = '';
-    updateShopHeader();
-    renderAll();
+    saveSession(code, pwHash);
+    enterMainScreen();
     rememberShopOnDevice(code);
 
     if (profileMandatory) {
@@ -747,6 +787,64 @@ async function enterShop() {
   } finally {
     btn.disabled = false;
     btn.textContent = authMode === 'signup' ? 'Sign up' : 'Log in';
+  }
+}
+
+function enterMainScreen() {
+  document.getElementById('onboarding').classList.remove('active');
+  document.getElementById('mainScreen').classList.add('active');
+  document.getElementById('shopPasswordInput').value = '';
+  updateShopHeader();
+  renderAll();
+
+  const hashTab = (location.hash || '').replace('#', '');
+  const validTabs = ['home', 'stock', 'sales', 'orders', 'debts'];
+  const startTab = validTabs.includes(hashTab) ? hashTab : 'home';
+  showTab(startTab, true);
+  history.replaceState({ tab: startTab }, '', '#' + startTab);
+}
+
+function saveSession(code, pwHash) {
+  try {
+    localStorage.setItem(SESSION_KEY, JSON.stringify({ code, passwordHash: pwHash }));
+  } catch (e) { /* storage unavailable, skip silently */ }
+}
+
+function clearSession() {
+  try { localStorage.removeItem(SESSION_KEY); } catch (e) { /* ignore */ }
+}
+
+async function tryAutoLogin() {
+  let session;
+  try {
+    session = JSON.parse(localStorage.getItem(SESSION_KEY) || 'null');
+  } catch (e) { session = null; }
+  if (!session || !session.code) return;
+
+  try {
+    await waitForFirebase();
+    const { db, doc, getDoc } = window.__firestore;
+    const ref = doc(db, 'shops', session.code);
+    const snap = await getDoc(ref);
+    if (!snap.exists()) { clearSession(); return; }
+    const data = snap.data();
+    if (data.passwordHash !== session.passwordHash) { clearSession(); return; }
+
+    state = {
+      products: data.products || [],
+      sales: data.sales || [],
+      debts: data.debts || [],
+      orders: data.orders || [],
+      profile: data.profile || {},
+      catalogue: data.catalogue || {},
+      restock: data.restock || {},
+      settings: data.settings || { currency: 'NGN' }
+    };
+    shopCode = session.code;
+    shopDocRef = ref;
+    enterMainScreen();
+  } catch (e) {
+    /* couldn't reach Firebase; just leave them on the login screen to try manually */
   }
 }
 
@@ -813,6 +911,21 @@ async function forgotResetPassword() {
   }
 }
 
+function populateCurrencySelect(selectedCode) {
+  const sel = document.getElementById('currencySelect');
+  const currencyName = (code) => {
+    try { return new Intl.DisplayNames(['en'], { type: 'currency' }).of(code); }
+    catch (e) { return code; }
+  };
+  let html = '<optgroup label="Major currencies">';
+  html += MAJOR_CURRENCIES.map(c => `<option value="${c}">${c} \u2014 ${currencyName(c)}</option>`).join('');
+  html += '</optgroup><optgroup label="Other currencies">';
+  html += OTHER_CURRENCIES.map(c => `<option value="${c}">${c} \u2014 ${currencyName(c)}</option>`).join('');
+  html += '</optgroup>';
+  sel.innerHTML = html;
+  sel.value = selectedCode || 'NGN';
+}
+
 function openProfileModal(mandatory) {
   const p = state.profile || {};
   document.getElementById('profileName').value = p.name || '';
@@ -823,6 +936,7 @@ function openProfileModal(mandatory) {
   const preview = document.getElementById('profileAvatarPreview');
   preview.innerHTML = p.profilePic ? `<img src="${p.profilePic}">` : '<span>&#128247;</span>';
   delete preview.dataset.pending;
+  populateCurrencySelect((state.settings && state.settings.currency) || 'NGN');
 
   document.getElementById('profileModalClose').style.display = mandatory ? 'none' : 'flex';
   document.getElementById('profileModalTitle').textContent = mandatory ? 'Finish setting up your shop' : 'Your profile';
@@ -879,8 +993,11 @@ async function saveProfile() {
     email: document.getElementById('profileEmail').value.trim(),
     profilePic: pendingPic || (state.profile ? state.profile.profilePic : null) || null
   };
+  state.settings = { currency: document.getElementById('currencySelect').value };
   await saveState('profile');
+  await saveState('settings');
   updateShopHeader();
+  renderAll();
   rememberShopOnDevice(shopCode);
 
   if (profileMandatory) {
@@ -942,9 +1059,11 @@ function switchShop() {
   document.getElementById('shopPasswordInput').value = '';
   shopCode = null;
   shopDocRef = null;
+  clearSession();
+  history.replaceState({}, '', location.pathname);
 }
 
-function showTab(name) {
+function showTab(name, skipHistory) {
   ['home', 'stock', 'sales', 'orders', 'debts'].forEach(t => {
     document.getElementById('tab-' + t).style.display = t === name ? 'block' : 'none';
   });
@@ -955,7 +1074,17 @@ function showTab(name) {
   if (name === 'sales') renderSalesTab();
   if (name === 'orders') renderOrdersList();
   if (name === 'debts') renderDebtList();
+
+  if (!skipHistory && shopCode) {
+    history.pushState({ tab: name }, '', '#' + name);
+  }
 }
+
+window.addEventListener('popstate', (e) => {
+  if (!shopCode) return;
+  const tab = (e.state && e.state.tab) || 'home';
+  showTab(tab, true);
+});
 
 function openModal(id) {
   if (id === 'saleModal') {
@@ -986,7 +1115,16 @@ function closeModal(id) {
 }
 
 function fmtMoney(n) {
-  return '\u20a6' + Number(n || 0).toLocaleString('en-NG');
+  const currency = (state.settings && state.settings.currency) || 'NGN';
+  try {
+    return new Intl.NumberFormat(undefined, {
+      style: 'currency',
+      currency,
+      maximumFractionDigits: 0
+    }).format(Number(n || 0));
+  } catch (e) {
+    return currency + ' ' + Number(n || 0).toLocaleString();
+  }
 }
 
 function escapeHtml(str) {
@@ -1061,6 +1199,10 @@ function renderStockList() {
   const el = document.getElementById('stockList');
   const query = (document.getElementById('stockSearchInput')?.value || '').trim().toLowerCase();
   const filtered = query ? state.products.filter(p => p.name.toLowerCase().includes(query)) : state.products;
+
+  const totalValue = state.products.reduce((s, p) => s + (Number(p.qty) * Number(p.price)), 0);
+  const valueEl = document.getElementById('statStockValue');
+  if (valueEl) valueEl.textContent = fmtMoney(totalValue);
 
   if (state.products.length === 0) {
     el.innerHTML = '<div class="empty-state">No items yet. Tap + to add your first one.</div>';
@@ -1477,6 +1619,145 @@ async function copyCatalogueText() {
   }
 }
 
+let restockCustomItems = [];
+
+function openRestockModal() {
+  const r = state.restock || {};
+  document.getElementById('restockNote').value = r.note || '';
+  restockCustomItems = (r.customOrders || []).slice();
+  document.getElementById('restockNewItemName').value = '';
+  document.getElementById('restockNewItemQty').value = '';
+  renderRestockStockPicker(r.stockOrders || []);
+  renderRestockCustomList();
+  openModal('restockModal');
+}
+
+function renderRestockStockPicker(existingOrders) {
+  const el = document.getElementById('restockStockPicker');
+  if (state.products.length === 0) {
+    el.innerHTML = '<div class="product-pick-item" style="color:var(--ink-faint);">No stock items yet</div>';
+    return;
+  }
+  const qtyMap = {};
+  (existingOrders || []).forEach(o => { qtyMap[o.productId] = o.qty; });
+
+  el.innerHTML = state.products.map(p => `
+    <div class="product-pick-item" style="cursor:default;">
+      <span>${escapeHtml(p.name)}</span>
+      <input type="number" inputmode="numeric" class="restock-stock-qty" data-product-id="${p.id}" data-product-name="${escapeHtml(p.name)}"
+        value="${qtyMap[p.id] || ''}" placeholder="0" style="width:70px; padding:6px 8px; font-size:13px;">
+    </div>`).join('');
+}
+
+function renderRestockCustomList() {
+  const el = document.getElementById('restockCustomList');
+  if (restockCustomItems.length === 0) {
+    el.innerHTML = '';
+    return;
+  }
+  el.innerHTML = restockCustomItems.map((item, i) => `
+    <div class="list-item">
+      <div class="li-main">
+        <div class="li-title">${escapeHtml(item.name)}</div>
+        <div class="li-sub">Qty: ${item.qty}</div>
+      </div>
+      <div class="icon-btn small" onclick="removeRestockCustomItem(${i})">&#128465;</div>
+    </div>`).join('');
+}
+
+function addRestockCustomItem() {
+  const name = document.getElementById('restockNewItemName').value.trim();
+  const qty = Number(document.getElementById('restockNewItemQty').value);
+  if (!name || !qty || qty <= 0) { toast('Enter an item name and quantity'); return; }
+  restockCustomItems.push({ name, qty });
+  document.getElementById('restockNewItemName').value = '';
+  document.getElementById('restockNewItemQty').value = '';
+  renderRestockCustomList();
+}
+
+function removeRestockCustomItem(index) {
+  restockCustomItems.splice(index, 1);
+  renderRestockCustomList();
+}
+
+function getRestockStockOrders() {
+  return Array.from(document.querySelectorAll('.restock-stock-qty'))
+    .map(el => ({ productId: el.dataset.productId, name: el.dataset.productName, qty: Number(el.value) }))
+    .filter(o => o.qty > 0);
+}
+
+async function saveRestockList() {
+  state.restock = {
+    note: document.getElementById('restockNote').value.trim(),
+    stockOrders: getRestockStockOrders(),
+    customOrders: restockCustomItems
+  };
+  await saveState('restock');
+  toast('Restock list saved');
+}
+
+function buildRestockItems() {
+  const stockOrders = getRestockStockOrders();
+  const combined = [...stockOrders, ...restockCustomItems];
+  return combined;
+}
+
+async function exportRestockImage() {
+  const items = buildRestockItems();
+  if (items.length === 0) { toast('Add at least one item first'); return; }
+  await saveRestockList();
+
+  const shopDisplayName = (state.profile && state.profile.shopName) ? state.profile.shopName : shopCode;
+  const note = document.getElementById('restockNote').value.trim();
+
+  const target = document.getElementById('restockRenderTarget');
+  target.innerHTML = `
+    <div style="width:420px; background:#FBF8F3; font-family: 'Inter', sans-serif; padding:28px; border-radius:16px;">
+      <div style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:20px; color:#1F4B43;">${escapeHtml(shopDisplayName)}</div>
+      <div style="font-size:13px; color:#5B6B62; margin:2px 0 18px;">Restock order</div>
+      ${note ? `<div style="font-size:13px; color:#5B6B62; margin-bottom:14px;">${escapeHtml(note)}</div>` : ''}
+      ${items.map(p => `
+        <div style="display:flex; justify-content:space-between; padding:12px 0; border-bottom:1px solid #E7E0D2;">
+          <span style="font-size:14.5px; color:#1F2A24;">${escapeHtml(p.name)}</span>
+          <span style="font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:14.5px; color:#1F4B43;">Qty: ${p.qty}</span>
+        </div>`).join('')}
+      <div style="text-align:center; font-size:11px; color:#9AA69C; margin-top:18px;">Made with Ledger</div>
+    </div>`;
+
+  try {
+    const canvas = await html2canvas(target.firstElementChild, { scale: 2, backgroundColor: '#FBF8F3' });
+    const link = document.createElement('a');
+    link.download = (shopCode || 'shop') + '-restock-order.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    toast('Order image downloaded');
+  } catch (e) {
+    toast("Couldn't generate the image. Try 'Copy as text' instead.");
+  } finally {
+    target.innerHTML = '';
+  }
+}
+
+async function copyRestockText() {
+  const items = buildRestockItems();
+  if (items.length === 0) { toast('Add at least one item first'); return; }
+  await saveRestockList();
+
+  const shopDisplayName = (state.profile && state.profile.shopName) ? state.profile.shopName : shopCode;
+  const note = document.getElementById('restockNote').value.trim();
+  let text = `*${shopDisplayName} \u2014 Restock Order*\n`;
+  if (note) text += note + '\n';
+  text += '\n';
+  items.forEach(p => { text += `${p.name} \u2014 Qty: ${p.qty}\n`; });
+
+  try {
+    await navigator.clipboard.writeText(text);
+    toast('Order copied \u2014 paste it into WhatsApp');
+  } catch (e) {
+    toast("Couldn't copy automatically. Select and copy the text manually.");
+  }
+}
+
 document.getElementById('shopCodeInput').addEventListener('keydown', e => {
   if (e.key === 'Enter') document.getElementById('shopPasswordInput').focus();
 });
@@ -1510,6 +1791,10 @@ bindEnter(['profileName', 'profileShopName', 'profileLocation', 'profilePhone', 
 bindEnter(['forgotShopCode'], forgotFindShop);
 bindEnter(['forgotAnswer', 'forgotNewPassword'], forgotResetPassword);
 bindEnter(['catalogueNote'], saveCatalogue);
+bindEnter(['restockNote'], saveRestockList);
+bindEnter(['restockNewItemName', 'restockNewItemQty'], addRestockCustomItem);
+
+tryAutoLogin();
 </script>
 
 </body>
