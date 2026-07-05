@@ -119,6 +119,25 @@
   .btn-danger-ghost:hover { background: var(--danger-tint); }
   .hint { font-size: 12px; color: var(--ink-faint); margin-top: 18px; line-height: 1.6; max-width: 280px; }
   .hint b { color: var(--ink-soft); }
+  .auth-toggle {
+    display: flex; background: var(--primary-tint); border-radius: 10px; padding: 4px;
+    width: 100%; max-width: 280px; margin-bottom: 20px;
+  }
+  .auth-toggle button {
+    flex: 1; background: none; border: none; padding: 9px 6px; border-radius: 7px; cursor: pointer;
+    font-family: 'Space Grotesk'; font-size: 13px; font-weight: 600; color: var(--primary);
+  }
+  .auth-toggle button.active { background: var(--primary); color: #fff; }
+  .avatar-circle {
+    width: 34px; height: 34px; border-radius: 50%; background: var(--primary-tint);
+    display: flex; align-items: center; justify-content: center; overflow: hidden;
+    border: 1.5px solid var(--border); cursor: pointer; flex-shrink: 0;
+  }
+  .avatar-circle img { width: 100%; height: 100%; object-fit: cover; }
+  .avatar-circle span { font-family: 'Space Grotesk'; font-weight: 600; color: var(--primary); font-size: 13px; }
+  .avatar-upload { width: 84px; height: 84px; border-radius: 50%; margin: 0 auto 16px; }
+  .avatar-upload span { font-size: 26px; }
+  .topbar-actions { display: flex; gap: 8px; align-items: center; }
 
   /* HEADER */
   .topbar {
@@ -284,6 +303,11 @@
     <h1>Ledger</h1>
     <p>Track stock, orders, and who owes you &mdash; right from your phone or computer.</p>
 
+    <div class="auth-toggle">
+      <button id="authTabLogin" class="active" onclick="setAuthMode('login')">Log in</button>
+      <button id="authTabSignup" onclick="setAuthMode('signup')">Sign up</button>
+    </div>
+
     <div class="field-group">
       <label for="shopCodeInput">Shop code</label>
       <input id="shopCodeInput" type="text" placeholder="e.g. ada-thrift-01" autocomplete="off" autocapitalize="off">
@@ -292,9 +316,52 @@
       <label for="shopPasswordInput">Password</label>
       <input id="shopPasswordInput" type="password" placeholder="At least 4 characters" autocomplete="off">
     </div>
-    <button class="btn btn-primary" id="continueBtn" onclick="enterShop()">Continue</button>
-    <p class="hint"><b>New here?</b> Pick any shop code and password &mdash; we'll create your ledger the first time you continue. Use the same code and password every time after that to get back into it.</p>
+
+    <div id="signupFields" style="display:none; width:100%; max-width:280px;">
+      <div class="field-group">
+        <label for="signupConfirmPassword">Confirm password</label>
+        <input id="signupConfirmPassword" type="password" placeholder="Re-enter your password" autocomplete="off">
+      </div>
+      <div class="field-group">
+        <label for="secretQuestionSelect">Security question</label>
+        <select id="secretQuestionSelect">
+          <option>What was the name of your first pet?</option>
+          <option>What city were you born in?</option>
+          <option>What is your mother's maiden name?</option>
+          <option>What was your first shop's name?</option>
+          <option>What is your favorite food?</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <label for="secretAnswerInput">Your answer</label>
+        <input id="secretAnswerInput" type="text" placeholder="Used only if you forget your password" autocomplete="off">
+      </div>
+    </div>
+
+    <button class="btn btn-primary" id="continueBtn" onclick="enterShop()">Log in</button>
+    <p class="hint" id="onboardHint">Use your shop code and password to get back into your ledger.</p>
+    <p class="hint" id="forgotPasswordLink" style="cursor:pointer; text-decoration:underline;" onclick="openForgotPassword()">Forgot your password?</p>
   </div>
+
+  <div class="modal-overlay" id="forgotModal">
+    <div class="modal-sheet">
+      <div class="icon-btn modal-close" onclick="closeModal('forgotModal')">&#10005;</div>
+      <h2>Reset your password</h2>
+      <div class="modal-sub" id="forgotStep1Sub">Enter your shop code to get started.</div>
+
+      <div id="forgotStep1">
+        <div class="field-group"><label>Shop code</label><input id="forgotShopCode" placeholder="e.g. ada-thrift-01"></div>
+        <div class="modal-actions"><button class="btn btn-primary" onclick="forgotFindShop()">Continue</button></div>
+      </div>
+
+      <div id="forgotStep2" style="display:none;">
+        <div class="field-group"><label id="forgotQuestionLabel">Security question</label><input id="forgotAnswer" placeholder="Your answer"></div>
+        <div class="field-group"><label>New password</label><input id="forgotNewPassword" type="password" placeholder="At least 4 characters"></div>
+        <div class="modal-actions"><button class="btn btn-primary" onclick="forgotResetPassword()">Reset password</button></div>
+      </div>
+    </div>
+  </div>
+
 
   <div id="mainScreen" class="screen">
 
@@ -309,13 +376,17 @@
       <button class="nav-btn" data-tab="orders" onclick="showTab('orders')"><span class="nicon">&#128203;</span>Orders</button>
       <button class="nav-btn" data-tab="debts" onclick="showTab('debts')"><span class="nicon">&#128179;</span>Debts</button>
       <div style="flex:1;"></div>
+      <button onclick="openProfileModal()"><span class="nicon">&#128100;</span>Profile</button>
       <button onclick="switchShop()"><span class="nicon">&#8635;</span>Switch shop</button>
     </div>
 
     <div style="flex:1; display:flex; flex-direction:column; min-width:0;">
       <div class="topbar">
         <div class="shopname">Ledger for <b id="shopNameLabel"></b></div>
-        <div class="icon-btn" onclick="switchShop()" id="mobileSwitchBtn">&#8635;</div>
+        <div class="topbar-actions">
+          <div class="avatar-circle" id="topbarAvatar" onclick="openProfileModal()"><span>+</span></div>
+          <div class="icon-btn" onclick="switchShop()" id="mobileSwitchBtn">&#8635;</div>
+        </div>
       </div>
 
       <div class="content">
@@ -480,15 +551,40 @@
   </div>
 </div>
 
+<div class="modal-overlay" id="profileModal">
+  <div class="modal-sheet">
+    <div class="icon-btn modal-close" onclick="closeModal('profileModal')">&#10005;</div>
+    <h2>Your profile</h2>
+    <div class="modal-sub">This is just for you &mdash; helps keep things personal if you run more than one shop.</div>
+
+    <div class="avatar-circle avatar-upload" id="profileAvatarPreview" onclick="document.getElementById('profilePicInput').click()"><span>&#128247;</span></div>
+    <input type="file" id="profilePicInput" accept="image/*" style="display:none;" onchange="handleProfilePicUpload(event)">
+    <p class="hint" style="text-align:center; margin:0 auto 16px; max-width:none;">Tap the circle to add a photo</p>
+
+    <div class="field-group"><label>Your name</label><input id="profileName" placeholder="e.g. Ada Okafor"></div>
+    <div class="field-group"><label>Shop name</label><input id="profileShopName" placeholder="e.g. Ada's Thrift Corner"></div>
+    <div class="field-group"><label>Location</label><input id="profileLocation" placeholder="e.g. Yaba, Lagos"></div>
+    <div class="field-group"><label>Phone number</label><input id="profilePhone" type="tel" placeholder="e.g. 0803 123 4567"></div>
+    <div class="field-group"><label>Email</label><input id="profileEmail" type="email" placeholder="e.g. ada@example.com"></div>
+    <p class="hint">Your phone number or email helps confirm it's you if you ever need account support.</p>
+
+    <div class="modal-actions"><button class="btn btn-primary" onclick="saveProfile()">Save profile</button></div>
+  </div>
+</div>
+
+
 <div class="toast" id="toast"></div>
 
 <script>
 let shopCode = null;
 let shopDocRef = null;
-let state = { products: [], sales: [], debts: [], orders: [] };
+let state = { products: [], sales: [], debts: [], orders: [], profile: {} };
 let fbReady = false;
 let salesPeriod = 'week';
 let saleSelectedProductId = null;
+let authMode = 'login';
+let forgotShopRef = null;
+let forgotSecretAnswerHash = null;
 
 window.addEventListener('firebase-ready', () => { fbReady = true; });
 
@@ -519,6 +615,18 @@ async function saveState(part) {
   }
 }
 
+function setAuthMode(mode) {
+  authMode = mode;
+  document.getElementById('authTabLogin').classList.toggle('active', mode === 'login');
+  document.getElementById('authTabSignup').classList.toggle('active', mode === 'signup');
+  document.getElementById('signupFields').style.display = mode === 'signup' ? 'block' : 'none';
+  document.getElementById('continueBtn').textContent = mode === 'signup' ? 'Sign up' : 'Log in';
+  document.getElementById('onboardHint').textContent = mode === 'signup'
+    ? "Pick a shop code and password you haven't used before. Your security question helps you recover your account if you forget your password."
+    : "Use your shop code and password to get back into your ledger.";
+  document.getElementById('forgotPasswordLink').style.display = mode === 'signup' ? 'none' : 'block';
+}
+
 async function enterShop() {
   const code = document.getElementById('shopCodeInput').value.trim().toLowerCase().replace(/\s+/g, '-');
   const password = document.getElementById('shopPasswordInput').value;
@@ -527,7 +635,7 @@ async function enterShop() {
 
   const btn = document.getElementById('continueBtn');
   btn.disabled = true;
-  btn.textContent = 'Checking...';
+  btn.textContent = authMode === 'signup' ? 'Creating account...' : 'Checking...';
 
   try {
     await waitForFirebase();
@@ -536,39 +644,184 @@ async function enterShop() {
     const snap = await getDoc(ref);
     const pwHash = await hashPassword(password);
 
-    if (!snap.exists()) {
-      await setDoc(ref, { passwordHash: pwHash, products: [], sales: [], debts: [], orders: [] });
-      state = { products: [], sales: [], debts: [], orders: [] };
+    if (authMode === 'signup') {
+      if (snap.exists()) {
+        toast('That shop code is already taken. Try logging in instead.');
+        btn.disabled = false; btn.textContent = 'Sign up';
+        return;
+      }
+      const confirmPw = document.getElementById('signupConfirmPassword').value;
+      if (password !== confirmPw) {
+        toast("Passwords don't match");
+        btn.disabled = false; btn.textContent = 'Sign up';
+        return;
+      }
+      const secretQuestion = document.getElementById('secretQuestionSelect').value;
+      const secretAnswer = document.getElementById('secretAnswerInput').value.trim().toLowerCase();
+      if (!secretAnswer) {
+        toast('Please answer the security question');
+        btn.disabled = false; btn.textContent = 'Sign up';
+        return;
+      }
+      const secretAnswerHash = await hashPassword(secretAnswer);
+      await setDoc(ref, {
+        passwordHash: pwHash,
+        secretQuestion, secretAnswerHash,
+        products: [], sales: [], debts: [], orders: [],
+        profile: {}
+      });
+      state = { products: [], sales: [], debts: [], orders: [], profile: {} };
       toast('Ledger created');
     } else {
+      if (!snap.exists()) {
+        toast('No shop found with that code. Try signing up instead.');
+        btn.disabled = false; btn.textContent = 'Log in';
+        return;
+      }
       const data = snap.data();
       if (data.passwordHash !== pwHash) {
         toast('Wrong password for that shop code');
-        btn.disabled = false;
-        btn.textContent = 'Continue';
+        btn.disabled = false; btn.textContent = 'Log in';
         return;
       }
       state = {
         products: data.products || [],
         sales: data.sales || [],
         debts: data.debts || [],
-        orders: data.orders || []
+        orders: data.orders || [],
+        profile: data.profile || {}
       };
     }
 
     shopCode = code;
     shopDocRef = ref;
-    document.getElementById('shopNameLabel').textContent = shopCode;
     document.getElementById('onboarding').classList.remove('active');
     document.getElementById('mainScreen').classList.add('active');
     document.getElementById('shopPasswordInput').value = '';
+    updateShopHeader();
     renderAll();
   } catch (e) {
     toast("Couldn't connect. Check your internet and try again.");
   } finally {
     btn.disabled = false;
-    btn.textContent = 'Continue';
+    btn.textContent = authMode === 'signup' ? 'Sign up' : 'Log in';
   }
+}
+
+function updateShopHeader() {
+  const displayName = (state.profile && state.profile.shopName) ? state.profile.shopName : shopCode;
+  document.getElementById('shopNameLabel').textContent = displayName;
+  const avatarEl = document.getElementById('topbarAvatar');
+  if (state.profile && state.profile.profilePic) {
+    avatarEl.innerHTML = `<img src="${state.profile.profilePic}">`;
+  } else {
+    const initial = displayName ? displayName.charAt(0).toUpperCase() : '+';
+    avatarEl.innerHTML = `<span>${initial}</span>`;
+  }
+}
+
+function openForgotPassword() {
+  document.getElementById('forgotStep1').style.display = 'block';
+  document.getElementById('forgotStep2').style.display = 'none';
+  document.getElementById('forgotShopCode').value = '';
+  document.getElementById('forgotAnswer').value = '';
+  document.getElementById('forgotNewPassword').value = '';
+  openModal('forgotModal');
+}
+
+async function forgotFindShop() {
+  const code = document.getElementById('forgotShopCode').value.trim().toLowerCase().replace(/\s+/g, '-');
+  if (!code) { toast('Enter your shop code'); return; }
+  try {
+    await waitForFirebase();
+    const { db, doc, getDoc } = window.__firestore;
+    const ref = doc(db, 'shops', code);
+    const snap = await getDoc(ref);
+    if (!snap.exists()) { toast('No shop found with that code'); return; }
+    const data = snap.data();
+    if (!data.secretQuestion || !data.secretAnswerHash) {
+      toast('This account has no recovery question set up. Contact support.');
+      return;
+    }
+    forgotShopRef = ref;
+    forgotSecretAnswerHash = data.secretAnswerHash;
+    document.getElementById('forgotQuestionLabel').textContent = data.secretQuestion;
+    document.getElementById('forgotStep1').style.display = 'none';
+    document.getElementById('forgotStep2').style.display = 'block';
+  } catch (e) {
+    toast("Couldn't connect. Try again.");
+  }
+}
+
+async function forgotResetPassword() {
+  const answer = document.getElementById('forgotAnswer').value.trim().toLowerCase();
+  const newPassword = document.getElementById('forgotNewPassword').value;
+  if (!newPassword || newPassword.length < 4) { toast('New password needs at least 4 characters'); return; }
+  try {
+    const answerHash = await hashPassword(answer);
+    if (answerHash !== forgotSecretAnswerHash) { toast('That answer is incorrect'); return; }
+    const { updateDoc } = window.__firestore;
+    const newHash = await hashPassword(newPassword);
+    await updateDoc(forgotShopRef, { passwordHash: newHash });
+    toast('Password updated. You can log in now.');
+    closeModal('forgotModal');
+    setAuthMode('login');
+  } catch (e) {
+    toast("Couldn't reset password. Try again.");
+  }
+}
+
+function openProfileModal() {
+  const p = state.profile || {};
+  document.getElementById('profileName').value = p.name || '';
+  document.getElementById('profileShopName').value = p.shopName || '';
+  document.getElementById('profileLocation').value = p.location || '';
+  document.getElementById('profilePhone').value = p.phone || '';
+  document.getElementById('profileEmail').value = p.email || '';
+  const preview = document.getElementById('profileAvatarPreview');
+  preview.innerHTML = p.profilePic ? `<img src="${p.profilePic}">` : '<span>&#128247;</span>';
+  openModal('profileModal');
+}
+
+function handleProfilePicUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const size = 200;
+      canvas.width = size; canvas.height = size;
+      const ctx = canvas.getContext('2d');
+      const minSide = Math.min(img.width, img.height);
+      const sx = (img.width - minSide) / 2;
+      const sy = (img.height - minSide) / 2;
+      ctx.drawImage(img, sx, sy, minSide, minSide, 0, 0, size, size);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+      document.getElementById('profileAvatarPreview').innerHTML = `<img src="${dataUrl}">`;
+      document.getElementById('profileAvatarPreview').dataset.pending = dataUrl;
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+async function saveProfile() {
+  const preview = document.getElementById('profileAvatarPreview');
+  const pendingPic = preview.dataset.pending;
+  state.profile = {
+    name: document.getElementById('profileName').value.trim(),
+    shopName: document.getElementById('profileShopName').value.trim(),
+    location: document.getElementById('profileLocation').value.trim(),
+    phone: document.getElementById('profilePhone').value.trim(),
+    email: document.getElementById('profileEmail').value.trim(),
+    profilePic: pendingPic || (state.profile ? state.profile.profilePic : null) || null
+  };
+  await saveState('profile');
+  updateShopHeader();
+  closeModal('profileModal');
+  toast('Profile saved');
 }
 
 function switchShop() {
