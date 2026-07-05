@@ -392,11 +392,7 @@
 
       <div class="content">
         <div id="tab-home" class="tabpanel">
-          <div class="stat-row three">
-            <div class="stat-card">
-              <div class="label">Items in stock</div>
-              <div class="value" id="statItems">0</div>
-            </div>
+          <div class="stat-row">
             <div class="stat-card">
               <div class="label">Pending orders</div>
               <div class="value" id="statOrders">&#8358;0</div>
@@ -431,9 +427,15 @@
               <button class="icon-btn" onclick="openModal('stockModal')">&#43;</button>
             </div>
           </div>
-          <div class="stat-card" style="margin-bottom:14px;">
-            <div class="label">Total stock value</div>
-            <div class="value" id="statStockValue">&#8358;0</div>
+          <div class="stat-row" style="margin-bottom:14px;">
+            <div class="stat-card">
+              <div class="label">Items in stock</div>
+              <div class="value" id="statItems">0</div>
+            </div>
+            <div class="stat-card">
+              <div class="label">Total stock value</div>
+              <div class="value" id="statStockValue">&#8358;0</div>
+            </div>
           </div>
           <div class="search-box">
             <span class="search-icon">&#128269;</span>
@@ -661,6 +663,45 @@ const SESSION_KEY = 'ledger_session';
 const MAJOR_CURRENCIES = ['USD', 'EUR', 'GBP', 'NGN'];
 const OTHER_CURRENCIES = ['AUD', 'CAD', 'CHF', 'CNY', 'GHS', 'INR', 'JPY', 'KES', 'XOF', 'XAF', 'ZAR', 'EGP', 'MAD', 'RWF', 'TZS', 'UGX', 'AED', 'SAR', 'BRL', 'MXN', 'SEK', 'NOK', 'DKK', 'PLN', 'TRY', 'SGD', 'HKD', 'NZD'];
 
+const CURRENCY_SYMBOLS = {
+  USD: '$', EUR: '\u20ac', GBP: '\u00a3', NGN: '\u20a6',
+  AUD: 'A$', CAD: 'C$', CHF: 'CHF', CNY: '\u00a5', GHS: 'GH\u20b5', INR: '\u20b9',
+  JPY: '\u00a5', KES: 'KSh', XOF: 'CFA', XAF: 'FCFA', ZAR: 'R', EGP: 'E\u00a3',
+  MAD: 'MAD', RWF: 'FRw', TZS: 'TSh', UGX: 'USh', AED: 'AED', SAR: 'SAR',
+  BRL: 'R$', MXN: 'MX$', SEK: 'kr', NOK: 'kr', DKK: 'kr', PLN: 'z\u0142',
+  TRY: '\u20ba', SGD: 'S$', HKD: 'HK$', NZD: 'NZ$'
+};
+
+const FX_CACHE_KEY = 'ledger_fx_rates';
+const FX_CACHE_TTL = 6 * 60 * 60 * 1000;
+let exchangeRates = null;
+
+async function ensureExchangeRates() {
+  const currency = (state.settings && state.settings.currency) || 'NGN';
+  if (currency === 'NGN') return;
+
+  try {
+    const cached = JSON.parse(localStorage.getItem(FX_CACHE_KEY) || 'null');
+    if (cached && Date.now() - cached.timestamp < FX_CACHE_TTL) {
+      exchangeRates = cached.rates;
+      return;
+    }
+  } catch (e) { /* ignore bad cache */ }
+
+  try {
+    const res = await fetch('https://open.er-api.com/v6/latest/NGN');
+    const data = await res.json();
+    if (data && data.result === 'success' && data.rates) {
+      exchangeRates = data.rates;
+      try {
+        localStorage.setItem(FX_CACHE_KEY, JSON.stringify({ rates: exchangeRates, timestamp: Date.now() }));
+      } catch (e) { /* storage full or unavailable, skip caching */ }
+    }
+  } catch (e) {
+    /* couldn't reach the rates service; fmtMoney will fall back to Naira */
+  }
+}
+
 window.addEventListener('firebase-ready', () => { fbReady = true; });
 
 function toast(msg) {
@@ -802,6 +843,8 @@ function enterMainScreen() {
   const startTab = validTabs.includes(hashTab) ? hashTab : 'home';
   showTab(startTab, true);
   history.replaceState({ tab: startTab }, '', '#' + startTab);
+
+  ensureExchangeRates().then(() => renderAll());
 }
 
 function saveSession(code, pwHash) {
@@ -1000,6 +1043,11 @@ async function saveProfile() {
   renderAll();
   rememberShopOnDevice(shopCode);
 
+  if (state.settings.currency !== 'NGN') {
+    toast('Loading live exchange rate...');
+    ensureExchangeRates().then(() => renderAll());
+  }
+
   if (profileMandatory) {
     profileMandatory = false;
     document.getElementById('profileModalClose').style.display = 'flex';
@@ -1116,15 +1164,26 @@ function closeModal(id) {
 
 function fmtMoney(n) {
   const currency = (state.settings && state.settings.currency) || 'NGN';
-  try {
-    return new Intl.NumberFormat(undefined, {
-      style: 'currency',
-      currency,
-      maximumFractionDigits: 0
-    }).format(Number(n || 0));
-  } catch (e) {
-    return currency + ' ' + Number(n || 0).toLocaleString();
+  const rawAmount = Number(n || 0);
+
+  let displayCurrency = currency;
+  let amount = rawAmount;
+
+  if (currency !== 'NGN') {
+    if (exchangeRates && exchangeRates[currency]) {
+      amount = rawAmount * exchangeRates[currency];
+    } else {
+      // Live rate not available yet (or failed to load) - fall back to Naira
+      // rather than show a converted-looking number that isn't actually converted.
+      displayCurrency = 'NGN';
+      amount = rawAmount;
+    }
   }
+
+  const symbol = CURRENCY_SYMBOLS[displayCurrency] || (displayCurrency + ' ');
+  const decimals = displayCurrency === 'NGN' ? 0 : (amount !== 0 && Math.abs(amount) < 100 ? 2 : 0);
+  const formatted = amount.toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+  return symbol + formatted;
 }
 
 function escapeHtml(str) {
