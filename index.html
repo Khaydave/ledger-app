@@ -27,6 +27,8 @@
   window.dispatchEvent(new Event('firebase-ready'));
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
   :root {
     --bg: #FBF8F3;
@@ -234,6 +236,11 @@
   .li-tag.owe { background: var(--danger-tint); color: var(--danger); }
   .li-tag.paid { background: var(--primary-tint); color: var(--primary); }
   .li-tag.pending { background: var(--accent-tint); color: #8a5a11; }
+  .profit-text { font-size: 11.5px; font-weight: 600; margin-top: 2px; }
+  .profit-text.is-profit { color: #2E7D32; }
+  .profit-text.is-loss { color: var(--danger); }
+  .value.is-profit-value { color: #2E7D32 !important; }
+  .value.is-loss-value { color: var(--danger) !important; }
   .li-actions { display: flex; gap: 4px; }
 
   .period-toggle { display: flex; gap: 6px; margin-bottom: 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 4px; }
@@ -842,10 +849,16 @@
             <button id="period-month" onclick="setSalesPeriod('month')">This month</button>
             <button id="period-year" onclick="setSalesPeriod('year')">This year</button>
           </div>
-          <div class="stat-card" style="margin-bottom:16px;">
-            <div class="label" id="salesPeriodLabel">Total sales &mdash; this week</div>
-            <div class="value" id="statSalesTotal">&#8358;0</div>
-            <div class="sub" id="statSalesCount">0 sales</div>
+          <div class="stat-row" style="margin-bottom:16px;">
+            <div class="stat-card">
+              <div class="label" id="salesPeriodLabel">Total sales &mdash; this week</div>
+              <div class="value" id="statSalesTotal">&#8358;0</div>
+              <div class="sub" id="statSalesCount">0 sales</div>
+            </div>
+            <div class="stat-card">
+              <div class="label" id="salesProfitLabel">Profit &mdash; this week</div>
+              <div class="value" id="statSalesProfit">&#8358;0</div>
+            </div>
           </div>
           <div id="salesList"></div>
         </div>
@@ -904,6 +917,11 @@
             </select>
           </div>
 
+          <div class="section-title" id="settingsReportsLabel">Reports</div>
+          <div class="field-group" style="max-width:280px;">
+            <button class="btn btn-ghost" onclick="openSummaryModal()">&#128202; View ledger summary</button>
+          </div>
+
           <div style="margin-top:28px; padding-top:20px; border-top:1px solid var(--border); max-width:280px;">
             <button class="btn btn-danger-ghost" id="settingsLogoutBtn" onclick="switchShop()">Log out</button>
           </div>
@@ -932,7 +950,8 @@
     <input type="hidden" id="stockEditId" value="">
     <div class="field-group"><label id="stockNameLabel">Item name</label><input id="stockName" placeholder="e.g. Blue ankara dress"></div>
     <div class="field-group"><label id="stockQtyLabel">Quantity</label><input id="stockQty" type="number" inputmode="numeric" placeholder="e.g. 10"></div>
-    <div class="field-group"><label id="stockPriceLabel">Price per item (&#8358;)</label><input id="stockPrice" type="number" inputmode="numeric" placeholder="e.g. 8500"></div>
+    <div class="field-group"><label id="stockCostPriceLabel">Buy price (cost, per item)</label><input id="stockCostPrice" type="number" inputmode="numeric" placeholder="e.g. 5000"></div>
+    <div class="field-group"><label id="stockPriceLabel">Sell price (per item)</label><input id="stockPrice" type="number" inputmode="numeric" placeholder="e.g. 8500"></div>
     <div class="modal-actions">
       <button class="btn btn-danger-ghost" id="stockDeleteBtn" style="display:none;" onclick="deleteStock()"><span id="stockDeleteBtnLabel">Delete</span></button>
       <button class="btn btn-primary" id="stockSaveBtn" onclick="submitStock()">Save item</button>
@@ -1100,6 +1119,69 @@
   </div>
 </div>
 
+<div class="modal-overlay" id="summaryModal">
+  <div class="modal-sheet" style="max-width: 520px;">
+    <div class="icon-btn modal-close" onclick="closeModal('summaryModal')">&#10005;</div>
+    <h2>Ledger summary</h2>
+    <div class="modal-sub">A full snapshot of your account &mdash; sales, profit, orders, debts, and stock.</div>
+
+    <div class="period-toggle" style="max-width:280px; margin-bottom:18px;">
+      <button id="summary-period-month" class="active" onclick="setSummaryPeriod('month')">Monthly</button>
+      <button id="summary-period-year" onclick="setSummaryPeriod('year')">Yearly</button>
+    </div>
+
+    <div id="summaryReportContent">
+      <div style="text-align:center; margin-bottom:18px;">
+        <div style="font-family:'Space Grotesk'; font-weight:700; font-size:18px;" id="summaryShopName"></div>
+        <div class="hint" style="margin:4px auto 0;" id="summaryPeriodLabel"></div>
+      </div>
+
+      <div class="stat-row" style="margin-bottom:10px;">
+        <div class="stat-card">
+          <div class="label">Total sales revenue</div>
+          <div class="value" id="summaryRevenue">&#8358;0</div>
+          <div class="sub" id="summarySalesCount">0 sales</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Total profit</div>
+          <div class="value" id="summaryProfit">&#8358;0</div>
+        </div>
+      </div>
+
+      <div class="stat-row" style="margin-bottom:10px;">
+        <div class="stat-card">
+          <div class="label">Pending orders</div>
+          <div class="value" id="summaryOrders">&#8358;0</div>
+          <div class="sub" id="summaryOrdersCount">0 orders</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Owed to you</div>
+          <div class="value danger" id="summaryDebts">&#8358;0</div>
+          <div class="sub" id="summaryDebtsCount">0 unpaid</div>
+        </div>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat-card">
+          <div class="label">Current stock value</div>
+          <div class="value" id="summaryStockValue">&#8358;0</div>
+          <div class="sub" id="summaryStockCount">0 items</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Sales logged in period</div>
+          <div class="value" id="summaryPeriodSalesCount">0</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title">Export this summary</div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="exportSummaryPDF()">&#128196; PDF</button>
+      <button class="btn btn-ghost" onclick="exportSummaryImage()">&#128247; JPEG</button>
+      <button class="btn btn-ghost" onclick="exportSummaryExcel()">&#128202; Excel</button>
+    </div>
+  </div>
+</div>
 
 <div class="toast" id="toast"></div>
 
@@ -2351,6 +2433,7 @@ function openModal(id) {
     document.getElementById('stockEditId').value = '';
     document.getElementById('stockName').value = '';
     document.getElementById('stockQty').value = '';
+    document.getElementById('stockCostPrice').value = '';
     document.getElementById('stockPrice').value = '';
     document.getElementById('stockModalTitle').textContent = t('stock_modal_title_add');
     document.getElementById('stockModalSub').textContent = t('stock_modal_sub_add');
@@ -2499,27 +2582,41 @@ function renderSalesTab() {
   const start = periodStartDate(salesPeriod);
   const filtered = state.sales.filter(s => new Date(s.date) >= start);
   const total = filtered.reduce((s, x) => s + Number(x.total), 0);
+  const totalProfit = filtered.reduce((s, x) => s + Number(x.profit || 0), 0);
   const label = salesPeriod === 'day' ? 'today' : salesPeriod === 'week' ? 'this week' : salesPeriod === 'month' ? 'this month' : 'this year';
 
   document.getElementById('salesPeriodLabel').textContent = 'Total sales \u2014 ' + label;
+  document.getElementById('salesProfitLabel').textContent = 'Profit \u2014 ' + label;
   document.getElementById('statSalesTotal').textContent = fmtMoney(total);
   document.getElementById('statSalesCount').textContent = filtered.length + (filtered.length === 1 ? ' sale' : ' sales');
+
+  const profitEl = document.getElementById('statSalesProfit');
+  if (profitEl) {
+    profitEl.textContent = fmtMoney(Math.abs(totalProfit)) + (totalProfit < 0 ? ' loss' : ' profit');
+    profitEl.className = 'value ' + (totalProfit < 0 ? 'is-loss-value' : 'is-profit-value');
+  }
 
   const el = document.getElementById('salesList');
   if (filtered.length === 0) {
     el.innerHTML = '<div class="empty-state">' + t('empty_no_sales_period') + '</div>';
     return;
   }
-  el.innerHTML = [...filtered].reverse().map(s => `
+  el.innerHTML = [...filtered].reverse().map(s => {
+    const profit = Number(s.profit || 0);
+    const profitClass = profit < 0 ? 'is-loss' : 'is-profit';
+    const profitLabel = (profit < 0 ? '\u2212' : '+') + fmtMoney(Math.abs(profit));
+    return `
     <div class="list-item" onclick="editSale('${s.id}')" style="cursor:pointer;">
       <div class="li-main">
         <div class="li-title">${escapeHtml(s.productName)}</div>
         <div class="li-sub">${s.qty} sold &middot; ${new Date(s.date).toLocaleDateString()}</div>
       </div>
-      <div class="li-right">
+      <div class="li-right" style="flex-direction:column; align-items:flex-end; gap:2px;">
         <div class="li-tag ok">${fmtMoney(s.total)}</div>
+        <div class="profit-text ${profitClass}">${profitLabel}</div>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 function renderOrdersList() {
@@ -2614,19 +2711,21 @@ async function submitStock() {
   const editId = document.getElementById('stockEditId').value;
   const name = document.getElementById('stockName').value.trim();
   const qty = Number(document.getElementById('stockQty').value);
+  const costPrice = Number(document.getElementById('stockCostPrice').value);
   const price = Number(document.getElementById('stockPrice').value);
   if (!name || qty === '' || isNaN(qty) || qty < 0) { toast('Fill in the item name and quantity'); return; }
 
   if (editId) {
     const item = state.products.find(p => p.id === editId);
-    if (item) { item.name = name; item.qty = qty; item.price = price || 0; }
+    if (item) { item.name = name; item.qty = qty; item.costPrice = costPrice || 0; item.price = price || 0; }
   } else {
     const existing = state.products.find(p => p.name.toLowerCase() === name.toLowerCase());
     if (existing) {
       existing.qty = Number(existing.qty) + qty;
+      if (costPrice) existing.costPrice = costPrice;
       if (price) existing.price = price;
     } else {
-      state.products.push({ id: crypto.randomUUID(), name, qty, price: price || 0 });
+      state.products.push({ id: crypto.randomUUID(), name, qty, costPrice: costPrice || 0, price: price || 0 });
     }
   }
   await saveState('products');
@@ -2642,6 +2741,7 @@ function editStock(id) {
   document.getElementById('stockEditId').value = id;
   document.getElementById('stockName').value = p.name;
   document.getElementById('stockQty').value = p.qty;
+  document.getElementById('stockCostPrice').value = p.costPrice || '';
   document.getElementById('stockPrice').value = p.price;
   document.getElementById('stockModalTitle').textContent = t('stock_modal_title_edit');
   document.getElementById('stockModalSub').textContent = t('stock_modal_sub_edit');
@@ -2669,6 +2769,9 @@ async function submitSale() {
   const product = state.products.find(p => p.id === pid);
   if (!product) { toast('That item no longer exists'); return; }
 
+  const unitCost = Number(product.costPrice || 0);
+  const unitSell = Number(product.price || 0);
+
   if (editId) {
     const sale = state.sales.find(s => s.id === editId);
     if (!sale) return;
@@ -2677,7 +2780,10 @@ async function submitSale() {
     if (diff > 0 && diff > Number(product.qty)) { toast('Not enough stock for that increase'); return; }
     product.qty = Number(product.qty) - diff;
     sale.qty = qty;
-    sale.total = qty * Number(product.price);
+    sale.unitCost = unitCost;
+    sale.unitSell = unitSell;
+    sale.total = qty * unitSell;
+    sale.profit = qty * (unitSell - unitCost);
   } else {
     if (qty > Number(product.qty)) { toast('Not enough stock for that'); return; }
     product.qty = Number(product.qty) - qty;
@@ -2686,7 +2792,10 @@ async function submitSale() {
       productId: pid,
       productName: product.name,
       qty,
-      total: qty * Number(product.price),
+      unitCost,
+      unitSell,
+      total: qty * unitSell,
+      profit: qty * (unitSell - unitCost),
       date: new Date().toISOString()
     });
   }
@@ -3167,6 +3276,174 @@ async function copyRestockText() {
   }
 }
 
+let summaryPeriod = 'month';
+
+function summaryPeriodRange(period) {
+  const now = new Date();
+  if (period === 'month') {
+    const start = new Date(now.getFullYear(), now.getMonth(), 1);
+    const end = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+    const label = start.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
+    return { start, end, label };
+  } else {
+    const start = new Date(now.getFullYear(), 0, 1);
+    const end = new Date(now.getFullYear() + 1, 0, 1);
+    return { start, end, label: String(now.getFullYear()) };
+  }
+}
+
+function computeSummary(period) {
+  const { start, end, label } = summaryPeriodRange(period);
+  const salesInRange = state.sales.filter(s => { const d = new Date(s.date); return d >= start && d < end; });
+  const totalRevenue = salesInRange.reduce((s, x) => s + Number(x.total), 0);
+  const totalProfit = salesInRange.reduce((s, x) => s + Number(x.profit || 0), 0);
+
+  const pendingOrders = state.orders.filter(o => !o.fulfilled);
+  const pendingOrdersValue = pendingOrders.reduce((s, o) => s + Number(o.amount), 0);
+
+  const debtsUnpaid = state.debts.filter(d => !d.paid);
+  const debtsOwed = debtsUnpaid.reduce((s, d) => s + Number(d.amount), 0);
+
+  const stockValue = state.products.reduce((s, p) => s + Number(p.qty) * Number(p.price), 0);
+  const stockItems = state.products.reduce((s, p) => s + Number(p.qty), 0);
+
+  return {
+    label, totalRevenue, totalProfit,
+    salesCount: salesInRange.length,
+    pendingOrdersValue, pendingOrdersCount: pendingOrders.length,
+    debtsOwed, debtsCount: debtsUnpaid.length,
+    stockValue, stockItems,
+    salesInRange
+  };
+}
+
+function setSummaryPeriod(period) {
+  summaryPeriod = period;
+  document.getElementById('summary-period-month').classList.toggle('active', period === 'month');
+  document.getElementById('summary-period-year').classList.toggle('active', period === 'year');
+  renderSummaryModal();
+}
+
+function openSummaryModal() {
+  summaryPeriod = 'month';
+  document.getElementById('summary-period-month').classList.add('active');
+  document.getElementById('summary-period-year').classList.remove('active');
+  renderSummaryModal();
+  openModal('summaryModal');
+}
+
+function renderSummaryModal() {
+  const s = computeSummary(summaryPeriod);
+  const shopDisplayName = (state.profile && state.profile.shopName) ? state.profile.shopName : shopCode;
+
+  document.getElementById('summaryShopName').textContent = shopDisplayName;
+  document.getElementById('summaryPeriodLabel').textContent = (summaryPeriod === 'month' ? 'Monthly summary \u2014 ' : 'Yearly summary \u2014 ') + s.label;
+
+  document.getElementById('summaryRevenue').textContent = fmtMoney(s.totalRevenue);
+  document.getElementById('summarySalesCount').textContent = s.salesCount + (s.salesCount === 1 ? ' sale' : ' sales');
+
+  const profitEl = document.getElementById('summaryProfit');
+  profitEl.textContent = fmtMoney(Math.abs(s.totalProfit)) + (s.totalProfit < 0 ? ' loss' : ' profit');
+  profitEl.className = 'value ' + (s.totalProfit < 0 ? 'is-loss-value' : 'is-profit-value');
+
+  document.getElementById('summaryOrders').textContent = fmtMoney(s.pendingOrdersValue);
+  document.getElementById('summaryOrdersCount').textContent = s.pendingOrdersCount + (s.pendingOrdersCount === 1 ? ' order' : ' orders');
+
+  document.getElementById('summaryDebts').textContent = fmtMoney(s.debtsOwed);
+  document.getElementById('summaryDebtsCount').textContent = s.debtsCount + (s.debtsCount === 1 ? ' unpaid' : ' unpaid');
+
+  document.getElementById('summaryStockValue').textContent = fmtMoney(s.stockValue);
+  document.getElementById('summaryStockCount').textContent = s.stockItems + ' items';
+
+  document.getElementById('summaryPeriodSalesCount').textContent = String(s.salesCount);
+}
+
+async function exportSummaryImage() {
+  try {
+    const target = document.getElementById('summaryReportContent');
+    const canvas = await html2canvas(target, { scale: 2, backgroundColor: getComputedStyle(document.body).getPropertyValue('--bg') || '#FBF8F3' });
+    const link = document.createElement('a');
+    link.download = (shopCode || 'shop') + '-ledger-summary.jpg';
+    link.href = canvas.toDataURL('image/jpeg', 0.92);
+    link.click();
+    toast('Summary image downloaded');
+  } catch (e) {
+    toast("Couldn't generate the image. Try again.");
+  }
+}
+
+async function exportSummaryPDF() {
+  try {
+    const target = document.getElementById('summaryReportContent');
+    const canvas = await html2canvas(target, { scale: 2, backgroundColor: '#FFFFFF' });
+    const imgData = canvas.toDataURL('image/png');
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'a4' });
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const imgWidth = pageWidth - 60;
+    const imgHeight = (canvas.height / canvas.width) * imgWidth;
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(16);
+    pdf.text('Ledger Summary', 30, 40);
+    pdf.addImage(imgData, 'PNG', 30, 60, imgWidth, imgHeight);
+    pdf.save((shopCode || 'shop') + '-ledger-summary.pdf');
+    toast('Summary PDF downloaded');
+  } catch (e) {
+    toast("Couldn't generate the PDF. Try again.");
+  }
+}
+
+function exportSummaryExcel() {
+  try {
+    const s = computeSummary(summaryPeriod);
+    const shopDisplayName = (state.profile && state.profile.shopName) ? state.profile.shopName : shopCode;
+
+    const summaryRows = [
+      ['Ledger Summary', ''],
+      ['Shop', shopDisplayName],
+      ['Period', (summaryPeriod === 'month' ? 'Monthly' : 'Yearly') + ' \u2014 ' + s.label],
+      ['', ''],
+      ['Total sales revenue', s.totalRevenue],
+      ['Total profit', s.totalProfit],
+      ['Sales logged in period', s.salesCount],
+      ['', ''],
+      ['Pending orders value', s.pendingOrdersValue],
+      ['Pending orders count', s.pendingOrdersCount],
+      ['', ''],
+      ['Owed to you (debts)', s.debtsOwed],
+      ['Unpaid debts count', s.debtsCount],
+      ['', ''],
+      ['Current stock value', s.stockValue],
+      ['Current stock items', s.stockItems]
+    ];
+
+    const salesRows = [
+      ['Date', 'Item', 'Quantity', 'Unit Cost', 'Unit Sell', 'Total', 'Profit']
+    ];
+    s.salesInRange.forEach(sale => {
+      salesRows.push([
+        new Date(sale.date).toLocaleDateString(),
+        sale.productName,
+        sale.qty,
+        sale.unitCost || 0,
+        sale.unitSell || 0,
+        sale.total,
+        sale.profit || 0
+      ]);
+    });
+
+    const wb = XLSX.utils.book_new();
+    const wsSummary = XLSX.utils.aoa_to_sheet(summaryRows);
+    const wsSales = XLSX.utils.aoa_to_sheet(salesRows);
+    XLSX.utils.book_append_sheet(wb, wsSummary, 'Summary');
+    XLSX.utils.book_append_sheet(wb, wsSales, 'Sales detail');
+    XLSX.writeFile(wb, (shopCode || 'shop') + '-ledger-summary.xlsx');
+    toast('Excel file downloaded');
+  } catch (e) {
+    toast("Couldn't generate the Excel file. Try again.");
+  }
+}
+
 document.getElementById('shopCodeInput').addEventListener('keydown', e => {
   if (e.key === 'Enter') document.getElementById('shopPasswordInput').focus();
 });
@@ -3193,7 +3470,7 @@ function bindEnter(ids, fn) {
 }
 
 bindEnter(['signupConfirmPassword', 'secretAnswerInput'], enterShop);
-bindEnter(['stockName', 'stockQty', 'stockPrice'], submitStock);
+bindEnter(['stockName', 'stockQty', 'stockCostPrice', 'stockPrice'], submitStock);
 bindEnter(['debtName', 'debtAmount'], submitDebt);
 bindEnter(['orderCustomer', 'orderDescription', 'orderAmount'], submitOrder);
 bindEnter(['profileName', 'profileShopName', 'profileLocation', 'profilePhone', 'profileEmail'], saveProfile);
