@@ -662,19 +662,32 @@
 <div class="modal-overlay" id="catalogueModal">
   <div class="modal-sheet" style="max-width: 480px;">
     <div class="icon-btn modal-close" onclick="closeModal('catalogueModal')">&#10005;</div>
-    <h2>Build your catalogue</h2>
-    <div class="modal-sub">Pick what to include, then export it to share with customers on WhatsApp or Instagram.</div>
 
-    <div class="field-group"><label>Caption (optional)</label><input id="catalogueNote" placeholder="e.g. New arrivals this week!"></div>
+    <div id="catalogueEditView">
+      <h2>Build your catalogue</h2>
+      <div class="modal-sub">Pick what to include, then review before sharing with customers.</div>
 
-    <div class="section-title" style="margin-top:12px;">Select items to include</div>
-    <div id="catalogueItemPicker" style="max-height:220px; overflow-y:auto; border:1px solid var(--border); border-radius:10px; margin-bottom:16px;"></div>
+      <div class="field-group"><label>Caption (optional)</label><input id="catalogueNote" placeholder="e.g. New arrivals this week!"></div>
 
-    <div class="modal-actions">
-      <button class="btn btn-ghost" onclick="saveCatalogue()">Save selection</button>
-      <button class="btn btn-primary" onclick="exportCatalogueImage()">Export as image</button>
+      <div class="section-title" style="margin-top:12px;">Select items to include</div>
+      <div id="catalogueItemPicker" style="max-height:220px; overflow-y:auto; border:1px solid var(--border); border-radius:10px; margin-bottom:16px;"></div>
+
+      <div class="modal-actions">
+        <button class="btn btn-primary" onclick="showCatalogueReview()">Review selection</button>
+      </div>
     </div>
-    <button class="btn btn-ghost" style="margin-top:10px;" onclick="copyCatalogueText()">Copy as text instead</button>
+
+    <div id="catalogueReviewView" style="display:none;">
+      <h2>Confirm your catalogue</h2>
+      <div class="modal-sub">Double check everything below before saving or sharing.</div>
+      <div id="catalogueReviewList" style="margin-bottom:16px;"></div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="backToCatalogueEdit()">Back to edit</button>
+        <button class="btn btn-primary" onclick="confirmCatalogueSave()">Confirm &amp; save</button>
+      </div>
+      <button class="btn btn-primary" style="margin-top:10px;" onclick="confirmCatalogueExport()">Confirm &amp; export as image</button>
+      <button class="btn btn-ghost" style="margin-top:10px;" onclick="confirmCatalogueCopy()">Confirm &amp; copy as text</button>
+    </div>
 
     <div id="catalogueRenderTarget" style="position:absolute; left:-9999px; top:0;"></div>
   </div>
@@ -683,27 +696,40 @@
 <div class="modal-overlay" id="restockModal">
   <div class="modal-sheet" style="max-width: 480px;">
     <div class="icon-btn modal-close" onclick="closeModal('restockModal')">&#10005;</div>
-    <h2>Order from wholesaler</h2>
-    <div class="modal-sub">Pick items and quantities you want to restock, then send the list to your wholesaler.</div>
 
-    <div class="field-group"><label>Note (optional)</label><input id="restockNote" placeholder="e.g. Please deliver by Friday"></div>
+    <div id="restockEditView">
+      <h2>Order from wholesaler</h2>
+      <div class="modal-sub">Pick items and quantities you want to restock, then review before sending.</div>
 
-    <div class="section-title" style="margin-top:12px;">Reorder existing items</div>
-    <div id="restockStockPicker" style="max-height:180px; overflow-y:auto; border:1px solid var(--border); border-radius:10px; margin-bottom:16px;"></div>
+      <div class="field-group"><label>Note (optional)</label><input id="restockNote" placeholder="e.g. Please deliver by Friday"></div>
 
-    <div class="section-title">Add a new item to order</div>
-    <div style="display:flex; gap:8px; margin-bottom:8px;">
-      <input id="restockNewItemName" placeholder="Item name" style="flex:2;">
-      <input id="restockNewItemQty" type="number" inputmode="numeric" placeholder="Qty" style="flex:1;">
-      <button class="icon-btn" onclick="addRestockCustomItem()">&#43;</button>
+      <div class="section-title" style="margin-top:12px;">Reorder existing items</div>
+      <div id="restockStockPicker" style="max-height:180px; overflow-y:auto; border:1px solid var(--border); border-radius:10px; margin-bottom:16px;"></div>
+
+      <div class="section-title">Add a new item to order</div>
+      <div style="display:flex; gap:8px; margin-bottom:8px;">
+        <input id="restockNewItemName" placeholder="Item name" style="flex:2;">
+        <input id="restockNewItemQty" type="number" inputmode="numeric" placeholder="Qty" style="flex:1;">
+        <button class="icon-btn" onclick="addRestockCustomItem()">&#43;</button>
+      </div>
+      <div id="restockCustomList" style="margin-bottom:16px;"></div>
+
+      <div class="modal-actions">
+        <button class="btn btn-primary" onclick="showRestockReview()">Review order</button>
+      </div>
     </div>
-    <div id="restockCustomList" style="margin-bottom:16px;"></div>
 
-    <div class="modal-actions">
-      <button class="btn btn-ghost" onclick="saveRestockList()">Save list</button>
-      <button class="btn btn-primary" onclick="exportRestockImage()">Export as image</button>
+    <div id="restockReviewView" style="display:none;">
+      <h2>Confirm your order</h2>
+      <div class="modal-sub">Double check quantities before sending this to your wholesaler.</div>
+      <div id="restockReviewList" style="margin-bottom:16px;"></div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="backToRestockEdit()">Back to edit</button>
+        <button class="btn btn-primary" onclick="confirmRestockSave()">Confirm &amp; save</button>
+      </div>
+      <button class="btn btn-primary" style="margin-top:10px;" onclick="confirmRestockExport()">Confirm &amp; export as image</button>
+      <button class="btn btn-ghost" style="margin-top:10px;" onclick="confirmRestockCopy()">Confirm &amp; copy as text</button>
     </div>
-    <button class="btn btn-ghost" style="margin-top:10px;" onclick="copyRestockText()">Copy as text instead</button>
 
     <div id="restockRenderTarget" style="position:absolute; left:-9999px; top:0;"></div>
   </div>
@@ -1773,6 +1799,8 @@ function openCatalogueModal() {
   const cat = state.catalogue || {};
   document.getElementById('catalogueNote').value = cat.note || '';
   renderCataloguePicker(cat.includedIds || []);
+  document.getElementById('catalogueEditView').style.display = 'block';
+  document.getElementById('catalogueReviewView').style.display = 'none';
   openModal('catalogueModal');
 }
 
@@ -1805,6 +1833,43 @@ async function saveCatalogue() {
 function buildCatalogueItems() {
   const includedIds = getSelectedCatalogueIds();
   return state.products.filter(p => includedIds.includes(p.id));
+}
+
+function showCatalogueReview() {
+  const items = buildCatalogueItems();
+  if (items.length === 0) { toast('Select at least one item first'); return; }
+
+  const note = document.getElementById('catalogueNote').value.trim();
+  const reviewEl = document.getElementById('catalogueReviewList');
+  reviewEl.innerHTML = (note ? `<p class="hint" style="margin-bottom:12px;"><b>Caption:</b> ${escapeHtml(note)}</p>` : '') +
+    items.map(p => `
+      <div class="list-item">
+        <div class="li-main"><div class="li-title">${escapeHtml(p.name)}</div></div>
+        <div class="li-tag ok">${fmtMoney(p.price)}</div>
+      </div>`).join('');
+
+  document.getElementById('catalogueEditView').style.display = 'none';
+  document.getElementById('catalogueReviewView').style.display = 'block';
+}
+
+function backToCatalogueEdit() {
+  document.getElementById('catalogueEditView').style.display = 'block';
+  document.getElementById('catalogueReviewView').style.display = 'none';
+}
+
+async function confirmCatalogueSave() {
+  await saveCatalogue();
+  closeModal('catalogueModal');
+}
+
+async function confirmCatalogueExport() {
+  await exportCatalogueImage();
+  closeModal('catalogueModal');
+}
+
+async function confirmCatalogueCopy() {
+  await copyCatalogueText();
+  closeModal('catalogueModal');
 }
 
 async function exportCatalogueImage() {
@@ -1876,6 +1941,8 @@ function openRestockModal() {
   document.getElementById('restockNewItemQty').value = '';
   renderRestockStockPicker(r.stockOrders || []);
   renderRestockCustomList();
+  document.getElementById('restockEditView').style.display = 'block';
+  document.getElementById('restockReviewView').style.display = 'none';
   openModal('restockModal');
 }
 
@@ -1941,6 +2008,43 @@ async function saveRestockList() {
   };
   await saveState('restock');
   toast('Restock list saved');
+}
+
+function showRestockReview() {
+  const items = buildRestockItems();
+  if (items.length === 0) { toast('Add at least one item first'); return; }
+
+  const note = document.getElementById('restockNote').value.trim();
+  const reviewEl = document.getElementById('restockReviewList');
+  reviewEl.innerHTML = (note ? `<p class="hint" style="margin-bottom:12px;"><b>Note:</b> ${escapeHtml(note)}</p>` : '') +
+    items.map(p => `
+      <div class="list-item">
+        <div class="li-main"><div class="li-title">${escapeHtml(p.name)}</div></div>
+        <div class="li-tag ok">Qty: ${p.qty}</div>
+      </div>`).join('');
+
+  document.getElementById('restockEditView').style.display = 'none';
+  document.getElementById('restockReviewView').style.display = 'block';
+}
+
+function backToRestockEdit() {
+  document.getElementById('restockEditView').style.display = 'block';
+  document.getElementById('restockReviewView').style.display = 'none';
+}
+
+async function confirmRestockSave() {
+  await saveRestockList();
+  closeModal('restockModal');
+}
+
+async function confirmRestockExport() {
+  await exportRestockImage();
+  closeModal('restockModal');
+}
+
+async function confirmRestockCopy() {
+  await copyRestockText();
+  closeModal('restockModal');
 }
 
 function buildRestockItems() {
