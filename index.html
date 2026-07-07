@@ -80,7 +80,16 @@
   }
   h1, h2, h3 { font-family: 'Space Grotesk', sans-serif; margin: 0; }
   .screen { display: none; flex: 1; }
-  .screen.active { display: flex; flex-direction: column; flex: 1; }
+  .screen.active { display: flex; flex-direction: column; flex: 1; animation: screenFadeIn 0.32s ease; }
+  @keyframes screenFadeIn {
+    from { opacity: 0; transform: translateY(10px) scale(0.985); }
+    to { opacity: 1; transform: none; }
+  }
+  .tabpanel.tab-enter { animation: tabFadeIn 0.26s ease; }
+  @keyframes tabFadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: none; }
+  }
   .content { padding: 20px 18px 100px; flex: 1; }
 
   /* ONBOARDING */
@@ -261,6 +270,7 @@
     background: var(--bg); width: 100%; max-width: 460px; border-radius: 20px 20px 0 0;
     padding: 22px 20px calc(22px + env(safe-area-inset-bottom)); max-height: 86vh; overflow-y: auto;
     position: relative;
+    box-shadow: 0 -12px 40px rgba(20,30,25,0.22), 0 -2px 8px rgba(20,30,25,0.1);
   }
   .modal-sheet h2 { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
   .modal-sub { font-size: 13px; color: var(--ink-soft); margin-bottom: 18px; }
@@ -278,6 +288,59 @@
     border-radius: 20px; z-index: 60; opacity: 0; transition: opacity 0.25s; pointer-events: none;
   }
   .toast.show { opacity: 1; }
+
+  /* PUBLIC CATALOGUE PAGE */
+  .public-cat-wrap { max-width: 480px; margin: 0 auto; padding: 32px 20px 60px; min-height: 100vh; }
+  .public-cat-header { text-align: center; margin-bottom: 28px; }
+  .public-cat-header .avatar-circle { width: 64px; height: 64px; margin: 0 auto 14px; }
+  .public-cat-header .avatar-circle span { font-size: 24px; }
+  .public-cat-header h1 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+  .public-cat-header .loc { font-size: 13px; color: var(--ink-soft); }
+  .public-cat-note {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+    padding: 14px 16px; margin-bottom: 20px; font-size: 13.5px; color: var(--ink-soft);
+    box-shadow: 0 8px 20px rgba(31,42,36,0.05);
+  }
+  .public-cat-item {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+    padding: 14px 16px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;
+    box-shadow: 0 8px 20px rgba(31,42,36,0.05);
+  }
+  .public-cat-item .name { font-size: 14.5px; font-weight: 500; }
+  .public-cat-item .price { font-family: 'Space Grotesk'; font-weight: 700; color: var(--primary); font-size: 15px; }
+  .whatsapp-cta {
+    position: sticky; bottom: 16px; margin-top: 24px;
+    background: #25D366; color: #fff; text-align: center; text-decoration: none;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 14px; border-radius: 12px; font-family: 'Space Grotesk'; font-weight: 600; font-size: 14.5px;
+    box-shadow: 0 12px 28px rgba(37,211,102,0.35);
+  }
+  .public-cat-footer { text-align: center; margin-top: 30px; font-size: 12px; color: var(--ink-faint); }
+  .public-cat-footer a { color: var(--primary); text-decoration: none; font-weight: 600; }
+
+  /* SETTINGS DRAWER (mobile) */
+  .settings-backdrop {
+    position: fixed; inset: 0; background: rgba(15,20,17,0.4); z-index: 44;
+    opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+  }
+  .settings-backdrop.active { opacity: 1; pointer-events: auto; }
+
+  @media (max-width: 859px) {
+    #tab-settings {
+      display: block !important;
+      position: fixed; top: 0; left: 0; bottom: 0; width: 82%; max-width: 320px;
+      background: var(--surface); z-index: 45; overflow-y: auto;
+      padding: 24px 18px calc(24px + env(safe-area-inset-bottom));
+      box-shadow: 18px 0 44px rgba(20,30,25,0.24), 4px 0 10px rgba(20,30,25,0.12);
+      transform: translateX(-105%);
+      transition: transform 0.3s ease;
+      animation: none;
+    }
+    #tab-settings.drawer-open { transform: translateX(0); }
+  }
+  @media (min-width: 860px) {
+    .settings-backdrop { display: none !important; }
+  }
 
   /* DESKTOP LAYOUT */
   @media (min-width: 860px) {
@@ -307,7 +370,7 @@
     .stat-card .value { font-size: 24px; }
     .quick-actions { grid-template-columns: repeat(4, 1fr); }
     .modal-overlay { align-items: center; }
-    .modal-sheet { max-width: 420px; border-radius: 18px; }
+    .modal-sheet { max-width: 420px; border-radius: 18px; box-shadow: 0 24px 60px rgba(20,30,25,0.28), 0 4px 14px rgba(20,30,25,0.12); }
     .topbar { padding: 24px 40px 0; }
   }
   /* LANDING PAGE */
@@ -459,6 +522,22 @@
 </script>
 
 <div id="app">
+
+  <div id="publicCatalogueScreen" class="screen">
+    <div class="public-cat-wrap" id="publicCatWrap">
+      <div class="public-cat-header">
+        <div class="avatar-circle" id="publicCatAvatar" style="margin:0 auto 14px;"><span>&#128230;</span></div>
+        <h1 id="publicCatShopName">Loading...</h1>
+        <div class="loc" id="publicCatLocation"></div>
+      </div>
+      <div id="publicCatNote" style="display:none;" class="public-cat-note"></div>
+      <div id="publicCatList"></div>
+      <a id="publicCatWhatsapp" class="whatsapp-cta" style="display:none;" href="#" target="_blank" rel="noopener">
+        <span>&#128172;</span><span>Message on WhatsApp</span>
+      </a>
+      <div class="public-cat-footer">Made with <a href="?" onclick="event.preventDefault(); location.href = location.pathname;">Ledger</a></div>
+    </div>
+  </div>
 
   <div id="landingScreen" class="screen active">
     <nav class="landing-nav">
@@ -806,6 +885,8 @@
             <button class="btn btn-danger-ghost" id="settingsLogoutBtn" onclick="switchShop()">Log out</button>
           </div>
         </div>
+
+        <div class="settings-backdrop" id="settingsBackdrop" onclick="closeSettingsDrawer()"></div>
       </div>
 
       <div class="navbar">
@@ -926,6 +1007,7 @@
       <div class="modal-actions">
         <button class="btn btn-primary" onclick="showCatalogueReview()"><span id="btnReviewCatalogue">Review selection</span></button>
       </div>
+      <button class="btn btn-ghost" style="margin-top:10px;" onclick="copyPublicCatalogueLink()">&#128279; Copy public catalogue link</button>
     </div>
 
     <div id="catalogueReviewView" style="display:none;">
@@ -1784,6 +1866,79 @@ async function tryAutoLogin() {
   }
 }
 
+async function showPublicCatalogue(code) {
+  document.getElementById('landingScreen').classList.remove('active');
+  document.getElementById('publicCatalogueScreen').classList.add('active');
+
+  const shopNameEl = document.getElementById('publicCatShopName');
+  const locationEl = document.getElementById('publicCatLocation');
+  const avatarEl = document.getElementById('publicCatAvatar');
+  const noteEl = document.getElementById('publicCatNote');
+  const listEl = document.getElementById('publicCatList');
+  const waEl = document.getElementById('publicCatWhatsapp');
+
+  try {
+    await waitForFirebase();
+    const { db, doc, getDoc } = window.__firestore;
+    const ref = doc(db, 'shops', code.trim().toLowerCase());
+    const snap = await getDoc(ref);
+
+    if (!snap.exists()) {
+      shopNameEl.textContent = "Store not found";
+      locationEl.textContent = "Double check the link and try again.";
+      return;
+    }
+
+    const data = snap.data();
+    const profile = data.profile || {};
+    const catalogue = data.catalogue || {};
+    const products = data.products || [];
+    const includedIds = catalogue.includedIds || [];
+    const items = products.filter(p => includedIds.includes(p.id));
+
+    const displayName = profile.shopName || code;
+    shopNameEl.textContent = displayName;
+    locationEl.textContent = profile.location || '';
+
+    if (profile.profilePic) {
+      avatarEl.innerHTML = `<img src="${profile.profilePic}">`;
+    } else {
+      avatarEl.innerHTML = `<span>${escapeHtml(displayName.charAt(0).toUpperCase())}</span>`;
+    }
+
+    if (catalogue.note) {
+      noteEl.textContent = catalogue.note;
+      noteEl.style.display = 'block';
+    }
+
+    // Use the shop's own saved currency setting to format prices consistently for viewers
+    state.settings = data.settings || { currency: 'NGN' };
+    if (state.settings.currency !== 'NGN') {
+      await ensureExchangeRates();
+    }
+
+    if (items.length === 0) {
+      listEl.innerHTML = '<div class="empty-state">This store hasn\'t shared any items yet.</div>';
+    } else {
+      listEl.innerHTML = items.map(p => `
+        <div class="public-cat-item">
+          <span class="name">${escapeHtml(p.name)}</span>
+          <span class="price">${fmtMoney(p.price)}</span>
+        </div>`).join('');
+    }
+
+    if (profile.phone) {
+      const digits = profile.phone.replace(/[^\d+]/g, '');
+      const message = encodeURIComponent(`Hi ${displayName}, I saw your catalogue and I'm interested in some items!`);
+      waEl.href = `https://wa.me/${digits}?text=${message}`;
+      waEl.style.display = 'flex';
+    }
+  } catch (e) {
+    shopNameEl.textContent = "Couldn't load this catalogue";
+    locationEl.textContent = "Check your internet connection and try again.";
+  }
+}
+
 function updateShopHeader() {
   const displayName = (state.profile && state.profile.shopName) ? state.profile.shopName : shopCode;
   document.getElementById('shopNameLabel').textContent = displayName;
@@ -2032,13 +2187,38 @@ function switchShop() {
   history.replaceState({}, '', location.pathname);
 }
 
+let lastActiveTabBeforeSettings = 'home';
+
 function showTab(name, skipHistory) {
+  if (name === 'settings') {
+    const current = ['home', 'stock', 'sales', 'orders', 'debts'].find(
+      t => document.getElementById('tab-' + t).style.display === 'block'
+    );
+    if (current) lastActiveTabBeforeSettings = current;
+  }
+
   ['home', 'stock', 'sales', 'orders', 'debts', 'settings'].forEach(t => {
     document.getElementById('tab-' + t).style.display = t === name ? 'block' : 'none';
   });
   document.querySelectorAll('.nav-btn').forEach(b => {
     b.classList.toggle('active', b.dataset.tab === name);
   });
+
+  const settingsPanel = document.getElementById('tab-settings');
+  const backdrop = document.getElementById('settingsBackdrop');
+  if (name === 'settings') {
+    settingsPanel.classList.add('drawer-open');
+    backdrop.classList.add('active');
+  } else {
+    settingsPanel.classList.remove('drawer-open');
+    backdrop.classList.remove('active');
+  }
+
+  const activeEl = document.getElementById('tab-' + name);
+  activeEl.classList.remove('tab-enter');
+  void activeEl.offsetWidth;
+  activeEl.classList.add('tab-enter');
+
   if (name === 'stock') renderStockList();
   if (name === 'sales') renderSalesTab();
   if (name === 'orders') renderOrdersList();
@@ -2048,6 +2228,10 @@ function showTab(name, skipHistory) {
   if (!skipHistory && shopCode) {
     history.pushState({ tab: name }, '', '#' + name);
   }
+}
+
+function closeSettingsDrawer() {
+  showTab(lastActiveTabBeforeSettings);
 }
 
 window.addEventListener('popstate', (e) => {
@@ -2512,6 +2696,16 @@ async function deleteDebt(id) {
   toast('Debt deleted');
 }
 
+async function copyPublicCatalogueLink() {
+  const link = location.origin + location.pathname + '?store=' + encodeURIComponent(shopCode);
+  try {
+    await navigator.clipboard.writeText(link);
+    toast('Link copied \u2014 share it with your customers');
+  } catch (e) {
+    toast(link);
+  }
+}
+
 function openCatalogueModal() {
   const cat = state.catalogue || {};
   document.getElementById('catalogueNote').value = cat.note || '';
@@ -2862,7 +3056,12 @@ bindEnter(['catalogueNote'], saveCatalogue);
 bindEnter(['restockNote'], saveRestockList);
 bindEnter(['restockNewItemName', 'restockNewItemQty'], addRestockCustomItem);
 
-tryAutoLogin();
+const publicStoreCode = new URLSearchParams(location.search).get('store');
+if (publicStoreCode) {
+  showPublicCatalogue(publicStoreCode);
+} else {
+  tryAutoLogin();
+}
 </script>
 
 </body>
