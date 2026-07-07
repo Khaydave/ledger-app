@@ -381,17 +381,17 @@
   <div class="modal-overlay" id="forgotModal">
     <div class="modal-sheet">
       <div class="icon-btn modal-close" onclick="closeModal('forgotModal')">&#10005;</div>
-      <h2>Reset your password</h2>
+      <h2 id="forgotModalTitle">Reset your password</h2>
       <div class="modal-sub" id="forgotStep1Sub">Enter your shop code to get started.</div>
 
       <div id="forgotStep1">
-        <div class="field-group"><label>Shop code</label><input id="forgotShopCode" placeholder="e.g. ada-thrift-01"></div>
+        <div class="field-group"><label id="forgotShopCodeLabel">Shop code</label><input id="forgotShopCode" placeholder="e.g. ada-thrift-01"></div>
         <div class="modal-actions"><button class="btn btn-primary" onclick="forgotFindShop()">Continue</button></div>
       </div>
 
       <div id="forgotStep2" style="display:none;">
         <div class="field-group"><label id="forgotQuestionLabel">Security question</label><input id="forgotAnswer" placeholder="Your answer"></div>
-        <div class="field-group"><label>New password</label><input id="forgotNewPassword" type="password" placeholder="At least 4 characters"></div>
+        <div class="field-group"><label id="forgotNewPasswordLabel">New password</label><input id="forgotNewPassword" type="password" placeholder="At least 4 characters"></div>
         <div class="modal-actions"><button class="btn btn-primary" onclick="forgotResetPassword()">Reset password</button></div>
       </div>
     </div>
@@ -445,10 +445,10 @@
             <button class="quick-btn secondary" onclick="openModal('debtModal')"><span class="qicon">&#128179;</span><span id="qaAddDebt">Add debt</span></button>
           </div>
 
-          <div class="section-title">Running low</div>
+          <div class="section-title" id="sectionRunningLow">Running low</div>
           <div id="lowStockList"></div>
 
-          <div class="section-title">Recent sales</div>
+          <div class="section-title" id="sectionRecentSales">Recent sales</div>
           <div id="recentSalesList"></div>
         </div>
 
@@ -552,7 +552,7 @@
           </div>
 
           <div style="margin-top:28px; padding-top:20px; border-top:1px solid var(--border); max-width:280px;">
-            <button class="btn btn-danger-ghost" onclick="switchShop()">Log out</button>
+            <button class="btn btn-danger-ghost" id="settingsLogoutBtn" onclick="switchShop()">Log out</button>
           </div>
         </div>
       </div>
@@ -575,11 +575,11 @@
     <h2 id="stockModalTitle">Add stock</h2>
     <div class="modal-sub" id="stockModalSub">Add a new item, or add more of one you already have.</div>
     <input type="hidden" id="stockEditId" value="">
-    <div class="field-group"><label>Item name</label><input id="stockName" placeholder="e.g. Blue ankara dress"></div>
-    <div class="field-group"><label>Quantity</label><input id="stockQty" type="number" inputmode="numeric" placeholder="e.g. 10"></div>
-    <div class="field-group"><label>Price per item (&#8358;)</label><input id="stockPrice" type="number" inputmode="numeric" placeholder="e.g. 8500"></div>
+    <div class="field-group"><label id="stockNameLabel">Item name</label><input id="stockName" placeholder="e.g. Blue ankara dress"></div>
+    <div class="field-group"><label id="stockQtyLabel">Quantity</label><input id="stockQty" type="number" inputmode="numeric" placeholder="e.g. 10"></div>
+    <div class="field-group"><label id="stockPriceLabel">Price per item (&#8358;)</label><input id="stockPrice" type="number" inputmode="numeric" placeholder="e.g. 8500"></div>
     <div class="modal-actions">
-      <button class="btn btn-danger-ghost" id="stockDeleteBtn" style="display:none;" onclick="deleteStock()">Delete</button>
+      <button class="btn btn-danger-ghost" id="stockDeleteBtn" style="display:none;" onclick="deleteStock()"><span id="stockDeleteBtnLabel">Delete</span></button>
       <button class="btn btn-primary" id="stockSaveBtn" onclick="submitStock()">Save item</button>
     </div>
   </div>
@@ -589,20 +589,20 @@
   <div class="modal-sheet">
     <div class="icon-btn modal-close" onclick="closeModal('saleModal')">&#10005;</div>
     <h2 id="saleModalTitle">Log a sale</h2>
-    <div class="modal-sub">This reduces the item's stock automatically.</div>
+    <div class="modal-sub" id="saleModalSub">This reduces the item's stock automatically.</div>
     <input type="hidden" id="saleEditId" value="">
     <input type="hidden" id="saleSelectedProduct" value="">
     <div class="field-group">
-      <label>Item</label>
+      <label id="saleItemLabel">Item</label>
       <div class="search-box">
         <span class="search-icon">&#128269;</span>
         <input id="saleSearchInput" placeholder="Search item to sell..." oninput="renderSaleProductPicker()" onfocus="renderSaleProductPicker()">
       </div>
       <div class="product-pick-list" id="saleProductPicker"></div>
     </div>
-    <div class="field-group"><label>Quantity sold</label><input id="saleQty" type="number" inputmode="numeric" value="1"></div>
+    <div class="field-group"><label id="saleQtyLabel">Quantity sold</label><input id="saleQty" type="number" inputmode="numeric" value="1"></div>
     <div class="modal-actions">
-      <button class="btn btn-danger-ghost" id="saleDeleteBtn" style="display:none;" onclick="deleteSale()">Delete</button>
+      <button class="btn btn-danger-ghost" id="saleDeleteBtn" style="display:none;" onclick="deleteSale()"><span id="saleDeleteBtnLabel">Delete</span></button>
       <button class="btn btn-primary" id="saleSaveBtn" onclick="submitSale()">Log sale</button>
     </div>
   </div>
@@ -611,23 +611,23 @@
 <div class="modal-overlay" id="orderModal">
   <div class="modal-sheet">
     <div class="icon-btn modal-close" onclick="closeModal('orderModal')">&#10005;</div>
-    <h2>Log an order</h2>
-    <div class="modal-sub">For orders a customer has placed but you haven't fulfilled or been paid for yet.</div>
-    <div class="field-group"><label>Customer name</label><input id="orderCustomer" placeholder="e.g. Blessing"></div>
-    <div class="field-group"><label>What did they order?</label><input id="orderDescription" placeholder="e.g. 2 skincare sets"></div>
-    <div class="field-group"><label>Order value (&#8358;)</label><input id="orderAmount" type="number" inputmode="numeric" placeholder="e.g. 12000"></div>
-    <div class="modal-actions"><button class="btn btn-primary" onclick="submitOrder()">Save order</button></div>
+    <h2 id="orderModalTitle">Log an order</h2>
+    <div class="modal-sub" id="orderModalSub">For orders a customer has placed but you haven't fulfilled or been paid for yet.</div>
+    <div class="field-group"><label id="orderCustomerLabel">Customer name</label><input id="orderCustomer" placeholder="e.g. Blessing"></div>
+    <div class="field-group"><label id="orderDescLabel">What did they order?</label><input id="orderDescription" placeholder="e.g. 2 skincare sets"></div>
+    <div class="field-group"><label id="orderAmountLabel">Order value (&#8358;)</label><input id="orderAmount" type="number" inputmode="numeric" placeholder="e.g. 12000"></div>
+    <div class="modal-actions"><button class="btn btn-primary" onclick="submitOrder()"><span id="btnSaveOrder">Save order</span></button></div>
   </div>
 </div>
 
 <div class="modal-overlay" id="debtModal">
   <div class="modal-sheet">
     <div class="icon-btn modal-close" onclick="closeModal('debtModal')">&#10005;</div>
-    <h2>Add a debt</h2>
-    <div class="modal-sub">Track a customer who paid later, or hasn't paid yet.</div>
-    <div class="field-group"><label>Customer name</label><input id="debtName" placeholder="e.g. Blessing"></div>
-    <div class="field-group"><label>Amount owed (&#8358;)</label><input id="debtAmount" type="number" inputmode="numeric" placeholder="e.g. 5000"></div>
-    <div class="modal-actions"><button class="btn btn-primary" onclick="submitDebt()">Save</button></div>
+    <h2 id="debtModalTitle">Add a debt</h2>
+    <div class="modal-sub" id="debtModalSub">Track a customer who paid later, or hasn't paid yet.</div>
+    <div class="field-group"><label id="debtNameLabel">Customer name</label><input id="debtName" placeholder="e.g. Blessing"></div>
+    <div class="field-group"><label id="debtAmountLabel">Amount owed (&#8358;)</label><input id="debtAmount" type="number" inputmode="numeric" placeholder="e.g. 5000"></div>
+    <div class="modal-actions"><button class="btn btn-primary" onclick="submitDebt()"><span id="btnSaveDebt">Save</span></button></div>
   </div>
 </div>
 
@@ -641,17 +641,17 @@
     <input type="file" id="profilePicInput" accept="image/*" style="display:none;" onchange="handleProfilePicUpload(event)">
     <p class="hint" style="text-align:center; margin:0 auto 16px; max-width:none;">Tap the circle to add a photo</p>
 
-    <div class="field-group"><label>Your name</label><input id="profileName" placeholder="e.g. Ada Okafor"></div>
-    <div class="field-group"><label>Shop name</label><input id="profileShopName" placeholder="e.g. Ada's Thrift Corner"></div>
-    <div class="field-group"><label>Location</label><input id="profileLocation" placeholder="e.g. Yaba, Lagos"></div>
-    <div class="field-group"><label>Phone number</label><input id="profilePhone" type="tel" placeholder="e.g. 0803 123 4567"></div>
-    <div class="field-group"><label>Email</label><input id="profileEmail" type="email" placeholder="e.g. ada@example.com"></div>
+    <div class="field-group"><label id="profileNameLabel">Your name</label><input id="profileName" placeholder="e.g. Ada Okafor"></div>
+    <div class="field-group"><label id="profileShopNameLabel">Shop name</label><input id="profileShopName" placeholder="e.g. Ada's Thrift Corner"></div>
+    <div class="field-group"><label id="profileLocationLabel">Location</label><input id="profileLocation" placeholder="e.g. Yaba, Lagos"></div>
+    <div class="field-group"><label id="profilePhoneLabel">Phone number</label><input id="profilePhone" type="tel" placeholder="e.g. 0803 123 4567"></div>
+    <div class="field-group"><label id="profileEmailLabel">Email</label><input id="profileEmail" type="email" placeholder="e.g. ada@example.com"></div>
     <p class="hint">Your phone number or email helps confirm it's you if you ever need account support.</p>
 
-    <div class="modal-actions"><button class="btn btn-primary" onclick="saveProfile()">Save profile</button></div>
+    <div class="modal-actions"><button class="btn btn-primary" onclick="saveProfile()"><span id="btnSaveProfile">Save profile</span></button></div>
 
     <div id="profileStoresSection" style="margin-top:26px; padding-top:20px; border-top:1px solid var(--border);">
-      <div class="section-title" style="margin-top:0;">Your stores on this device</div>
+      <div class="section-title" style="margin-top:0;" id="sectionYourStores">Your stores on this device</div>
       <div id="profileStoresList"></div>
       <button class="btn btn-ghost" style="margin-top:8px;" onclick="closeModal('profileModal'); switchShop();">+ Add or switch to another store</button>
       <p class="hint">This list is remembered only on this phone or computer &mdash; it won't show up if you open Ledger on a different device. You'll still need each store's password to switch into it.</p>
@@ -664,29 +664,29 @@
     <div class="icon-btn modal-close" onclick="closeModal('catalogueModal')">&#10005;</div>
 
     <div id="catalogueEditView">
-      <h2>Build your catalogue</h2>
-      <div class="modal-sub">Pick what to include, then review before sharing with customers.</div>
+      <h2 id="catalogueModalTitle">Build your catalogue</h2>
+      <div class="modal-sub" id="catalogueModalSub">Pick what to include, then review before sharing with customers.</div>
 
-      <div class="field-group"><label>Caption (optional)</label><input id="catalogueNote" placeholder="e.g. New arrivals this week!"></div>
+      <div class="field-group"><label id="catalogueNoteLabel">Caption (optional)</label><input id="catalogueNote" placeholder="e.g. New arrivals this week!"></div>
 
-      <div class="section-title" style="margin-top:12px;">Select items to include</div>
+      <div class="section-title" style="margin-top:12px;" id="sectionCatalogueSelect">Select items to include</div>
       <div id="catalogueItemPicker" style="max-height:220px; overflow-y:auto; border:1px solid var(--border); border-radius:10px; margin-bottom:16px;"></div>
 
       <div class="modal-actions">
-        <button class="btn btn-primary" onclick="showCatalogueReview()">Review selection</button>
+        <button class="btn btn-primary" onclick="showCatalogueReview()"><span id="btnReviewCatalogue">Review selection</span></button>
       </div>
     </div>
 
     <div id="catalogueReviewView" style="display:none;">
-      <h2>Confirm your catalogue</h2>
-      <div class="modal-sub">Double check everything below before saving or sharing.</div>
+      <h2 id="catalogueReviewTitle">Confirm your catalogue</h2>
+      <div class="modal-sub" id="catalogueReviewSub">Double check everything below before saving or sharing.</div>
       <div id="catalogueReviewList" style="margin-bottom:16px;"></div>
       <div class="modal-actions">
-        <button class="btn btn-ghost" onclick="backToCatalogueEdit()">Back to edit</button>
-        <button class="btn btn-primary" onclick="confirmCatalogueSave()">Confirm &amp; save</button>
+        <button class="btn btn-ghost" onclick="backToCatalogueEdit()"><span id="btnBackCatalogue">Back to edit</span></button>
+        <button class="btn btn-primary" onclick="confirmCatalogueSave()"><span id="btnConfirmSaveCatalogue">Confirm &amp; save</span></button>
       </div>
-      <button class="btn btn-primary" style="margin-top:10px;" onclick="confirmCatalogueExport()">Confirm &amp; export as image</button>
-      <button class="btn btn-ghost" style="margin-top:10px;" onclick="confirmCatalogueCopy()">Confirm &amp; copy as text</button>
+      <button class="btn btn-primary" style="margin-top:10px;" onclick="confirmCatalogueExport()"><span id="btnConfirmExportCatalogue">Confirm &amp; export as image</span></button>
+      <button class="btn btn-ghost" style="margin-top:10px;" onclick="confirmCatalogueCopy()"><span id="btnConfirmCopyCatalogue">Confirm &amp; copy as text</span></button>
     </div>
 
     <div id="catalogueRenderTarget" style="position:absolute; left:-9999px; top:0;"></div>
@@ -698,15 +698,15 @@
     <div class="icon-btn modal-close" onclick="closeModal('restockModal')">&#10005;</div>
 
     <div id="restockEditView">
-      <h2>Order from wholesaler</h2>
-      <div class="modal-sub">Pick items and quantities you want to restock, then review before sending.</div>
+      <h2 id="restockModalTitle">Order from wholesaler</h2>
+      <div class="modal-sub" id="restockModalSub">Pick items and quantities you want to restock, then review before sending.</div>
 
-      <div class="field-group"><label>Note (optional)</label><input id="restockNote" placeholder="e.g. Please deliver by Friday"></div>
+      <div class="field-group"><label id="restockNoteLabel">Note (optional)</label><input id="restockNote" placeholder="e.g. Please deliver by Friday"></div>
 
-      <div class="section-title" style="margin-top:12px;">Reorder existing items</div>
+      <div class="section-title" style="margin-top:12px;" id="sectionRestockReorder">Reorder existing items</div>
       <div id="restockStockPicker" style="max-height:180px; overflow-y:auto; border:1px solid var(--border); border-radius:10px; margin-bottom:16px;"></div>
 
-      <div class="section-title">Add a new item to order</div>
+      <div class="section-title" id="sectionRestockAddNew">Add a new item to order</div>
       <div style="display:flex; gap:8px; margin-bottom:8px;">
         <input id="restockNewItemName" placeholder="Item name" style="flex:2;">
         <input id="restockNewItemQty" type="number" inputmode="numeric" placeholder="Qty" style="flex:1;">
@@ -715,20 +715,20 @@
       <div id="restockCustomList" style="margin-bottom:16px;"></div>
 
       <div class="modal-actions">
-        <button class="btn btn-primary" onclick="showRestockReview()">Review order</button>
+        <button class="btn btn-primary" onclick="showRestockReview()"><span id="btnReviewRestock">Review order</span></button>
       </div>
     </div>
 
     <div id="restockReviewView" style="display:none;">
-      <h2>Confirm your order</h2>
-      <div class="modal-sub">Double check quantities before sending this to your wholesaler.</div>
+      <h2 id="restockReviewTitle">Confirm your order</h2>
+      <div class="modal-sub" id="restockReviewSub">Double check quantities before sending this to your wholesaler.</div>
       <div id="restockReviewList" style="margin-bottom:16px;"></div>
       <div class="modal-actions">
-        <button class="btn btn-ghost" onclick="backToRestockEdit()">Back to edit</button>
-        <button class="btn btn-primary" onclick="confirmRestockSave()">Confirm &amp; save</button>
+        <button class="btn btn-ghost" onclick="backToRestockEdit()"><span id="btnBackRestock">Back to edit</span></button>
+        <button class="btn btn-primary" onclick="confirmRestockSave()"><span id="btnConfirmSaveRestock">Confirm &amp; save</span></button>
       </div>
-      <button class="btn btn-primary" style="margin-top:10px;" onclick="confirmRestockExport()">Confirm &amp; export as image</button>
-      <button class="btn btn-ghost" style="margin-top:10px;" onclick="confirmRestockCopy()">Confirm &amp; copy as text</button>
+      <button class="btn btn-primary" style="margin-top:10px;" onclick="confirmRestockExport()"><span id="btnConfirmExportRestock">Confirm &amp; export as image</span></button>
+      <button class="btn btn-ghost" style="margin-top:10px;" onclick="confirmRestockCopy()"><span id="btnConfirmCopyRestock">Confirm &amp; copy as text</span></button>
     </div>
 
     <div id="restockRenderTarget" style="position:absolute; left:-9999px; top:0;"></div>
@@ -765,49 +765,479 @@ const CURRENCY_SYMBOLS = {
 
 const TRANSLATIONS = {
   en: {
-    nav_home: 'Home', nav_stock: 'Stock', nav_sales: 'Sales', nav_orders: 'Orders', nav_debts: 'Debts',
-    tab_stock: 'Your stock', tab_sales: 'Sales', tab_orders: 'Orders', tab_debts: 'Customer debts', tab_settings: 'Settings',
-    stat_orders: 'Pending orders', stat_sales_week: 'Sales this week', stat_items: 'Items in stock',
-    stat_stock_value: 'Total stock value', stat_orders_total: 'Pending order value', stat_owed: 'Owed to you',
-    qa_log_sale: 'Log a sale', qa_add_stock: 'Add stock', qa_log_order: 'Log an order', qa_add_debt: 'Add debt',
-    settings_appearance: 'Appearance', settings_currency: 'Currency', settings_language: 'Language',
-    auth_login: 'Log in', auth_signup: 'Sign up', log_out: 'Log out'
+    nav_home: 'Home',
+    nav_stock: 'Stock',
+    nav_sales: 'Sales',
+    nav_orders: 'Orders',
+    nav_debts: 'Debts',
+    tab_stock: 'Your stock',
+    tab_sales: 'Sales',
+    tab_orders: 'Orders',
+    tab_debts: 'Customer debts',
+    tab_settings: 'Settings',
+    stat_orders: 'Pending orders',
+    stat_sales_week: 'Sales this week',
+    stat_items: 'Items in stock',
+    stat_stock_value: 'Total stock value',
+    stat_orders_total: 'Pending order value',
+    stat_owed: 'Owed to you',
+    qa_log_sale: 'Log a sale',
+    qa_add_stock: 'Add stock',
+    qa_log_order: 'Log an order',
+    qa_add_debt: 'Add debt',
+    settings_appearance: 'Appearance',
+    settings_currency: 'Currency',
+    settings_language: 'Language',
+    auth_login: 'Log in',
+    auth_signup: 'Sign up',
+    log_out: 'Log out',
+    section_running_low: 'Running low',
+    section_recent_sales: 'Recent sales',
+    section_catalogue_select: 'Select items to include',
+    section_restock_reorder: 'Reorder existing items',
+    section_restock_add_new: 'Add a new item to order',
+    section_your_stores: 'Your stores on this device',
+    forgot_modal_title: 'Reset your password',
+    forgot_shopcode_label: 'Shop code',
+    forgot_newpw_label: 'New password',
+    stock_name_label: 'Item name',
+    stock_qty_label: 'Quantity',
+    stock_price_label: 'Price per item',
+    sale_modal_sub: 'This reduces the item\'s stock automatically.',
+    sale_item_label: 'Item',
+    sale_qty_label: 'Quantity sold',
+    order_modal_title: 'Log an order',
+    order_modal_sub: 'For orders a customer has placed but you haven\'t fulfilled or been paid for yet.',
+    order_customer_label: 'Customer name',
+    order_desc_label: 'What did they order?',
+    order_amount_label: 'Order value',
+    debt_modal_title: 'Add a debt',
+    debt_modal_sub: 'Track a customer who paid later, or hasn\'t paid yet.',
+    debt_name_label: 'Customer name',
+    debt_amount_label: 'Amount owed',
+    profile_name_label: 'Your name',
+    profile_shopname_label: 'Shop name',
+    profile_location_label: 'Location',
+    profile_phone_label: 'Phone number',
+    profile_email_label: 'Email',
+    catalogue_modal_title: 'Build your catalogue',
+    catalogue_modal_sub: 'Pick what to include, then review before sharing with customers.',
+    catalogue_note_label: 'Caption (optional)',
+    catalogue_review_title: 'Confirm your catalogue',
+    catalogue_review_sub: 'Double check everything below before saving or sharing.',
+    restock_modal_title: 'Order from wholesaler',
+    restock_modal_sub: 'Pick items and quantities you want to restock, then review before sending.',
+    restock_note_label: 'Note (optional)',
+    restock_review_title: 'Confirm your order',
+    restock_review_sub: 'Double check quantities before sending this to your wholesaler.',
+    btn_delete: 'Delete',
+    btn_save_order: 'Save order',
+    btn_save_debt: 'Save',
+    btn_save_profile: 'Save profile',
+    btn_review_catalogue: 'Review selection',
+    btn_back: 'Back to edit',
+    btn_confirm_save: 'Confirm & save',
+    btn_confirm_export: 'Confirm & export as image',
+    btn_confirm_copy: 'Confirm & copy as text',
+    btn_review_restock: 'Review order',
+    empty_no_stores: 'No other stores remembered on this device yet.',
+    empty_no_low_stock: 'Nothing running low right now.',
+    empty_no_sales_yet: 'No sales logged yet.',
+    empty_no_stock: 'No items yet. Tap + to add your first one.',
+    empty_no_stock_match: 'No items match your search.',
+    empty_no_sales_period: 'No sales in this period.',
+    empty_no_orders: 'No orders logged. Tap + to add one.',
+    empty_no_orders_match: 'No orders match your search.',
+    empty_no_debts: 'No debts logged. Tap + to add one.',
+    stock_modal_title_add: 'Add stock',
+    stock_modal_title_edit: 'Edit stock item',
+    stock_modal_sub_add: 'Add a new item, or add more of one you already have.',
+    stock_modal_sub_edit: 'Update the details, or delete this item entirely.',
+    btn_save_item: 'Save item',
+    btn_save_changes: 'Save changes',
+    sale_modal_title_add: 'Log a sale',
+    sale_modal_title_edit: 'Edit sale',
+    btn_log_sale: 'Log sale'
   },
   fr: {
-    nav_home: 'Accueil', nav_stock: 'Stock', nav_sales: 'Ventes', nav_orders: 'Commandes', nav_debts: 'Dettes',
-    tab_stock: 'Votre stock', tab_sales: 'Ventes', tab_orders: 'Commandes', tab_debts: 'Dettes clients', tab_settings: 'Param\u00e8tres',
-    stat_orders: 'Commandes en attente', stat_sales_week: 'Ventes cette semaine', stat_items: 'Articles en stock',
-    stat_stock_value: 'Valeur totale du stock', stat_orders_total: 'Valeur des commandes en attente', stat_owed: 'Somme due',
-    qa_log_sale: 'Enregistrer une vente', qa_add_stock: 'Ajouter du stock', qa_log_order: 'Enregistrer une commande', qa_add_debt: 'Ajouter une dette',
-    settings_appearance: 'Apparence', settings_currency: 'Devise', settings_language: 'Langue',
-    auth_login: 'Connexion', auth_signup: 'Inscription', log_out: 'D\u00e9connexion'
+    nav_home: 'Accueil',
+    nav_stock: 'Stock',
+    nav_sales: 'Ventes',
+    nav_orders: 'Commandes',
+    nav_debts: 'Dettes',
+    tab_stock: 'Votre stock',
+    tab_sales: 'Ventes',
+    tab_orders: 'Commandes',
+    tab_debts: 'Dettes clients',
+    tab_settings: 'Paramètres',
+    stat_orders: 'Commandes en attente',
+    stat_sales_week: 'Ventes cette semaine',
+    stat_items: 'Articles en stock',
+    stat_stock_value: 'Valeur totale du stock',
+    stat_orders_total: 'Valeur des commandes en attente',
+    stat_owed: 'Somme due',
+    qa_log_sale: 'Enregistrer une vente',
+    qa_add_stock: 'Ajouter du stock',
+    qa_log_order: 'Enregistrer une commande',
+    qa_add_debt: 'Ajouter une dette',
+    settings_appearance: 'Apparence',
+    settings_currency: 'Devise',
+    settings_language: 'Langue',
+    auth_login: 'Connexion',
+    auth_signup: 'Inscription',
+    log_out: 'Déconnexion',
+    section_running_low: 'Stock faible',
+    section_recent_sales: 'Ventes récentes',
+    section_catalogue_select: 'Sélectionnez les articles à inclure',
+    section_restock_reorder: 'Recommander des articles existants',
+    section_restock_add_new: 'Ajouter un nouvel article à commander',
+    section_your_stores: 'Vos boutiques sur cet appareil',
+    forgot_modal_title: 'Réinitialiser votre mot de passe',
+    forgot_shopcode_label: 'Code boutique',
+    forgot_newpw_label: 'Nouveau mot de passe',
+    stock_name_label: 'Nom de l\'article',
+    stock_qty_label: 'Quantité',
+    stock_price_label: 'Prix par article',
+    sale_modal_sub: 'Cela réduit automatiquement le stock de l\'article.',
+    sale_item_label: 'Article',
+    sale_qty_label: 'Quantité vendue',
+    order_modal_title: 'Enregistrer une commande',
+    order_modal_sub: 'Pour les commandes qu\'un client a passées mais que vous n\'avez pas encore honorées ou facturées.',
+    order_customer_label: 'Nom du client',
+    order_desc_label: 'Qu\'ont-ils commandé ?',
+    order_amount_label: 'Valeur de la commande',
+    debt_modal_title: 'Ajouter une dette',
+    debt_modal_sub: 'Suivez un client qui a payé plus tard, ou qui n\'a pas encore payé.',
+    debt_name_label: 'Nom du client',
+    debt_amount_label: 'Montant dû',
+    profile_name_label: 'Votre nom',
+    profile_shopname_label: 'Nom de la boutique',
+    profile_location_label: 'Localisation',
+    profile_phone_label: 'Numéro de téléphone',
+    profile_email_label: 'E-mail',
+    catalogue_modal_title: 'Créez votre catalogue',
+    catalogue_modal_sub: 'Choisissez quoi inclure, puis vérifiez avant de partager avec vos clients.',
+    catalogue_note_label: 'Légende (facultatif)',
+    catalogue_review_title: 'Confirmez votre catalogue',
+    catalogue_review_sub: 'Vérifiez tout ci-dessous avant d\'enregistrer ou de partager.',
+    restock_modal_title: 'Commander auprès du grossiste',
+    restock_modal_sub: 'Choisissez les articles et quantités à recommander, puis vérifiez avant d\'envoyer.',
+    restock_note_label: 'Remarque (facultatif)',
+    restock_review_title: 'Confirmez votre commande',
+    restock_review_sub: 'Vérifiez les quantités avant d\'envoyer ceci à votre grossiste.',
+    btn_delete: 'Supprimer',
+    btn_save_order: 'Enregistrer la commande',
+    btn_save_debt: 'Enregistrer',
+    btn_save_profile: 'Enregistrer le profil',
+    btn_review_catalogue: 'Vérifier la sélection',
+    btn_back: 'Retour à la modification',
+    btn_confirm_save: 'Confirmer et enregistrer',
+    btn_confirm_export: 'Confirmer et exporter en image',
+    btn_confirm_copy: 'Confirmer et copier en texte',
+    btn_review_restock: 'Vérifier la commande',
+    empty_no_stores: 'Aucune autre boutique mémorisée sur cet appareil pour l\'instant.',
+    empty_no_low_stock: 'Rien ne manque pour le moment.',
+    empty_no_sales_yet: 'Aucune vente enregistrée pour l\'instant.',
+    empty_no_stock: 'Aucun article pour l\'instant. Appuyez sur + pour ajouter le premier.',
+    empty_no_stock_match: 'Aucun article ne correspond à votre recherche.',
+    empty_no_sales_period: 'Aucune vente sur cette période.',
+    empty_no_orders: 'Aucune commande enregistrée. Appuyez sur + pour en ajouter une.',
+    empty_no_orders_match: 'Aucune commande ne correspond à votre recherche.',
+    empty_no_debts: 'Aucune dette enregistrée. Appuyez sur + pour en ajouter une.',
+    stock_modal_title_add: 'Ajouter du stock',
+    stock_modal_title_edit: 'Modifier l\'article',
+    stock_modal_sub_add: 'Ajoutez un nouvel article, ou augmentez la quantité d\'un article existant.',
+    stock_modal_sub_edit: 'Modifiez les détails, ou supprimez cet article complètement.',
+    btn_save_item: 'Enregistrer l\'article',
+    btn_save_changes: 'Enregistrer les modifications',
+    sale_modal_title_add: 'Enregistrer une vente',
+    sale_modal_title_edit: 'Modifier la vente',
+    btn_log_sale: 'Enregistrer la vente'
   },
   es: {
-    nav_home: 'Inicio', nav_stock: 'Inventario', nav_sales: 'Ventas', nav_orders: 'Pedidos', nav_debts: 'Deudas',
-    tab_stock: 'Tu inventario', tab_sales: 'Ventas', tab_orders: 'Pedidos', tab_debts: 'Deudas de clientes', tab_settings: 'Ajustes',
-    stat_orders: 'Pedidos pendientes', stat_sales_week: 'Ventas esta semana', stat_items: 'Art\u00edculos en inventario',
-    stat_stock_value: 'Valor total del inventario', stat_orders_total: 'Valor de pedidos pendientes', stat_owed: 'Total adeudado',
-    qa_log_sale: 'Registrar venta', qa_add_stock: 'A\u00f1adir inventario', qa_log_order: 'Registrar pedido', qa_add_debt: 'A\u00f1adir deuda',
-    settings_appearance: 'Apariencia', settings_currency: 'Moneda', settings_language: 'Idioma',
-    auth_login: 'Iniciar sesi\u00f3n', auth_signup: 'Registrarse', log_out: 'Cerrar sesi\u00f3n'
+    nav_home: 'Inicio',
+    nav_stock: 'Inventario',
+    nav_sales: 'Ventas',
+    nav_orders: 'Pedidos',
+    nav_debts: 'Deudas',
+    tab_stock: 'Tu inventario',
+    tab_sales: 'Ventas',
+    tab_orders: 'Pedidos',
+    tab_debts: 'Deudas de clientes',
+    tab_settings: 'Ajustes',
+    stat_orders: 'Pedidos pendientes',
+    stat_sales_week: 'Ventas esta semana',
+    stat_items: 'Artículos en inventario',
+    stat_stock_value: 'Valor total del inventario',
+    stat_orders_total: 'Valor de pedidos pendientes',
+    stat_owed: 'Total adeudado',
+    qa_log_sale: 'Registrar venta',
+    qa_add_stock: 'Añadir inventario',
+    qa_log_order: 'Registrar pedido',
+    qa_add_debt: 'Añadir deuda',
+    settings_appearance: 'Apariencia',
+    settings_currency: 'Moneda',
+    settings_language: 'Idioma',
+    auth_login: 'Iniciar sesión',
+    auth_signup: 'Registrarse',
+    log_out: 'Cerrar sesión',
+    section_running_low: 'Con poco stock',
+    section_recent_sales: 'Ventas recientes',
+    section_catalogue_select: 'Selecciona los artículos a incluir',
+    section_restock_reorder: 'Reordenar artículos existentes',
+    section_restock_add_new: 'Añadir un artículo nuevo para pedir',
+    section_your_stores: 'Tus tiendas en este dispositivo',
+    forgot_modal_title: 'Restablecer tu contraseña',
+    forgot_shopcode_label: 'Código de tienda',
+    forgot_newpw_label: 'Nueva contraseña',
+    stock_name_label: 'Nombre del artículo',
+    stock_qty_label: 'Cantidad',
+    stock_price_label: 'Precio por artículo',
+    sale_modal_sub: 'Esto reduce el inventario del artículo automáticamente.',
+    sale_item_label: 'Artículo',
+    sale_qty_label: 'Cantidad vendida',
+    order_modal_title: 'Registrar un pedido',
+    order_modal_sub: 'Para pedidos que un cliente ha hecho pero que aún no has entregado ni cobrado.',
+    order_customer_label: 'Nombre del cliente',
+    order_desc_label: '¿Qué pidieron?',
+    order_amount_label: 'Valor del pedido',
+    debt_modal_title: 'Añadir una deuda',
+    debt_modal_sub: 'Registra a un cliente que pagó después, o que aún no ha pagado.',
+    debt_name_label: 'Nombre del cliente',
+    debt_amount_label: 'Monto adeudado',
+    profile_name_label: 'Tu nombre',
+    profile_shopname_label: 'Nombre de la tienda',
+    profile_location_label: 'Ubicación',
+    profile_phone_label: 'Número de teléfono',
+    profile_email_label: 'Correo electrónico',
+    catalogue_modal_title: 'Crea tu catálogo',
+    catalogue_modal_sub: 'Elige qué incluir y luego revisa antes de compartir con tus clientes.',
+    catalogue_note_label: 'Descripción (opcional)',
+    catalogue_review_title: 'Confirma tu catálogo',
+    catalogue_review_sub: 'Revisa todo antes de guardar o compartir.',
+    restock_modal_title: 'Pedir al mayorista',
+    restock_modal_sub: 'Elige artículos y cantidades para reabastecer, luego revisa antes de enviar.',
+    restock_note_label: 'Nota (opcional)',
+    restock_review_title: 'Confirma tu pedido',
+    restock_review_sub: 'Revisa las cantidades antes de enviar esto a tu mayorista.',
+    btn_delete: 'Eliminar',
+    btn_save_order: 'Guardar pedido',
+    btn_save_debt: 'Guardar',
+    btn_save_profile: 'Guardar perfil',
+    btn_review_catalogue: 'Revisar selección',
+    btn_back: 'Volver a editar',
+    btn_confirm_save: 'Confirmar y guardar',
+    btn_confirm_export: 'Confirmar y exportar como imagen',
+    btn_confirm_copy: 'Confirmar y copiar como texto',
+    btn_review_restock: 'Revisar pedido',
+    empty_no_stores: 'Ninguna otra tienda recordada en este dispositivo todavía.',
+    empty_no_low_stock: 'Nada escaseando por ahora.',
+    empty_no_sales_yet: 'Aún no hay ventas registradas.',
+    empty_no_stock: 'Aún no hay artículos. Toca + para añadir el primero.',
+    empty_no_stock_match: 'Ningún artículo coincide con tu búsqueda.',
+    empty_no_sales_period: 'No hay ventas en este período.',
+    empty_no_orders: 'No hay pedidos registrados. Toca + para añadir uno.',
+    empty_no_orders_match: 'Ningún pedido coincide con tu búsqueda.',
+    empty_no_debts: 'No hay deudas registradas. Toca + para añadir una.',
+    stock_modal_title_add: 'Añadir inventario',
+    stock_modal_title_edit: 'Editar artículo',
+    stock_modal_sub_add: 'Añade un artículo nuevo, o aumenta la cantidad de uno que ya tienes.',
+    stock_modal_sub_edit: 'Actualiza los detalles, o elimina este artículo por completo.',
+    btn_save_item: 'Guardar artículo',
+    btn_save_changes: 'Guardar cambios',
+    sale_modal_title_add: 'Registrar venta',
+    sale_modal_title_edit: 'Editar venta',
+    btn_log_sale: 'Registrar venta'
   },
   de: {
-    nav_home: 'Start', nav_stock: 'Lager', nav_sales: 'Verk\u00e4ufe', nav_orders: 'Bestellungen', nav_debts: 'Schulden',
-    tab_stock: 'Dein Lager', tab_sales: 'Verk\u00e4ufe', tab_orders: 'Bestellungen', tab_debts: 'Kundenschulden', tab_settings: 'Einstellungen',
-    stat_orders: 'Offene Bestellungen', stat_sales_week: 'Verk\u00e4ufe diese Woche', stat_items: 'Artikel auf Lager',
-    stat_stock_value: 'Gesamtwert des Lagers', stat_orders_total: 'Wert offener Bestellungen', stat_owed: 'Ausstehender Betrag',
-    qa_log_sale: 'Verkauf erfassen', qa_add_stock: 'Lager hinzuf\u00fcgen', qa_log_order: 'Bestellung erfassen', qa_add_debt: 'Schuld hinzuf\u00fcgen',
-    settings_appearance: 'Erscheinungsbild', settings_currency: 'W\u00e4hrung', settings_language: 'Sprache',
-    auth_login: 'Anmelden', auth_signup: 'Registrieren', log_out: 'Abmelden'
+    nav_home: 'Start',
+    nav_stock: 'Lager',
+    nav_sales: 'Verkäufe',
+    nav_orders: 'Bestellungen',
+    nav_debts: 'Schulden',
+    tab_stock: 'Dein Lager',
+    tab_sales: 'Verkäufe',
+    tab_orders: 'Bestellungen',
+    tab_debts: 'Kundenschulden',
+    tab_settings: 'Einstellungen',
+    stat_orders: 'Offene Bestellungen',
+    stat_sales_week: 'Verkäufe diese Woche',
+    stat_items: 'Artikel auf Lager',
+    stat_stock_value: 'Gesamtwert des Lagers',
+    stat_orders_total: 'Wert offener Bestellungen',
+    stat_owed: 'Ausstehender Betrag',
+    qa_log_sale: 'Verkauf erfassen',
+    qa_add_stock: 'Lager hinzufügen',
+    qa_log_order: 'Bestellung erfassen',
+    qa_add_debt: 'Schuld hinzufügen',
+    settings_appearance: 'Erscheinungsbild',
+    settings_currency: 'Währung',
+    settings_language: 'Sprache',
+    auth_login: 'Anmelden',
+    auth_signup: 'Registrieren',
+    log_out: 'Abmelden',
+    section_running_low: 'Wird knapp',
+    section_recent_sales: 'Letzte Verkäufe',
+    section_catalogue_select: 'Artikel zum Einschließen auswählen',
+    section_restock_reorder: 'Vorhandene Artikel nachbestellen',
+    section_restock_add_new: 'Neuen Artikel zur Bestellung hinzufügen',
+    section_your_stores: 'Deine Läden auf diesem Gerät',
+    forgot_modal_title: 'Passwort zurücksetzen',
+    forgot_shopcode_label: 'Shop-Code',
+    forgot_newpw_label: 'Neues Passwort',
+    stock_name_label: 'Artikelname',
+    stock_qty_label: 'Menge',
+    stock_price_label: 'Preis pro Artikel',
+    sale_modal_sub: 'Dies verringert automatisch den Lagerbestand des Artikels.',
+    sale_item_label: 'Artikel',
+    sale_qty_label: 'Verkaufte Menge',
+    order_modal_title: 'Bestellung erfassen',
+    order_modal_sub: 'Für Bestellungen, die ein Kunde aufgegeben hat, aber die du noch nicht ausgeführt oder bezahlt bekommen hast.',
+    order_customer_label: 'Kundenname',
+    order_desc_label: 'Was haben sie bestellt?',
+    order_amount_label: 'Bestellwert',
+    debt_modal_title: 'Schuld hinzufügen',
+    debt_modal_sub: 'Verfolge einen Kunden, der später bezahlt hat oder noch nicht bezahlt hat.',
+    debt_name_label: 'Kundenname',
+    debt_amount_label: 'Geschuldeter Betrag',
+    profile_name_label: 'Dein Name',
+    profile_shopname_label: 'Shop-Name',
+    profile_location_label: 'Standort',
+    profile_phone_label: 'Telefonnummer',
+    profile_email_label: 'E-Mail',
+    catalogue_modal_title: 'Erstelle deinen Katalog',
+    catalogue_modal_sub: 'Wähle aus, was enthalten sein soll, und prüfe es vor dem Teilen mit Kunden.',
+    catalogue_note_label: 'Bildunterschrift (optional)',
+    catalogue_review_title: 'Bestätige deinen Katalog',
+    catalogue_review_sub: 'Überprüfe alles unten, bevor du speicherst oder teilst.',
+    restock_modal_title: 'Beim Großhändler bestellen',
+    restock_modal_sub: 'Wähle Artikel und Mengen zum Nachbestellen, dann prüfe vor dem Senden.',
+    restock_note_label: 'Notiz (optional)',
+    restock_review_title: 'Bestätige deine Bestellung',
+    restock_review_sub: 'Überprüfe die Mengen, bevor du dies an deinen Großhändler sendest.',
+    btn_delete: 'Löschen',
+    btn_save_order: 'Bestellung speichern',
+    btn_save_debt: 'Speichern',
+    btn_save_profile: 'Profil speichern',
+    btn_review_catalogue: 'Auswahl überprüfen',
+    btn_back: 'Zurück zur Bearbeitung',
+    btn_confirm_save: 'Bestätigen & speichern',
+    btn_confirm_export: 'Bestätigen & als Bild exportieren',
+    btn_confirm_copy: 'Bestätigen & als Text kopieren',
+    btn_review_restock: 'Bestellung überprüfen',
+    empty_no_stores: 'Noch keine weiteren Läden auf diesem Gerät gespeichert.',
+    empty_no_low_stock: 'Gerade wird nichts knapp.',
+    empty_no_sales_yet: 'Noch keine Verkäufe erfasst.',
+    empty_no_stock: 'Noch keine Artikel. Tippe auf +, um den ersten hinzuzufügen.',
+    empty_no_stock_match: 'Keine Artikel entsprechen deiner Suche.',
+    empty_no_sales_period: 'Keine Verkäufe in diesem Zeitraum.',
+    empty_no_orders: 'Keine Bestellungen erfasst. Tippe auf +, um eine hinzuzufügen.',
+    empty_no_orders_match: 'Keine Bestellungen entsprechen deiner Suche.',
+    empty_no_debts: 'Keine Schulden erfasst. Tippe auf +, um eine hinzuzufügen.',
+    stock_modal_title_add: 'Lager hinzufügen',
+    stock_modal_title_edit: 'Artikel bearbeiten',
+    stock_modal_sub_add: 'Füge einen neuen Artikel hinzu oder erhöhe die Menge eines vorhandenen.',
+    stock_modal_sub_edit: 'Aktualisiere die Details oder lösche diesen Artikel vollständig.',
+    btn_save_item: 'Artikel speichern',
+    btn_save_changes: 'Änderungen speichern',
+    sale_modal_title_add: 'Verkauf erfassen',
+    sale_modal_title_edit: 'Verkauf bearbeiten',
+    btn_log_sale: 'Verkauf erfassen'
   },
   zh: {
-    nav_home: '\u9996\u9875', nav_stock: '\u5e93\u5b58', nav_sales: '\u9500\u552e', nav_orders: '\u8ba2\u5355', nav_debts: '\u6b20\u6b3e',
-    tab_stock: '\u60a8\u7684\u5e93\u5b58', tab_sales: '\u9500\u552e', tab_orders: '\u8ba2\u5355', tab_debts: '\u5ba2\u6237\u6b20\u6b3e', tab_settings: '\u8bbe\u7f6e',
-    stat_orders: '\u5f85\u5904\u7406\u8ba2\u5355', stat_sales_week: '\u672c\u5468\u9500\u552e\u989d', stat_items: '\u5e93\u5b58\u5546\u54c1\u6570',
-    stat_stock_value: '\u5e93\u5b58\u603b\u4ef7\u503c', stat_orders_total: '\u5f85\u5904\u7406\u8ba2\u5355\u603b\u989d', stat_owed: '\u5ba2\u6237\u6b20\u6b3e\u603b\u989d',
-    qa_log_sale: '\u8bb0\u5f55\u9500\u552e', qa_add_stock: '\u6dfb\u52a0\u5e93\u5b58', qa_log_order: '\u8bb0\u5f55\u8ba2\u5355', qa_add_debt: '\u6dfb\u52a0\u6b20\u6b3e',
-    settings_appearance: '\u5916\u89c2', settings_currency: '\u8d27\u5e01', settings_language: '\u8bed\u8a00',
-    auth_login: '\u767b\u5f55', auth_signup: '\u6ce8\u518c', log_out: '\u9000\u51fa\u767b\u5f55'
+    nav_home: '首页',
+    nav_stock: '库存',
+    nav_sales: '销售',
+    nav_orders: '订单',
+    nav_debts: '欠款',
+    tab_stock: '您的库存',
+    tab_sales: '销售',
+    tab_orders: '订单',
+    tab_debts: '客户欠款',
+    tab_settings: '设置',
+    stat_orders: '待处理订单',
+    stat_sales_week: '本周销售额',
+    stat_items: '库存商品数',
+    stat_stock_value: '库存总价值',
+    stat_orders_total: '待处理订单总额',
+    stat_owed: '客户欠款总额',
+    qa_log_sale: '记录销售',
+    qa_add_stock: '添加库存',
+    qa_log_order: '记录订单',
+    qa_add_debt: '添加欠款',
+    settings_appearance: '外观',
+    settings_currency: '货币',
+    settings_language: '语言',
+    auth_login: '登录',
+    auth_signup: '注册',
+    log_out: '退出登录',
+    section_running_low: '库存紧张',
+    section_recent_sales: '最近销售',
+    section_catalogue_select: '选择要包含的商品',
+    section_restock_reorder: '重新订购现有商品',
+    section_restock_add_new: '添加要订购的新商品',
+    section_your_stores: '此设备上的店铺',
+    forgot_modal_title: '重置密码',
+    forgot_shopcode_label: '店铺代码',
+    forgot_newpw_label: '新密码',
+    stock_name_label: '商品名称',
+    stock_qty_label: '数量',
+    stock_price_label: '单价',
+    sale_modal_sub: '这将自动减少该商品的库存。',
+    sale_item_label: '商品',
+    sale_qty_label: '销售数量',
+    order_modal_title: '记录订单',
+    order_modal_sub: '适用于客户已下单但您尚未交付或收款的订单。',
+    order_customer_label: '客户姓名',
+    order_desc_label: '他们订了什么？',
+    order_amount_label: '订单金额',
+    debt_modal_title: '添加欠款',
+    debt_modal_sub: '记录稍后付款或尚未付款的客户。',
+    debt_name_label: '客户姓名',
+    debt_amount_label: '欠款金额',
+    profile_name_label: '您的姓名',
+    profile_shopname_label: '店铺名称',
+    profile_location_label: '位置',
+    profile_phone_label: '电话号码',
+    profile_email_label: '电子邮件',
+    catalogue_modal_title: '创建您的目录',
+    catalogue_modal_sub: '选择要包含的内容，然后在与客户分享前进行确认。',
+    catalogue_note_label: '描述（可选）',
+    catalogue_review_title: '确认您的目录',
+    catalogue_review_sub: '保存或分享前请确认以下内容。',
+    restock_modal_title: '向批发商订购',
+    restock_modal_sub: '选择要补货的商品及数量，然后在发送前进行确认。',
+    restock_note_label: '备注（可选）',
+    restock_review_title: '确认您的订单',
+    restock_review_sub: '在发送给批发商之前请确认数量。',
+    btn_delete: '删除',
+    btn_save_order: '保存订单',
+    btn_save_debt: '保存',
+    btn_save_profile: '保存资料',
+    btn_review_catalogue: '查看所选内容',
+    btn_back: '返回编辑',
+    btn_confirm_save: '确认并保存',
+    btn_confirm_export: '确认并导出为图片',
+    btn_confirm_copy: '确认并复制为文本',
+    btn_review_restock: '查看订单',
+    empty_no_stores: '此设备上还没有记住其他店铺。',
+    empty_no_low_stock: '目前没有库存紧张的商品。',
+    empty_no_sales_yet: '还没有销售记录。',
+    empty_no_stock: '还没有商品。点击 + 添加第一个。',
+    empty_no_stock_match: '没有匹配的商品。',
+    empty_no_sales_period: '此时段内没有销售记录。',
+    empty_no_orders: '还没有订单。点击 + 添加一个。',
+    empty_no_orders_match: '没有匹配的订单。',
+    empty_no_debts: '还没有欠款记录。点击 + 添加一个。',
+    stock_modal_title_add: '添加库存',
+    stock_modal_title_edit: '编辑库存商品',
+    stock_modal_sub_add: '添加新商品，或增加已有商品的数量。',
+    stock_modal_sub_edit: '更新详情，或完全删除此商品。',
+    btn_save_item: '保存商品',
+    btn_save_changes: '保存更改',
+    sale_modal_title_add: '记录销售',
+    sale_modal_title_edit: '编辑销售',
+    btn_log_sale: '记录销售'
   }
 };
 
@@ -828,7 +1258,31 @@ function applyTranslations() {
     statLabelOrders: 'stat_orders', statLabelSalesWeek: 'stat_sales_week', statLabelItems: 'stat_items',
     statLabelStockValue: 'stat_stock_value', statLabelOrdersTotal: 'stat_orders_total', statLabelOwed: 'stat_owed',
     qaLogSale: 'qa_log_sale', qaAddStock: 'qa_add_stock', qaLogOrder: 'qa_log_order', qaAddDebt: 'qa_add_debt',
-    settingsAppearanceLabel: 'settings_appearance', settingsCurrencyLabel: 'settings_currency', settingsLanguageLabel: 'settings_language'
+    settingsAppearanceLabel: 'settings_appearance', settingsCurrencyLabel: 'settings_currency', settingsLanguageLabel: 'settings_language',
+    settingsLogoutBtn: 'log_out',
+    sectionRunningLow: 'section_running_low', sectionRecentSales: 'section_recent_sales',
+    sectionCatalogueSelect: 'section_catalogue_select', sectionRestockReorder: 'section_restock_reorder',
+    sectionRestockAddNew: 'section_restock_add_new', sectionYourStores: 'section_your_stores',
+    forgotModalTitle: 'forgot_modal_title', forgotShopCodeLabel: 'forgot_shopcode_label', forgotNewPasswordLabel: 'forgot_newpw_label',
+    stockNameLabel: 'stock_name_label', stockQtyLabel: 'stock_qty_label', stockPriceLabel: 'stock_price_label',
+    stockDeleteBtnLabel: 'btn_delete',
+    saleModalSub: 'sale_modal_sub', saleItemLabel: 'sale_item_label', saleQtyLabel: 'sale_qty_label',
+    saleDeleteBtnLabel: 'btn_delete',
+    orderModalTitle: 'order_modal_title', orderModalSub: 'order_modal_sub',
+    orderCustomerLabel: 'order_customer_label', orderDescLabel: 'order_desc_label', orderAmountLabel: 'order_amount_label',
+    debtModalTitle: 'debt_modal_title', debtModalSub: 'debt_modal_sub',
+    debtNameLabel: 'debt_name_label', debtAmountLabel: 'debt_amount_label',
+    profileNameLabel: 'profile_name_label', profileShopNameLabel: 'profile_shopname_label', profileLocationLabel: 'profile_location_label',
+    profilePhoneLabel: 'profile_phone_label', profileEmailLabel: 'profile_email_label',
+    catalogueModalTitle: 'catalogue_modal_title', catalogueModalSub: 'catalogue_modal_sub', catalogueNoteLabel: 'catalogue_note_label',
+    catalogueReviewTitle: 'catalogue_review_title', catalogueReviewSub: 'catalogue_review_sub',
+    restockModalTitle: 'restock_modal_title', restockModalSub: 'restock_modal_sub', restockNoteLabel: 'restock_note_label',
+    restockReviewTitle: 'restock_review_title', restockReviewSub: 'restock_review_sub',
+    btnSaveOrder: 'btn_save_order', btnSaveDebt: 'btn_save_debt', btnSaveProfile: 'btn_save_profile',
+    btnReviewCatalogue: 'btn_review_catalogue', btnBackCatalogue: 'btn_back', btnConfirmSaveCatalogue: 'btn_confirm_save',
+    btnConfirmExportCatalogue: 'btn_confirm_export', btnConfirmCopyCatalogue: 'btn_confirm_copy',
+    btnReviewRestock: 'btn_review_restock', btnBackRestock: 'btn_back', btnConfirmSaveRestock: 'btn_confirm_save',
+    btnConfirmExportRestock: 'btn_confirm_export', btnConfirmCopyRestock: 'btn_confirm_copy'
   };
   Object.keys(idMap).forEach(id => {
     const el = document.getElementById(id);
@@ -838,6 +1292,12 @@ function applyTranslations() {
   const authSignupBtn = document.getElementById('authTabSignup');
   if (authLoginBtn) authLoginBtn.textContent = t('auth_login');
   if (authSignupBtn) authSignupBtn.textContent = t('auth_signup');
+
+  // Re-render any currently visible lists so their empty-state text picks up the new language
+  renderStockList();
+  renderSalesTab();
+  renderOrdersList();
+  renderDebtList();
 }
 
 const FX_CACHE_KEY = 'ledger_fx_rates';
@@ -904,7 +1364,7 @@ function setAuthMode(mode) {
   document.getElementById('authTabLogin').classList.toggle('active', mode === 'login');
   document.getElementById('authTabSignup').classList.toggle('active', mode === 'signup');
   document.getElementById('signupFields').style.display = mode === 'signup' ? 'block' : 'none';
-  document.getElementById('continueBtn').textContent = mode === 'signup' ? 'Sign up' : 'Log in';
+  document.getElementById('continueBtn').textContent = mode === 'signup' ? t('auth_signup') : t('auth_login');
   document.getElementById('onboardHint').textContent = mode === 'signup'
     ? "Pick a shop code and password you haven't used before. Your security question helps you recover your account if you forget your password."
     : "Use your shop code and password to get back into your ledger.";
@@ -931,20 +1391,20 @@ async function enterShop() {
     if (authMode === 'signup') {
       if (snap.exists()) {
         toast('That shop code is already taken. Try logging in instead.');
-        btn.disabled = false; btn.textContent = 'Sign up';
+        btn.disabled = false; btn.textContent = t('auth_signup');
         return;
       }
       const confirmPw = document.getElementById('signupConfirmPassword').value;
       if (password !== confirmPw) {
         toast("Passwords don't match");
-        btn.disabled = false; btn.textContent = 'Sign up';
+        btn.disabled = false; btn.textContent = t('auth_signup');
         return;
       }
       const secretQuestion = document.getElementById('secretQuestionSelect').value;
       const secretAnswer = document.getElementById('secretAnswerInput').value.trim().toLowerCase();
       if (!secretAnswer) {
         toast('Please answer the security question');
-        btn.disabled = false; btn.textContent = 'Sign up';
+        btn.disabled = false; btn.textContent = t('auth_signup');
         return;
       }
       const secretAnswerHash = await hashPassword(secretAnswer);
@@ -962,13 +1422,13 @@ async function enterShop() {
     } else {
       if (!snap.exists()) {
         toast('No shop found with that code. Try signing up instead.');
-        btn.disabled = false; btn.textContent = 'Log in';
+        btn.disabled = false; btn.textContent = t('auth_login');
         return;
       }
       const data = snap.data();
       if (data.passwordHash !== pwHash) {
         toast('Wrong password for that shop code');
-        btn.disabled = false; btn.textContent = 'Log in';
+        btn.disabled = false; btn.textContent = t('auth_login');
         return;
       }
       state = {
@@ -997,7 +1457,7 @@ async function enterShop() {
     toast("Couldn't connect. Check your internet and try again.");
   } finally {
     btn.disabled = false;
-    btn.textContent = authMode === 'signup' ? 'Sign up' : 'Log in';
+    btn.textContent = authMode === 'signup' ? t('auth_signup') : t('auth_login');
   }
 }
 
@@ -1283,7 +1743,7 @@ function renderProfileStoresList() {
   const el = document.getElementById('profileStoresList');
   const shops = getKnownShops().filter(s => s.code !== shopCode);
   if (shops.length === 0) {
-    el.innerHTML = '<div class="empty-state">No other stores remembered on this device yet.</div>';
+    el.innerHTML = '<div class="empty-state">' + t('empty_no_stores') + '</div>';
     return;
   }
   el.innerHTML = shops.map(s => `
@@ -1345,8 +1805,8 @@ function openModal(id) {
     document.getElementById('saleSelectedProduct').value = '';
     document.getElementById('saleSearchInput').value = '';
     document.getElementById('saleQty').value = 1;
-    document.getElementById('saleModalTitle').textContent = 'Log a sale';
-    document.getElementById('saleSaveBtn').textContent = 'Log sale';
+    document.getElementById('saleModalTitle').textContent = t('sale_modal_title_add');
+    document.getElementById('saleSaveBtn').textContent = t('btn_log_sale');
     document.getElementById('saleDeleteBtn').style.display = 'none';
     saleSelectedProductId = null;
     renderSaleProductPicker();
@@ -1356,9 +1816,9 @@ function openModal(id) {
     document.getElementById('stockName').value = '';
     document.getElementById('stockQty').value = '';
     document.getElementById('stockPrice').value = '';
-    document.getElementById('stockModalTitle').textContent = 'Add stock';
-    document.getElementById('stockModalSub').textContent = "Add a new item, or add more of one you already have.";
-    document.getElementById('stockSaveBtn').textContent = 'Save item';
+    document.getElementById('stockModalTitle').textContent = t('stock_modal_title_add');
+    document.getElementById('stockModalSub').textContent = t('stock_modal_sub_add');
+    document.getElementById('stockSaveBtn').textContent = t('btn_save_item');
     document.getElementById('stockDeleteBtn').style.display = 'none';
   }
   document.getElementById(id).classList.add('active');
@@ -1431,7 +1891,7 @@ function renderDashboard() {
   const lowStock = state.products.filter(p => Number(p.qty) <= 2);
   const lowEl = document.getElementById('lowStockList');
   if (lowStock.length === 0) {
-    lowEl.innerHTML = '<div class="empty-state">Nothing running low right now.</div>';
+    lowEl.innerHTML = '<div class="empty-state">' + t('empty_no_low_stock') + '</div>';
   } else {
     lowEl.innerHTML = lowStock.map(p => `
       <div class="list-item">
@@ -1446,7 +1906,7 @@ function renderDashboard() {
   const recent = [...state.sales].reverse().slice(0, 5);
   const recEl = document.getElementById('recentSalesList');
   if (recent.length === 0) {
-    recEl.innerHTML = '<div class="empty-state">No sales logged yet.</div>';
+    recEl.innerHTML = '<div class="empty-state">' + t('empty_no_sales_yet') + '</div>';
   } else {
     recEl.innerHTML = recent.map(s => `
       <div class="list-item">
@@ -1469,11 +1929,11 @@ function renderStockList() {
   if (valueEl) valueEl.textContent = fmtMoney(totalValue);
 
   if (state.products.length === 0) {
-    el.innerHTML = '<div class="empty-state">No items yet. Tap + to add your first one.</div>';
+    el.innerHTML = '<div class="empty-state">' + t('empty_no_stock') + '</div>';
     return;
   }
   if (filtered.length === 0) {
-    el.innerHTML = '<div class="empty-state">No items match your search.</div>';
+    el.innerHTML = '<div class="empty-state">' + t('empty_no_stock_match') + '</div>';
     return;
   }
   el.innerHTML = filtered.map(p => {
@@ -1511,7 +1971,7 @@ function renderSalesTab() {
 
   const el = document.getElementById('salesList');
   if (filtered.length === 0) {
-    el.innerHTML = '<div class="empty-state">No sales in this period.</div>';
+    el.innerHTML = '<div class="empty-state">' + t('empty_no_sales_period') + '</div>';
     return;
   }
   el.innerHTML = [...filtered].reverse().map(s => `
@@ -1539,11 +1999,11 @@ function renderOrdersList() {
 
   const el = document.getElementById('ordersList');
   if (state.orders.length === 0) {
-    el.innerHTML = '<div class="empty-state">No orders logged. Tap + to add one.</div>';
+    el.innerHTML = '<div class="empty-state">' + t('empty_no_orders') + '</div>';
     return;
   }
   if (filtered.length === 0) {
-    el.innerHTML = '<div class="empty-state">No orders match your search.</div>';
+    el.innerHTML = '<div class="empty-state">' + t('empty_no_orders_match') + '</div>';
     return;
   }
   el.innerHTML = [...filtered].reverse().map(o => `
@@ -1567,7 +2027,7 @@ function renderDebtList() {
 
   const el = document.getElementById('debtList');
   if (state.debts.length === 0) {
-    el.innerHTML = '<div class="empty-state">No debts logged. Tap + to add one.</div>';
+    el.innerHTML = '<div class="empty-state">' + t('empty_no_debts') + '</div>';
     return;
   }
   el.innerHTML = [...state.debts].reverse().map(d => `
@@ -1647,9 +2107,9 @@ function editStock(id) {
   document.getElementById('stockName').value = p.name;
   document.getElementById('stockQty').value = p.qty;
   document.getElementById('stockPrice').value = p.price;
-  document.getElementById('stockModalTitle').textContent = 'Edit stock item';
-  document.getElementById('stockModalSub').textContent = 'Update the details, or delete this item entirely.';
-  document.getElementById('stockSaveBtn').textContent = 'Save changes';
+  document.getElementById('stockModalTitle').textContent = t('stock_modal_title_edit');
+  document.getElementById('stockModalSub').textContent = t('stock_modal_sub_edit');
+  document.getElementById('stockSaveBtn').textContent = t('btn_save_changes');
   document.getElementById('stockDeleteBtn').style.display = 'block';
 }
 
@@ -1711,8 +2171,8 @@ function editSale(id) {
   saleSelectedProductId = sale.productId;
   document.getElementById('saleSearchInput').value = sale.productName;
   document.getElementById('saleQty').value = sale.qty;
-  document.getElementById('saleModalTitle').textContent = 'Edit sale';
-  document.getElementById('saleSaveBtn').textContent = 'Save changes';
+  document.getElementById('saleModalTitle').textContent = t('sale_modal_title_edit');
+  document.getElementById('saleSaveBtn').textContent = t('btn_save_changes');
   document.getElementById('saleDeleteBtn').style.display = 'block';
   renderSaleProductPicker();
 }
