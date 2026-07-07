@@ -70,6 +70,7 @@
     color: var(--ink);
     font-family: 'Inter', -apple-system, sans-serif;
     -webkit-tap-highlight-color: transparent;
+    overflow-x: hidden;
   }
   #app {
     max-width: 460px;
@@ -339,7 +340,17 @@
     #tab-settings.drawer-open { transform: translateX(0); }
   }
   @media (min-width: 860px) {
-    .settings-backdrop { display: none !important; }
+    #tab-settings {
+      display: block !important;
+      position: fixed; top: 0; right: 0; bottom: 0; left: auto; width: 380px; max-width: 40vw;
+      background: var(--surface); z-index: 45; overflow-y: auto;
+      padding: 28px 26px calc(28px + env(safe-area-inset-bottom));
+      box-shadow: -18px 0 44px rgba(20,30,25,0.2), -4px 0 10px rgba(20,30,25,0.1);
+      transform: translateX(105%);
+      transition: transform 0.3s ease;
+      animation: none;
+    }
+    #tab-settings.drawer-open { transform: translateX(0); }
   }
 
   /* DESKTOP LAYOUT */
@@ -420,26 +431,27 @@
 
   /* Phone mockup stack */
   .mockup-stack {
-    position: relative; height: 420px; display: flex; align-items: center; justify-content: center;
+    position: relative; height: 300px; display: flex; align-items: center; justify-content: center;
+    max-width: 100%; overflow: visible;
   }
   .phone-mock {
-    position: absolute; width: 200px; background: var(--surface); border-radius: 26px;
-    border: 6px solid #0F1E19; box-shadow: 0 24px 48px rgba(20,30,25,0.28), 0 4px 12px rgba(20,30,25,0.15);
-    overflow: hidden; padding: 14px 12px;
+    position: absolute; width: 148px; background: var(--surface); border-radius: 22px;
+    border: 5px solid #0F1E19; box-shadow: 0 20px 40px rgba(20,30,25,0.26), 0 4px 10px rgba(20,30,25,0.14);
+    overflow: hidden; padding: 11px 9px;
   }
-  .phone-mock.back { transform: rotate(-9deg) translate(-92px, 6px); z-index: 1; opacity: 0.92; }
-  .phone-mock.front { transform: rotate(6deg) translate(70px, -10px); z-index: 2; }
-  .phone-mock .mock-stat-row { display: flex; gap: 8px; margin-bottom: 10px; }
-  .phone-mock .mock-stat { flex: 1; background: var(--primary-tint); border-radius: 10px; padding: 8px 9px; }
-  .phone-mock .mock-stat .ml { font-size: 8px; color: var(--ink-soft); margin-bottom: 3px; }
-  .phone-mock .mock-stat .mv { font-family: 'Space Grotesk'; font-weight: 700; font-size: 13px; color: var(--primary); }
+  .phone-mock.back { transform: rotate(-8deg) translate(-56px, 4px); z-index: 1; opacity: 0.92; }
+  .phone-mock.front { transform: rotate(6deg) translate(50px, -8px); z-index: 2; }
+  .phone-mock .mock-stat-row { display: flex; gap: 6px; margin-bottom: 8px; }
+  .phone-mock .mock-stat { flex: 1; background: var(--primary-tint); border-radius: 8px; padding: 6px 7px; }
+  .phone-mock .mock-stat .ml { font-size: 7px; color: var(--ink-soft); margin-bottom: 2px; }
+  .phone-mock .mock-stat .mv { font-family: 'Space Grotesk'; font-weight: 700; font-size: 11px; color: var(--primary); }
   .phone-mock .mock-row {
     display: flex; justify-content: space-between; align-items: center;
-    background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
-    padding: 8px 9px; margin-bottom: 6px; font-size: 9.5px;
+    background: var(--bg); border: 1px solid var(--border); border-radius: 7px;
+    padding: 6px 7px; margin-bottom: 5px; font-size: 8px;
   }
-  .phone-mock .mock-row .mtag { background: var(--accent-tint); color: #8a5a11; border-radius: 5px; padding: 2px 6px; font-size: 8px; font-weight: 700; }
-  .phone-mock .mock-title { font-family: 'Space Grotesk'; font-weight: 700; font-size: 11px; margin-bottom: 8px; color: var(--ink); }
+  .phone-mock .mock-row .mtag { background: var(--accent-tint); color: #8a5a11; border-radius: 4px; padding: 2px 5px; font-size: 7px; font-weight: 700; }
+  .phone-mock .mock-title { font-family: 'Space Grotesk'; font-weight: 700; font-size: 9.5px; margin-bottom: 7px; color: var(--ink); }
 
   .landing-section { max-width: 1100px; margin: 0 auto; padding: 50px 24px; }
   .landing-section.tinted { background: var(--surface); border-radius: 28px; max-width: 1052px; }
@@ -509,6 +521,17 @@
     .section-heading { font-size: 30px; }
     .landing-section { padding: 64px 40px; }
     .steps-wrap { max-width: 640px; }
+    .mockup-stack { height: 420px; }
+    .phone-mock { width: 200px; border-radius: 26px; border-width: 6px; padding: 14px 12px; }
+    .phone-mock.back { transform: rotate(-9deg) translate(-92px, 6px); }
+    .phone-mock.front { transform: rotate(6deg) translate(70px, -10px); }
+    .phone-mock .mock-stat-row { gap: 8px; margin-bottom: 10px; }
+    .phone-mock .mock-stat { border-radius: 10px; padding: 8px 9px; }
+    .phone-mock .mock-stat .ml { font-size: 8px; margin-bottom: 3px; }
+    .phone-mock .mock-stat .mv { font-size: 13px; }
+    .phone-mock .mock-row { border-radius: 8px; padding: 8px 9px; margin-bottom: 6px; font-size: 9.5px; }
+    .phone-mock .mock-row .mtag { border-radius: 5px; padding: 2px 6px; font-size: 8px; }
+    .phone-mock .mock-title { font-size: 11px; margin-bottom: 8px; }
   }
 </style>
 </head>
@@ -976,7 +999,13 @@
     <div class="field-group"><label id="profileNameLabel">Your name</label><input id="profileName" placeholder="e.g. Ada Okafor"></div>
     <div class="field-group"><label id="profileShopNameLabel">Shop name</label><input id="profileShopName" placeholder="e.g. Ada's Thrift Corner"></div>
     <div class="field-group"><label id="profileLocationLabel">Location</label><input id="profileLocation" placeholder="e.g. Yaba, Lagos"></div>
-    <div class="field-group"><label id="profilePhoneLabel">Phone number</label><input id="profilePhone" type="tel" placeholder="e.g. 0803 123 4567"></div>
+    <div class="field-group">
+      <label id="profilePhoneLabel">Phone number</label>
+      <div style="display:flex; gap:8px;">
+        <select id="profileCountryCode" style="flex: 0 0 108px;"></select>
+        <input id="profilePhone" type="tel" placeholder="e.g. 0803 123 4567" style="flex:1;">
+      </div>
+    </div>
     <div class="field-group"><label id="profileEmailLabel">Email</label><input id="profileEmail" type="email" placeholder="e.g. ada@example.com"></div>
     <p class="hint">Your phone number or email helps confirm it's you if you ever need account support.</p>
 
@@ -1001,7 +1030,10 @@
 
       <div class="field-group"><label id="catalogueNoteLabel">Caption (optional)</label><input id="catalogueNote" placeholder="e.g. New arrivals this week!"></div>
 
-      <div class="section-title" style="margin-top:12px;" id="sectionCatalogueSelect">Select items to include</div>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px;">
+        <div class="section-title" style="margin-top:0;" id="sectionCatalogueSelect">Select items to include</div>
+        <span class="ghost-link" style="font-size:12.5px; font-weight:600; color:var(--primary); cursor:pointer;" onclick="toggleSelectAllCatalogue()" id="btnSelectAllCatalogue">Select all</span>
+      </div>
       <div id="catalogueItemPicker" style="max-height:220px; overflow-y:auto; border:1px solid var(--border); border-radius:10px; margin-bottom:16px;"></div>
 
       <div class="modal-actions">
@@ -1095,6 +1127,40 @@ const CURRENCY_SYMBOLS = {
   BRL: 'R$', MXN: 'MX$', SEK: 'kr', NOK: 'kr', DKK: 'kr', PLN: 'z\u0142',
   TRY: '\u20ba', SGD: 'S$', HKD: 'HK$', NZD: 'NZ$'
 };
+
+const COUNTRY_CODES = [
+  { code: '+234', name: 'Nigeria' },
+  { code: '+233', name: 'Ghana' },
+  { code: '+254', name: 'Kenya' },
+  { code: '+27', name: 'South Africa' },
+  { code: '+256', name: 'Uganda' },
+  { code: '+255', name: 'Tanzania' },
+  { code: '+250', name: 'Rwanda' },
+  { code: '+20', name: 'Egypt' },
+  { code: '+212', name: 'Morocco' },
+  { code: '+225', name: "C\u00f4te d'Ivoire" },
+  { code: '+221', name: 'Senegal' },
+  { code: '+1', name: 'US / Canada' },
+  { code: '+44', name: 'United Kingdom' },
+  { code: '+353', name: 'Ireland' },
+  { code: '+49', name: 'Germany' },
+  { code: '+33', name: 'France' },
+  { code: '+34', name: 'Spain' },
+  { code: '+39', name: 'Italy' },
+  { code: '+31', name: 'Netherlands' },
+  { code: '+351', name: 'Portugal' },
+  { code: '+91', name: 'India' },
+  { code: '+86', name: 'China' },
+  { code: '+81', name: 'Japan' },
+  { code: '+82', name: 'South Korea' },
+  { code: '+65', name: 'Singapore' },
+  { code: '+971', name: 'UAE' },
+  { code: '+966', name: 'Saudi Arabia' },
+  { code: '+61', name: 'Australia' },
+  { code: '+64', name: 'New Zealand' },
+  { code: '+55', name: 'Brazil' },
+  { code: '+52', name: 'Mexico' }
+];
 
 const TRANSLATIONS = {
   en: {
@@ -1190,7 +1256,10 @@ const TRANSLATIONS = {
     btn_save_changes: 'Save changes',
     sale_modal_title_add: 'Log a sale',
     sale_modal_title_edit: 'Edit sale',
-    btn_log_sale: 'Log sale'
+    btn_log_sale: 'Log sale',
+    nav_settings: 'Settings',
+    btn_select_all: 'Select all',
+    btn_deselect_all: 'Deselect all'
   },
   fr: {
     nav_home: 'Accueil',
@@ -1285,7 +1354,10 @@ const TRANSLATIONS = {
     btn_save_changes: 'Enregistrer les modifications',
     sale_modal_title_add: 'Enregistrer une vente',
     sale_modal_title_edit: 'Modifier la vente',
-    btn_log_sale: 'Enregistrer la vente'
+    btn_log_sale: 'Enregistrer la vente',
+    nav_settings: 'Paramètres',
+    btn_select_all: 'Tout sélectionner',
+    btn_deselect_all: 'Tout désélectionner'
   },
   es: {
     nav_home: 'Inicio',
@@ -1380,7 +1452,10 @@ const TRANSLATIONS = {
     btn_save_changes: 'Guardar cambios',
     sale_modal_title_add: 'Registrar venta',
     sale_modal_title_edit: 'Editar venta',
-    btn_log_sale: 'Registrar venta'
+    btn_log_sale: 'Registrar venta',
+    nav_settings: 'Ajustes',
+    btn_select_all: 'Seleccionar todo',
+    btn_deselect_all: 'Deseleccionar todo'
   },
   de: {
     nav_home: 'Start',
@@ -1475,7 +1550,10 @@ const TRANSLATIONS = {
     btn_save_changes: 'Änderungen speichern',
     sale_modal_title_add: 'Verkauf erfassen',
     sale_modal_title_edit: 'Verkauf bearbeiten',
-    btn_log_sale: 'Verkauf erfassen'
+    btn_log_sale: 'Verkauf erfassen',
+    nav_settings: 'Einstellungen',
+    btn_select_all: 'Alle auswählen',
+    btn_deselect_all: 'Alle abwählen'
   },
   zh: {
     nav_home: '首页',
@@ -1570,7 +1648,10 @@ const TRANSLATIONS = {
     btn_save_changes: '保存更改',
     sale_modal_title_add: '记录销售',
     sale_modal_title_edit: '编辑销售',
-    btn_log_sale: '记录销售'
+    btn_log_sale: '记录销售',
+    nav_settings: '设置',
+    btn_select_all: '全选',
+    btn_deselect_all: '取消全选'
   }
 };
 
@@ -1928,9 +2009,11 @@ async function showPublicCatalogue(code) {
     }
 
     if (profile.phone) {
-      const digits = profile.phone.replace(/[^\d+]/g, '');
+      const countryDigits = (profile.countryCode || '+234').replace(/[^\d]/g, '');
+      const localDigits = profile.phone.replace(/[^\d]/g, '').replace(/^0+/, '');
+      const fullNumber = countryDigits + localDigits;
       const message = encodeURIComponent(`Hi ${displayName}, I saw your catalogue and I'm interested in some items!`);
-      waEl.href = `https://wa.me/${digits}?text=${message}`;
+      waEl.href = `https://wa.me/${fullNumber}?text=${message}`;
       waEl.style.display = 'flex';
     }
   } catch (e) {
@@ -2053,11 +2136,18 @@ async function changeLanguage() {
   toast('Language updated');
 }
 
+function populateCountryCodeSelect(selectedCode) {
+  const sel = document.getElementById('profileCountryCode');
+  sel.innerHTML = COUNTRY_CODES.map(c => `<option value="${c.code}">${c.code} ${c.name}</option>`).join('');
+  sel.value = selectedCode || '+234';
+}
+
 function openProfileModal(mandatory) {
   const p = state.profile || {};
   document.getElementById('profileName').value = p.name || '';
   document.getElementById('profileShopName').value = p.shopName || '';
   document.getElementById('profileLocation').value = p.location || '';
+  populateCountryCodeSelect(p.countryCode || '+234');
   document.getElementById('profilePhone').value = p.phone || '';
   document.getElementById('profileEmail').value = p.email || '';
   const preview = document.getElementById('profileAvatarPreview');
@@ -2115,6 +2205,7 @@ async function saveProfile() {
     name,
     shopName: shopNameVal,
     location,
+    countryCode: document.getElementById('profileCountryCode').value,
     phone: document.getElementById('profilePhone').value.trim(),
     email: document.getElementById('profileEmail').value.trim(),
     profilePic: pendingPic || (state.profile ? state.profile.profilePic : null) || null
@@ -2712,6 +2803,8 @@ function openCatalogueModal() {
   renderCataloguePicker(cat.includedIds || []);
   document.getElementById('catalogueEditView').style.display = 'block';
   document.getElementById('catalogueReviewView').style.display = 'none';
+  const allSelected = state.products.length > 0 && cat.includedIds && cat.includedIds.length === state.products.length;
+  document.getElementById('btnSelectAllCatalogue').textContent = allSelected ? t('btn_deselect_all') : t('btn_select_all');
   openModal('catalogueModal');
 }
 
@@ -2730,6 +2823,14 @@ function renderCataloguePicker(includedIds) {
 
 function getSelectedCatalogueIds() {
   return Array.from(document.querySelectorAll('.catalogue-check:checked')).map(el => el.value);
+}
+
+function toggleSelectAllCatalogue() {
+  const checkboxes = document.querySelectorAll('.catalogue-check');
+  if (checkboxes.length === 0) return;
+  const allChecked = Array.from(checkboxes).every(c => c.checked);
+  checkboxes.forEach(c => { c.checked = !allChecked; });
+  document.getElementById('btnSelectAllCatalogue').textContent = allChecked ? t('btn_select_all') : t('btn_deselect_all');
 }
 
 async function saveCatalogue() {
