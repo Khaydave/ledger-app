@@ -975,6 +975,11 @@
       <div class="product-pick-list" id="saleProductPicker"></div>
     </div>
     <div class="field-group"><label id="saleQtyLabel">Quantity sold</label><input id="saleQty" type="number" inputmode="numeric" value="1"></div>
+    <div class="field-group">
+      <label id="saleSellPriceLabel">Price sold at (per item)</label>
+      <input id="saleSellPrice" type="number" inputmode="numeric" placeholder="e.g. 8500">
+      <p class="hint" id="saleSellPriceHint" style="margin-top:6px;">Fills in with the item's usual sell price &mdash; change it if you sold for more or less this time.</p>
+    </div>
     <div class="modal-actions">
       <button class="btn btn-danger-ghost" id="saleDeleteBtn" style="display:none;" onclick="deleteSale()"><span id="saleDeleteBtnLabel">Delete</span></button>
       <button class="btn btn-primary" id="saleSaveBtn" onclick="submitSale()">Log sale</button>
@@ -2423,6 +2428,7 @@ function openModal(id) {
     document.getElementById('saleSelectedProduct').value = '';
     document.getElementById('saleSearchInput').value = '';
     document.getElementById('saleQty').value = 1;
+    document.getElementById('saleSellPrice').value = '';
     document.getElementById('saleModalTitle').textContent = t('sale_modal_title_add');
     document.getElementById('saleSaveBtn').textContent = t('btn_log_sale');
     document.getElementById('saleDeleteBtn').style.display = 'none';
@@ -2703,6 +2709,7 @@ function selectSaleProduct(id) {
   document.getElementById('saleSelectedProduct').value = id;
   const p = state.products.find(x => x.id === id);
   document.getElementById('saleSearchInput').value = p ? p.name : '';
+  if (p) document.getElementById('saleSellPrice').value = p.price || '';
   renderSaleProductPicker();
   document.getElementById('saleQty').focus();
 }
@@ -2763,14 +2770,16 @@ async function submitSale() {
   const editId = document.getElementById('saleEditId').value;
   const pid = document.getElementById('saleSelectedProduct').value || saleSelectedProductId;
   const qty = Number(document.getElementById('saleQty').value);
+  const sellPriceInput = document.getElementById('saleSellPrice').value;
   if (!pid) { toast('Search and select an item first'); return; }
   if (!qty || qty <= 0) { toast('Enter a quantity'); return; }
+  if (sellPriceInput === '' || isNaN(Number(sellPriceInput)) || Number(sellPriceInput) < 0) { toast('Enter the price it sold at'); return; }
 
   const product = state.products.find(p => p.id === pid);
   if (!product) { toast('That item no longer exists'); return; }
 
   const unitCost = Number(product.costPrice || 0);
-  const unitSell = Number(product.price || 0);
+  const unitSell = Number(sellPriceInput);
 
   if (editId) {
     const sale = state.sales.find(s => s.id === editId);
@@ -2816,6 +2825,7 @@ function editSale(id) {
   saleSelectedProductId = sale.productId;
   document.getElementById('saleSearchInput').value = sale.productName;
   document.getElementById('saleQty').value = sale.qty;
+  document.getElementById('saleSellPrice').value = sale.unitSell != null ? sale.unitSell : '';
   document.getElementById('saleModalTitle').textContent = t('sale_modal_title_edit');
   document.getElementById('saleSaveBtn').textContent = t('btn_save_changes');
   document.getElementById('saleDeleteBtn').style.display = 'block';
@@ -3451,6 +3461,9 @@ document.getElementById('shopPasswordInput').addEventListener('keydown', e => {
   if (e.key === 'Enter') enterShop();
 });
 document.getElementById('saleQty').addEventListener('keydown', e => {
+  if (e.key === 'Enter') { e.preventDefault(); submitSale(); }
+});
+document.getElementById('saleSellPrice').addEventListener('keydown', e => {
   if (e.key === 'Enter') { e.preventDefault(); submitSale(); }
 });
 document.getElementById('saleSearchInput').addEventListener('keydown', e => {
