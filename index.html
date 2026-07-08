@@ -2852,7 +2852,7 @@ function renderSalesTab() {
 
   const profitEl = document.getElementById('statSalesProfit');
   if (profitEl) {
-    profitEl.textContent = fmtMoney(Math.abs(totalProfit)) + (totalProfit < 0 ? ' loss' : ' profit');
+    profitEl.textContent = (totalProfit < 0 ? '- ' : '') + fmtMoney(Math.abs(totalProfit));
     profitEl.className = 'value ' + (totalProfit < 0 ? 'is-loss-value' : 'is-profit-value');
   }
 
@@ -2864,7 +2864,7 @@ function renderSalesTab() {
   el.innerHTML = [...filtered].reverse().map(s => {
     const profit = Number(s.profit || 0);
     const profitClass = profit < 0 ? 'is-loss' : 'is-profit';
-    const profitLabel = (profit < 0 ? '\u2212' : '+') + fmtMoney(Math.abs(profit));
+    const profitLabel = (profit < 0 ? '- ' : '') + fmtMoney(Math.abs(profit));
     return `
     <div class="list-item" onclick="editSale('${s.id}')" style="cursor:pointer;">
       <div class="li-main">
@@ -3607,7 +3607,7 @@ function renderSummaryModal() {
   document.getElementById('summarySalesCount').textContent = s.salesCount + (s.salesCount === 1 ? ' sale' : ' sales');
 
   const profitEl = document.getElementById('summaryProfit');
-  profitEl.textContent = fmtMoney(Math.abs(s.totalProfit)) + (s.totalProfit < 0 ? ' loss' : ' profit');
+  profitEl.textContent = (s.totalProfit < 0 ? '- ' : '') + fmtMoney(Math.abs(s.totalProfit));
   profitEl.className = 'value ' + (s.totalProfit < 0 ? 'is-loss-value' : 'is-profit-value');
 
   document.getElementById('summaryOrders').textContent = fmtMoney(s.pendingOrdersValue);
