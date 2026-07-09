@@ -515,6 +515,27 @@
   .step-card h3 { font-size: 15.5px; font-weight: 600; margin-bottom: 5px; }
   .step-card p { font-size: 13.5px; color: var(--ink-soft); margin: 0; line-height: 1.55; }
 
+  .faq-list { max-width: 720px; }
+  .faq-item {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+    margin-bottom: 10px; overflow: hidden; box-shadow: 0 6px 16px rgba(31,42,36,0.04);
+  }
+  .faq-question {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 18px; cursor: pointer; font-family: 'Space Grotesk'; font-weight: 600;
+    font-size: 14.5px; color: var(--ink); gap: 12px;
+  }
+  .faq-question .faq-icon {
+    flex-shrink: 0; width: 22px; height: 22px; border-radius: 6px; background: var(--primary-tint);
+    color: var(--primary); display: flex; align-items: center; justify-content: center;
+    font-size: 15px; font-weight: 700; transition: transform 0.2s;
+  }
+  .faq-item.open .faq-question .faq-icon { transform: rotate(45deg); }
+  .faq-answer {
+    display: none; padding: 0 18px 16px; font-size: 13.5px; color: var(--ink-soft); line-height: 1.6;
+  }
+  .faq-item.open .faq-answer { display: block; }
+
   .landing-cta-band {
     background: var(--primary); border-radius: 28px; max-width: 1340px; margin: 20px auto 60px;
     padding: 56px 32px; text-align: center; position: relative; overflow: hidden;
@@ -751,6 +772,13 @@
           <div class="step-card"><h3>Start logging</h3><p>Record sales, orders, and debts as they happen. That's the whole job from here.</p></div>
         </div>
       </div>
+    </section>
+
+    <section class="landing-section">
+      <div class="section-label">Questions</div>
+      <h2 class="section-heading">Frequently asked questions</h2>
+      <p class="section-sub">The things people usually ask before they try it.</p>
+      <div class="faq-list" id="landingFaqList"></div>
     </section>
 
     <section class="landing-section" style="padding-top:10px; padding-bottom:10px;">
@@ -1043,6 +1071,11 @@
             <button class="btn btn-ghost" onclick="openSummaryModal()">&#128202; View ledger summary</button>
           </div>
 
+          <div class="section-title" id="settingsSupportLabel">Support</div>
+          <div class="field-group" style="max-width:280px;">
+            <button class="btn btn-ghost" onclick="openFaqModal()">&#128172; Help &amp; FAQ</button>
+          </div>
+
           <div style="margin-top:28px; padding-top:20px; border-top:1px solid var(--border); max-width:280px;">
             <button class="btn btn-danger-ghost" id="settingsLogoutBtn" onclick="switchShop()">Log out</button>
           </div>
@@ -1309,6 +1342,15 @@
       <button class="btn btn-ghost" onclick="exportSummaryImage()">&#128247; JPEG</button>
       <button class="btn btn-ghost" onclick="exportSummaryExcel()">&#128202; Excel</button>
     </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="faqModal">
+  <div class="modal-sheet" style="max-width: 520px;">
+    <div class="icon-btn modal-close" onclick="closeModal('faqModal')">&#10005;</div>
+    <h2>Help &amp; FAQ</h2>
+    <div class="modal-sub">Common questions about using Ledger.</div>
+    <div class="faq-list" id="modalFaqList"></div>
   </div>
 </div>
 
@@ -2793,6 +2835,72 @@ function escapeHtml(str) {
   return div.innerHTML;
 }
 
+const FAQ_ITEMS = [
+  {
+    q: "Is Ledger free to use?",
+    a: "Yes. Creating a shop and tracking your stock, sales, orders, and debts costs nothing to start. There's no forced subscription just to use the basics."
+  },
+  {
+    q: "Do I need to download an app?",
+    a: "No. Ledger runs right in your phone's browser \u2014 just open the link. There's nothing to install and nothing to update."
+  },
+  {
+    q: "Is my data safe?",
+    a: "Your shop is protected by a shop code and password that only you know. As with any early-stage tool, we'd recommend not sharing your shop code and password with anyone you don't trust."
+  },
+  {
+    q: "What if I forget my password?",
+    a: "Tap \u201cForgot your password?\u201d on the login screen. If you set up a security question when you signed up, you can use it to reset your password yourself."
+  },
+  {
+    q: "Can I use a currency other than Naira?",
+    a: "Yes. Go to Settings and pick your currency \u2014 amounts update everywhere in your ledger using live exchange rates."
+  },
+  {
+    q: "Can customers see my stock without creating an account?",
+    a: "Yes. Every shop gets a shareable public catalogue link. Customers can view what you have in stock and message you on WhatsApp to order \u2014 no login needed on their end."
+  },
+  {
+    q: "Can I use Ledger on more than one phone or computer?",
+    a: "Yes. Log in with the same shop code and password on any device, and your data will be there \u2014 it's stored securely online, not just on one phone."
+  },
+  {
+    q: "Does Ledger work without internet?",
+    a: "Not currently \u2014 Ledger saves your data online as you go, so it needs an internet connection to work."
+  },
+  {
+    q: "Can I run more than one shop?",
+    a: "Yes. Each shop has its own code and password. If you use Ledger on the same device for more than one shop, it'll remember them for quick switching."
+  },
+  {
+    q: "How do I get help if I run into a problem?",
+    a: "Use the Help & FAQ section in Settings, or reach out through our social pages linked at the bottom of this page."
+  }
+];
+
+function renderFAQList(containerId) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  el.innerHTML = FAQ_ITEMS.map((item, i) => `
+    <div class="faq-item" id="${containerId}-item-${i}">
+      <div class="faq-question" onclick="toggleFaqItem('${containerId}', ${i})">
+        <span>${escapeHtml(item.q)}</span>
+        <span class="faq-icon">&#43;</span>
+      </div>
+      <div class="faq-answer">${escapeHtml(item.a)}</div>
+    </div>`).join('');
+}
+
+function toggleFaqItem(containerId, index) {
+  const item = document.getElementById(containerId + '-item-' + index);
+  if (item) item.classList.toggle('open');
+}
+
+function openFaqModal() {
+  renderFAQList('modalFaqList');
+  openModal('faqModal');
+}
+
 function renderAll() {
   renderDashboard();
   renderStockList();
@@ -4002,6 +4110,8 @@ bindEnter(['restockNote'], saveRestockList);
 bindEnter(['restockNewItemName', 'restockNewItemQty'], addRestockCustomItem);
 bindEnter(['adminEmailInput', 'adminPasswordInput', 'adminConfirmPasswordInput'], submitAdminAuth);
 bindEnter(['newAdminEmail', 'newAdminPassword'], addNewAdmin);
+
+renderFAQList('landingFaqList');
 
 const publicStoreCode = new URLSearchParams(location.search).get('store');
 const isAdminRoute = new URLSearchParams(location.search).get('admin') === '1';
