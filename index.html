@@ -1540,7 +1540,7 @@
 <script>
 let shopCode = null;
 let shopDocRef = null;
-let state = { products: [], sales: [], debts: [], orders: [], dropshipOrders: [], profile: {}, catalogue: {}, restock: {}, settings: {} };
+let state = { products: [], sales: [], debts: [], orders: [], dropshipOrders: [], dropshipDebts: [], profile: {}, catalogue: {}, restock: {}, settings: {} };
 let fbReady = false;
 let salesPeriod = 'week';
 let saleSelectedProductId = null;
@@ -1610,6 +1610,10 @@ const TRANSLATIONS = {
     nav_sales: 'Sales',
     nav_orders: 'Orders',
     nav_debts: 'Debts',
+    'nav_do-home': 'Home',
+    'nav_do-orders': 'Customer Orders',
+    'nav_do-wholesaler': 'Wholesaler List',
+    'nav_do-profit': 'Profit',
     tab_stock: 'Your stock',
     tab_sales: 'Sales',
     tab_orders: 'Orders',
@@ -2278,10 +2282,10 @@ async function enterShop() {
       await setDoc(ref, {
         passwordHash: pwHash,
         secretQuestion, secretAnswerHash,
-        products: [], sales: [], debts: [], orders: [], dropshipOrders: [],
+        products: [], sales: [], debts: [], orders: [], dropshipOrders: [], dropshipDebts: [],
         profile: {}, catalogue: {}, restock: {}, settings: defaultSettings
       });
-      state = { products: [], sales: [], debts: [], orders: [], dropshipOrders: [], profile: {}, catalogue: {}, restock: {}, settings: defaultSettings };
+      state = { products: [], sales: [], debts: [], orders: [], dropshipOrders: [], dropshipDebts: [], profile: {}, catalogue: {}, restock: {}, settings: defaultSettings };
       profileMandatory = true;
       toast('Ledger created');
       recordLoginEvent(code, 'signup');
@@ -2303,6 +2307,8 @@ async function enterShop() {
         debts: data.debts || [],
         orders: data.orders || [],
         dropshipOrders: data.dropshipOrders || [],
+      dropshipDebts: data.dropshipDebts || [],
+        dropshipDebts: data.dropshipDebts || [],
         profile: data.profile || {},
         catalogue: data.catalogue || {},
         restock: data.restock || {},
@@ -2416,6 +2422,7 @@ async function tryAutoLogin() {
       debts: data.debts || [],
       orders: data.orders || [],
       dropshipOrders: data.dropshipOrders || [],
+      dropshipDebts: data.dropshipDebts || [],
       profile: data.profile || {},
       catalogue: data.catalogue || {},
       restock: data.restock || {},
@@ -3416,16 +3423,35 @@ function renderOrdersList() {
     </div>`).join('');
 }
 
+function isDropshipMode() {
+  return (state.settings && state.settings.mode) === 'dropshipper';
+}
+function getActiveDebts() {
+  if (isDropshipMode()) {
+    if (!state.dropshipDebts) state.dropshipDebts = [];
+    return state.dropshipDebts;
+  }
+  return state.debts;
+}
+function setActiveDebts(arr) {
+  if (isDropshipMode()) state.dropshipDebts = arr;
+  else state.debts = arr;
+}
+function activeDebtsStateKey() {
+  return isDropshipMode() ? 'dropshipDebts' : 'debts';
+}
+
 function renderDebtList() {
-  const totalOwed = state.debts.filter(d => !d.paid).reduce((s, d) => s + Number(d.amount), 0);
+  const debts = getActiveDebts();
+  const totalOwed = debts.filter(d => !d.paid).reduce((s, d) => s + Number(d.amount), 0);
   document.getElementById('statOwed').textContent = fmtMoney(totalOwed);
 
   const el = document.getElementById('debtList');
-  if (state.debts.length === 0) {
+  if (debts.length === 0) {
     el.innerHTML = '<div class="empty-state">' + t('empty_no_debts') + '</div>';
     return;
   }
-  el.innerHTML = [...state.debts].reverse().map(d => `
+  el.innerHTML = [...debts].reverse().map(d => `
     <div class="list-item">
       <div class="li-main" onclick="togglePaid('${d.id}')" style="cursor:pointer;">
         <div class="li-title">${escapeHtml(d.customer)}</div>
@@ -3641,8 +3667,8 @@ async function submitDebt() {
   const amount = Number(document.getElementById('debtAmount').value);
   if (!customer || !amount || amount <= 0) { toast('Fill in the customer and amount'); return; }
 
-  state.debts.push({ id: crypto.randomUUID(), customer, amount, paid: false, date: new Date().toISOString() });
-  await saveState('debts');
+  getActiveDebts().push({ id: crypto.randomUUID(), customer, amount, paid: false, date: new Date().toISOString() });
+  await saveState(activeDebtsStateKey());
   document.getElementById('debtName').value = '';
   document.getElementById('debtAmount').value = '';
   closeModal('debtModal');
@@ -3651,17 +3677,17 @@ async function submitDebt() {
 }
 
 async function togglePaid(id) {
-  const debt = state.debts.find(d => d.id === id);
+  const debt = getActiveDebts().find(d => d.id === id);
   if (!debt) return;
   debt.paid = !debt.paid;
-  await saveState('debts');
+  await saveState(activeDebtsStateKey());
   renderAll();
   toast(debt.paid ? 'Marked as paid' : 'Marked as unpaid');
 }
 
 async function deleteDebt(id) {
-  state.debts = state.debts.filter(d => d.id !== id);
-  await saveState('debts');
+  setActiveDebts(getActiveDebts().filter(d => d.id !== id));
+  await saveState(activeDebtsStateKey());
   renderAll();
   toast('Debt deleted');
 }
@@ -4555,7 +4581,7 @@ function computeSummary(period) {
   const pendingOrders = state.orders.filter(o => !o.fulfilled);
   const pendingOrdersValue = pendingOrders.reduce((s, o) => s + Number(o.amount), 0);
 
-  const debtsUnpaid = state.debts.filter(d => !d.paid);
+  const debtsUnpaid = getActiveDebts().filter(d => !d.paid);
   const debtsOwed = debtsUnpaid.reduce((s, d) => s + Number(d.amount), 0);
 
   const stockValue = state.products.reduce((s, p) => s + Number(p.qty) * Number(p.price), 0);
