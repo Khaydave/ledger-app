@@ -1066,7 +1066,7 @@
           </div>
           <div class="stat-row" style="margin-bottom:18px;">
             <div class="stat-card">
-              <div class="label">Owed to wholesalers</div>
+              <div class="label">Wholesaler cost (not yet delivered)</div>
               <div class="value danger" id="doStatOwedWholesaler">&#8358;0</div>
             </div>
             <div class="stat-card">
@@ -1099,6 +1099,10 @@
             <h2 style="font-size:18px;">Wholesaler list</h2>
           </div>
           <p class="hint" style="margin-bottom:14px;">Every pending customer order, ready to send to your wholesaler.</p>
+          <div class="field-group" style="max-width:260px;">
+            <label>Wholesaler's currency</label>
+            <select id="doWholesalerCurrencySelect" onchange="changeDoWholesalerCurrency()"></select>
+          </div>
           <div class="stat-card" style="margin-bottom:16px;">
             <div class="label">Total to order</div>
             <div class="value" id="doWholesalerTotal">&#8358;0</div>
@@ -1307,7 +1311,8 @@
     <input type="hidden" id="doOrderEditId" value="">
     <div class="field-group"><label>Customer name</label><input id="doOrderCustomer" placeholder="e.g. Blessing"></div>
     <div class="field-group"><label>What did they order?</label><input id="doOrderDescription" placeholder="e.g. Blue ankara dress, size M"></div>
-    <div class="field-group"><label>Price you'll charge them</label><input id="doOrderSellPrice" type="number" inputmode="numeric" placeholder="e.g. 12000"></div>
+    <div class="field-group"><label>Quantity</label><input id="doOrderQty" type="number" inputmode="numeric" placeholder="e.g. 1" value="1"></div>
+    <div class="field-group"><label>Price you'll charge them (total)</label><input id="doOrderSellPrice" type="number" inputmode="numeric" placeholder="e.g. 12000"></div>
     <div class="field-group"><label>Wholesaler cost (fill in once known)</label><input id="doOrderCostPrice" type="number" inputmode="numeric" placeholder="e.g. 8000"></div>
     <div class="field-group">
       <label>Stage</label>
@@ -1317,16 +1322,7 @@
         <option value="delivered">Delivered to customer</option>
       </select>
     </div>
-    <div style="display:flex; gap:16px; margin-bottom:16px;">
-      <label style="display:flex; align-items:center; gap:8px; font-size:13px; color:var(--ink-soft);">
-        <input type="checkbox" id="doOrderCustomerPaid" style="width:auto;"> Customer has paid
-      </label>
-    </div>
-    <div style="display:flex; gap:16px; margin-bottom:16px;">
-      <label style="display:flex; align-items:center; gap:8px; font-size:13px; color:var(--ink-soft);">
-        <input type="checkbox" id="doOrderWholesalerPaid" style="width:auto;"> You've paid the wholesaler
-      </label>
-    </div>
+    <p class="hint" style="margin-bottom:16px;">New orders start as unpaid. Once saved, tap the payment tag on the order to mark it paid or unpaid.</p>
     <div class="modal-actions">
       <button class="btn btn-danger-ghost" id="doOrderDeleteBtn" style="display:none;" onclick="deleteDoOrder()">Delete</button>
       <button class="btn btn-primary" id="doOrderSaveBtn" onclick="submitDoOrder()">Save order</button>
@@ -2174,8 +2170,9 @@ const FX_CACHE_TTL = 6 * 60 * 60 * 1000;
 let exchangeRates = null;
 
 async function ensureExchangeRates() {
-  const currency = (state.settings && state.settings.currency) || 'NGN';
-  if (currency === 'NGN') return;
+  const shopCurrency = (state.settings && state.settings.currency) || 'NGN';
+  const wholesalerCurrency = (state.restock && state.restock.dropshipCurrency) || 'NGN';
+  if (shopCurrency === 'NGN' && wholesalerCurrency === 'NGN') return;
 
   try {
     const cached = JSON.parse(localStorage.getItem(FX_CACHE_KEY) || 'null');
@@ -3034,11 +3031,10 @@ function openModal(id) {
     document.getElementById('doOrderEditId').value = '';
     document.getElementById('doOrderCustomer').value = '';
     document.getElementById('doOrderDescription').value = '';
+    document.getElementById('doOrderQty').value = 1;
     document.getElementById('doOrderSellPrice').value = '';
     document.getElementById('doOrderCostPrice').value = '';
     document.getElementById('doOrderStage').value = 'pending';
-    document.getElementById('doOrderCustomerPaid').checked = false;
-    document.getElementById('doOrderWholesalerPaid').checked = false;
     document.getElementById('doOrderModalTitle').textContent = 'Log customer order';
     document.getElementById('doOrderSaveBtn').textContent = 'Save order';
     document.getElementById('doOrderDeleteBtn').style.display = 'none';
@@ -3062,6 +3058,28 @@ function fmtMoney(n) {
     } else {
       // Live rate not available yet (or failed to load) - fall back to Naira
       // rather than show a converted-looking number that isn't actually converted.
+      displayCurrency = 'NGN';
+      amount = rawAmount;
+    }
+  }
+
+  const symbol = CURRENCY_SYMBOLS[displayCurrency] || (displayCurrency + ' ');
+  const decimals = displayCurrency === 'NGN' ? 0 : (amount !== 0 && Math.abs(amount) < 100 ? 2 : 0);
+  const formatted = amount.toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+  return symbol + formatted;
+}
+
+function fmtWholesalerMoney(n) {
+  const currency = (state.restock && state.restock.dropshipCurrency) || 'NGN';
+  const rawAmount = Number(n || 0);
+
+  let displayCurrency = currency;
+  let amount = rawAmount;
+
+  if (currency !== 'NGN') {
+    if (exchangeRates && exchangeRates[currency]) {
+      amount = rawAmount * exchangeRates[currency];
+    } else {
       displayCurrency = 'NGN';
       amount = rawAmount;
     }
@@ -3698,12 +3716,11 @@ async function submitDoOrder() {
   const editId = document.getElementById('doOrderEditId').value;
   const customer = document.getElementById('doOrderCustomer').value.trim();
   const description = document.getElementById('doOrderDescription').value.trim();
+  const qty = Number(document.getElementById('doOrderQty').value) || 1;
   const sellPrice = Number(document.getElementById('doOrderSellPrice').value);
   const costPriceRaw = document.getElementById('doOrderCostPrice').value;
   const costPrice = costPriceRaw === '' ? null : Number(costPriceRaw);
   const stage = document.getElementById('doOrderStage').value;
-  const customerPaid = document.getElementById('doOrderCustomerPaid').checked;
-  const wholesalerPaid = document.getElementById('doOrderWholesalerPaid').checked;
 
   if (!customer || !description || !sellPrice || sellPrice <= 0) {
     toast('Fill in the customer, description, and price to charge them');
@@ -3715,17 +3732,17 @@ async function submitDoOrder() {
     if (order) {
       order.customer = customer;
       order.description = description;
+      order.qty = qty;
       order.sellPrice = sellPrice;
       order.costPrice = costPrice;
       order.stage = stage;
-      order.customerPaid = customerPaid;
-      order.wholesalerPaid = wholesalerPaid;
+      // customerPaid is intentionally left untouched here - it's only changed via the tap-to-toggle action
     }
   } else {
     state.dropshipOrders.push({
       id: crypto.randomUUID(),
-      customer, description, sellPrice, costPrice, stage,
-      customerPaid, wholesalerPaid,
+      customer, description, qty, sellPrice, costPrice, stage,
+      customerPaid: false,
       date: new Date().toISOString()
     });
   }
@@ -3743,14 +3760,22 @@ function editDoOrder(id) {
   document.getElementById('doOrderEditId').value = id;
   document.getElementById('doOrderCustomer').value = order.customer;
   document.getElementById('doOrderDescription').value = order.description;
+  document.getElementById('doOrderQty').value = order.qty || 1;
   document.getElementById('doOrderSellPrice').value = order.sellPrice;
   document.getElementById('doOrderCostPrice').value = order.costPrice != null ? order.costPrice : '';
   document.getElementById('doOrderStage').value = order.stage || 'pending';
-  document.getElementById('doOrderCustomerPaid').checked = !!order.customerPaid;
-  document.getElementById('doOrderWholesalerPaid').checked = !!order.wholesalerPaid;
   document.getElementById('doOrderModalTitle').textContent = 'Edit customer order';
   document.getElementById('doOrderSaveBtn').textContent = 'Save changes';
   document.getElementById('doOrderDeleteBtn').style.display = 'block';
+}
+
+async function toggleDoOrderPaid(id) {
+  const order = state.dropshipOrders.find(o => o.id === id);
+  if (!order) return;
+  order.customerPaid = !order.customerPaid;
+  await saveState('dropshipOrders');
+  renderAll();
+  toast(order.customerPaid ? 'Marked as paid' : 'Marked as unpaid');
 }
 
 async function deleteDoOrder() {
@@ -3775,7 +3800,8 @@ function renderDoHome() {
   const pendingValue = pending.reduce((s, o) => s + Number(o.sellPrice || 0), 0);
 
   const unpaidCustomer = orders.filter(o => !o.customerPaid).reduce((s, o) => s + Number(o.sellPrice || 0), 0);
-  const owedWholesaler = orders.filter(o => !o.wholesalerPaid && o.costPrice != null).reduce((s, o) => s + Number(o.costPrice || 0), 0);
+  const notYetDelivered = orders.filter(o => o.stage !== 'delivered' && o.costPrice != null);
+  const owedWholesaler = notYetDelivered.reduce((s, o) => s + Number(o.costPrice || 0), 0);
 
   const { start: weekStart } = periodRange('week');
   const weekOrders = orders.filter(o => new Date(o.date) >= weekStart && o.costPrice != null);
@@ -3798,7 +3824,7 @@ function renderDoHome() {
         <div class="list-item" onclick="editDoOrder('${o.id}')" style="cursor:pointer;">
           <div class="li-main">
             <div class="li-title">${escapeHtml(o.customer)}</div>
-            <div class="li-sub">${escapeHtml(o.description)}</div>
+            <div class="li-sub">${o.qty || 1} &times; ${escapeHtml(o.description)}</div>
           </div>
           <div class="li-right">
             <div class="li-tag ${badge.cls}">${badge.label}</div>
@@ -3827,16 +3853,15 @@ function renderDoOrdersList() {
   }
   el.innerHTML = [...filtered].reverse().map(o => {
     const badge = doOrderStageBadge(o);
-    const payTags = `${o.customerPaid ? '&#10003; Customer paid' : '&#10005; Customer unpaid'} &middot; ${o.wholesalerPaid ? '&#10003; Wholesaler paid' : '&#10005; Wholesaler unpaid'}`;
     return `
       <div class="list-item" onclick="editDoOrder('${o.id}')" style="cursor:pointer;">
         <div class="li-main">
           <div class="li-title">${escapeHtml(o.customer)}</div>
-          <div class="li-sub">${escapeHtml(o.description)}</div>
-          <div class="li-sub" style="margin-top:2px;">${payTags}</div>
+          <div class="li-sub">${o.qty || 1} &times; ${escapeHtml(o.description)}</div>
         </div>
         <div class="li-right">
           <div class="li-tag ${badge.cls}">${badge.label}</div>
+          <div class="li-tag ${o.customerPaid ? 'paid' : 'owe'}" onclick="event.stopPropagation(); toggleDoOrderPaid('${o.id}')" style="cursor:pointer;">${o.customerPaid ? 'Paid' : 'Unpaid'}</div>
           <div class="profit-text" style="color:var(--ink-soft);">${fmtMoney(o.sellPrice)}</div>
         </div>
       </div>`;
@@ -3847,11 +3872,42 @@ function buildDoWholesalerItems() {
   return (state.dropshipOrders || []).filter(o => o.stage === 'pending');
 }
 
+function populateDoWholesalerCurrencySelect() {
+  const sel = document.getElementById('doWholesalerCurrencySelect');
+  if (!sel || sel.options.length > 0) {
+    if (sel) sel.value = (state.restock && state.restock.dropshipCurrency) || 'NGN';
+    return;
+  }
+  const currencyName = (code) => {
+    try { return new Intl.DisplayNames(['en'], { type: 'currency' }).of(code); }
+    catch (e) { return code; }
+  };
+  let html = '<optgroup label="Major currencies">';
+  html += MAJOR_CURRENCIES.map(c => `<option value="${c}">${c} \u2014 ${currencyName(c)}</option>`).join('');
+  html += '</optgroup><optgroup label="Other currencies">';
+  html += OTHER_CURRENCIES.map(c => `<option value="${c}">${c} \u2014 ${currencyName(c)}</option>`).join('');
+  html += '</optgroup>';
+  sel.innerHTML = html;
+  sel.value = (state.restock && state.restock.dropshipCurrency) || 'NGN';
+}
+
+async function changeDoWholesalerCurrency() {
+  const currency = document.getElementById('doWholesalerCurrencySelect').value;
+  state.restock = { ...(state.restock || {}), dropshipCurrency: currency };
+  await saveState('restock');
+  if (currency !== 'NGN') {
+    toast('Loading live exchange rate...');
+    await ensureExchangeRates();
+  }
+  renderDoWholesalerList();
+}
+
 function renderDoWholesalerList() {
+  populateDoWholesalerCurrencySelect();
   const items = buildDoWholesalerItems();
   const total = items.reduce((s, o) => s + Number(o.costPrice != null ? o.costPrice : o.sellPrice), 0);
 
-  document.getElementById('doWholesalerTotal').textContent = fmtMoney(total);
+  document.getElementById('doWholesalerTotal').textContent = fmtWholesalerMoney(total);
   document.getElementById('doWholesalerCount').textContent = items.length + (items.length === 1 ? ' item' : ' items');
 
   const noteField = document.getElementById('doWholesalerNote');
@@ -3866,9 +3922,9 @@ function renderDoWholesalerList() {
     <div class="list-item">
       <div class="li-main">
         <div class="li-title">${escapeHtml(o.description)}</div>
-        <div class="li-sub">For ${escapeHtml(o.customer)}</div>
+        <div class="li-sub">Qty: ${o.qty || 1} &middot; For ${escapeHtml(o.customer)}</div>
       </div>
-      <div class="li-tag ok">${o.costPrice != null ? fmtMoney(o.costPrice) : 'Cost TBD'}</div>
+      <div class="li-tag ok">${o.costPrice != null ? fmtWholesalerMoney(o.costPrice) : 'Cost TBD'}</div>
     </div>`).join('');
 }
 
@@ -3893,8 +3949,8 @@ function renderDoWholesalerTarget() {
       ${note ? `<div style="font-size:13px; color:#5B6B62; margin-bottom:14px;">${escapeHtml(note)}</div>` : ''}
       ${items.map(o => `
         <div style="display:flex; justify-content:space-between; padding:12px 0; border-bottom:1px solid #E7E0D2;">
-          <span style="font-size:14.5px; color:#1F2A24;">${escapeHtml(o.description)}</span>
-          <span style="font-family:'Plus Jakarta Sans',sans-serif; font-weight:600; font-size:14.5px; color:#1F4B43;">${o.costPrice != null ? fmtMoney(o.costPrice) : 'TBD'}</span>
+          <span style="font-size:14.5px; color:#1F2A24;">${escapeHtml(o.description)} <span style="color:#9AA69C;">&times; ${o.qty || 1}</span></span>
+          <span style="font-family:'Plus Jakarta Sans',sans-serif; font-weight:600; font-size:14.5px; color:#1F4B43;">${o.costPrice != null ? fmtWholesalerMoney(o.costPrice) : 'TBD'}</span>
         </div>`).join('')}
       <div style="text-align:center; font-size:11px; color:#9AA69C; margin-top:18px;">Made with Ledger</div>
     </div>`;
@@ -3948,14 +4004,16 @@ async function exportDoWholesalerExcel() {
   try {
     const shopDisplayName = (state.profile && state.profile.shopName) ? state.profile.shopName : shopCode;
     const note = document.getElementById('doWholesalerNote').value.trim();
+    const currency = (state.restock && state.restock.dropshipCurrency) || 'NGN';
     const rows = [
       ['Wholesaler Order \u2014 Customer Pre-Orders'],
       ['Shop', shopDisplayName],
       ['Note', note || ''],
+      ['Currency', currency],
       [''],
-      ['Customer', 'Item', 'Cost']
+      ['Customer', 'Item', 'Quantity', 'Cost']
     ];
-    items.forEach(o => rows.push([o.customer, o.description, o.costPrice != null ? o.costPrice : 'TBD']));
+    items.forEach(o => rows.push([o.customer, o.description, o.qty || 1, o.costPrice != null ? fmtWholesalerMoney(o.costPrice) : 'TBD']));
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.aoa_to_sheet(rows);
     XLSX.utils.book_append_sheet(wb, ws, 'Wholesaler order');
@@ -3975,7 +4033,7 @@ async function copyDoWholesalerText() {
   let text = `*${shopDisplayName} \u2014 Wholesaler Order*\n`;
   if (note) text += note + '\n';
   text += '\n';
-  items.forEach(o => { text += `${o.description} (for ${o.customer}) \u2014 ${o.costPrice != null ? fmtMoney(o.costPrice) : 'cost TBD'}\n`; });
+  items.forEach(o => { text += `${o.description} (Qty: ${o.qty || 1}, for ${o.customer}) \u2014 ${o.costPrice != null ? fmtWholesalerMoney(o.costPrice) : 'cost TBD'}\n`; });
   try {
     await navigator.clipboard.writeText(text);
     toast('Order copied \u2014 paste it into WhatsApp');
