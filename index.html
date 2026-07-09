@@ -866,6 +866,14 @@
           <option value="zh">&#20013;&#25991;</option>
         </select>
       </div>
+      <div class="field-group">
+        <label>What kind of shop is this?</label>
+        <div class="auth-toggle" style="margin-bottom:0;">
+          <button type="button" id="signupModeRegular" class="active" onclick="setSignupMode('regular')">Regular seller</button>
+          <button type="button" id="signupModeDropship" onclick="setSignupMode('dropshipper')">Dropshipper</button>
+        </div>
+        <p class="hint" style="margin-top:6px;">You can switch this anytime later in Settings &mdash; this is just where you start.</p>
+      </div>
     </div>
 
     <button class="btn btn-primary" id="continueBtn" onclick="enterShop()">Log in</button>
@@ -900,11 +908,20 @@
         <div class="mark"><img src="data:image/png;base64,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" alt="Ledger logo"></div>
         <div class="brand-name">Ledger</div>
       </div>
-      <button class="nav-btn active" data-tab="home" onclick="showTab('home')"><span class="nicon">&#8962;</span>Home</button>
-      <button class="nav-btn" data-tab="stock" onclick="showTab('stock')"><span class="nicon">&#128230;</span>Stock</button>
-      <button class="nav-btn" data-tab="sales" onclick="showTab('sales')"><span class="nicon">&#128200;</span>Sales</button>
-      <button class="nav-btn" data-tab="orders" onclick="showTab('orders')"><span class="nicon">&#128203;</span>Orders</button>
-      <button class="nav-btn" data-tab="debts" onclick="showTab('debts')"><span class="nicon">&#128179;</span>Debts</button>
+      <div id="navRegular">
+        <button class="nav-btn active" data-tab="home" onclick="showTab('home')"><span class="nicon">&#8962;</span>Home</button>
+        <button class="nav-btn" data-tab="stock" onclick="showTab('stock')"><span class="nicon">&#128230;</span>Stock</button>
+        <button class="nav-btn" data-tab="sales" onclick="showTab('sales')"><span class="nicon">&#128200;</span>Sales</button>
+        <button class="nav-btn" data-tab="orders" onclick="showTab('orders')"><span class="nicon">&#128203;</span>Orders</button>
+        <button class="nav-btn" data-tab="debts" onclick="showTab('debts')"><span class="nicon">&#128179;</span>Debts</button>
+      </div>
+      <div id="navDropship" style="display:none;">
+        <button class="nav-btn active" data-tab="do-home" onclick="showTab('do-home')"><span class="nicon">&#8962;</span>Home</button>
+        <button class="nav-btn" data-tab="do-orders" onclick="showTab('do-orders')"><span class="nicon">&#128203;</span>Customer Orders</button>
+        <button class="nav-btn" data-tab="do-wholesaler" onclick="showTab('do-wholesaler')"><span class="nicon">&#128230;</span>Wholesaler List</button>
+        <button class="nav-btn" data-tab="do-profit" onclick="showTab('do-profit')"><span class="nicon">&#128200;</span>Profit</button>
+        <button class="nav-btn" data-tab="debts" onclick="showTab('debts')"><span class="nicon">&#128179;</span>Debts</button>
+      </div>
       <div style="flex:1;"></div>
       <button onclick="openProfileModal()"><span class="nicon">&#128100;</span>Profile</button>
       <button class="nav-btn" data-tab="settings" onclick="showTab('settings')"><span class="nicon">&#9881;</span>Settings</button>
@@ -1035,6 +1052,113 @@
           <div id="ordersList"></div>
         </div>
 
+        <div id="tab-do-home" class="tabpanel" style="display:none;">
+          <div class="stat-row" style="margin-bottom:18px;">
+            <div class="stat-card">
+              <div class="label">Pending customer orders</div>
+              <div class="value" id="doStatPendingOrders">&#8358;0</div>
+              <div class="sub" id="doStatPendingOrdersCount">0 orders</div>
+            </div>
+            <div class="stat-card">
+              <div class="label">Unpaid from customers</div>
+              <div class="value danger" id="doStatUnpaidCustomer">&#8358;0</div>
+            </div>
+          </div>
+          <div class="stat-row" style="margin-bottom:18px;">
+            <div class="stat-card">
+              <div class="label">Owed to wholesalers</div>
+              <div class="value danger" id="doStatOwedWholesaler">&#8358;0</div>
+            </div>
+            <div class="stat-card">
+              <div class="label">Profit this week</div>
+              <div class="value" id="doStatProfitWeek">&#8358;0</div>
+            </div>
+          </div>
+          <div class="quick-actions">
+            <button class="quick-btn" onclick="openModal('doOrderModal')"><span class="qicon">&#43;</span>Log customer order</button>
+            <button class="quick-btn secondary" onclick="showTab('do-wholesaler')"><span class="qicon">&#128230;</span>Wholesaler list</button>
+          </div>
+          <div class="section-title">Recent orders</div>
+          <div id="doRecentOrdersList"></div>
+        </div>
+
+        <div id="tab-do-orders" class="tabpanel" style="display:none;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin: 6px 0 14px;">
+            <h2 style="font-size:18px;">Customer orders</h2>
+            <button class="icon-btn" onclick="openModal('doOrderModal')">&#43;</button>
+          </div>
+          <div class="search-box">
+            <span class="search-icon">&#128269;</span>
+            <input id="doOrderSearchInput" placeholder="Search by customer..." oninput="renderDoOrdersList()">
+          </div>
+          <div id="doOrdersList"></div>
+        </div>
+
+        <div id="tab-do-wholesaler" class="tabpanel" style="display:none;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin: 6px 0 14px;">
+            <h2 style="font-size:18px;">Wholesaler list</h2>
+          </div>
+          <p class="hint" style="margin-bottom:14px;">Every pending customer order, ready to send to your wholesaler.</p>
+          <div class="stat-card" style="margin-bottom:16px;">
+            <div class="label">Total to order</div>
+            <div class="value" id="doWholesalerTotal">&#8358;0</div>
+            <div class="sub" id="doWholesalerCount">0 items</div>
+          </div>
+          <div class="field-group"><label>Note (optional)</label><input id="doWholesalerNote" placeholder="e.g. Please deliver by Friday"></div>
+          <div class="modal-actions" style="margin-bottom:10px;">
+            <button class="btn btn-ghost" onclick="exportDoWholesalerImage()">&#128247; JPEG</button>
+            <button class="btn btn-ghost" onclick="exportDoWholesalerPDF()">&#128196; PDF</button>
+            <button class="btn btn-ghost" onclick="exportDoWholesalerExcel()">&#128202; Excel</button>
+          </div>
+          <button class="btn btn-ghost" style="margin-bottom:16px;" onclick="copyDoWholesalerText()">Copy as text</button>
+          <div id="doWholesalerList"></div>
+          <div id="doWholesalerRenderTarget" style="position:absolute; left:-9999px; top:0;"></div>
+        </div>
+
+        <div id="tab-do-profit" class="tabpanel" style="display:none;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin: 6px 0 14px;">
+            <h2 style="font-size:18px;">Profit</h2>
+          </div>
+          <div class="field-group" style="max-width:220px;">
+            <select id="doProfitPeriodSelect" onchange="setDoProfitPeriod(this.value)">
+              <option value="day">Today</option>
+              <option value="yesterday">Yesterday</option>
+              <option value="week" selected>This week</option>
+              <option value="lastweek">Last week</option>
+              <option value="month">This month</option>
+              <option value="lastmonth">Last month</option>
+              <option value="year">This year</option>
+              <option value="lastyear">Last year</option>
+              <option value="custom">Custom range&hellip;</option>
+            </select>
+          </div>
+          <div id="doProfitCustomRangeGroup" style="display:none; max-width:320px; margin-bottom:16px;">
+            <div style="display:flex; gap:8px; align-items:end;">
+              <div class="field-group" style="margin-bottom:0; flex:1;">
+                <label style="font-size:11px;">From</label>
+                <input type="date" id="doProfitCustomStart">
+              </div>
+              <div class="field-group" style="margin-bottom:0; flex:1;">
+                <label style="font-size:11px;">To</label>
+                <input type="date" id="doProfitCustomEnd">
+              </div>
+              <button class="icon-btn" onclick="applyDoProfitCustomRange()" title="Apply">&#10003;</button>
+            </div>
+          </div>
+          <div class="stat-row" style="margin-bottom:16px;">
+            <div class="stat-card">
+              <div class="label" id="doProfitRevenueLabel">Revenue &mdash; this week</div>
+              <div class="value" id="doStatRevenue">&#8358;0</div>
+              <div class="sub" id="doStatRevenueCount">0 orders</div>
+            </div>
+            <div class="stat-card">
+              <div class="label" id="doProfitLabel">Profit &mdash; this week</div>
+              <div class="value" id="doStatProfit">&#8358;0</div>
+            </div>
+          </div>
+          <div id="doProfitList"></div>
+        </div>
+
         <div id="tab-debts" class="tabpanel" style="display:none;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin: 6px 0 14px;">
             <h2 style="font-size:18px;" id="debtsTabTitle">Customer debts</h2>
@@ -1077,6 +1201,13 @@
             <button class="btn btn-ghost" onclick="openSummaryModal()">&#128202; View ledger summary</button>
           </div>
 
+          <div class="section-title">Shop type</div>
+          <div class="period-toggle" style="max-width:280px;">
+            <button id="modeToggleRegular" class="active" onclick="switchAppMode('regular')">Regular seller</button>
+            <button id="modeToggleDropship" onclick="switchAppMode('dropshipper')">Dropshipper</button>
+          </div>
+          <p class="hint" style="margin-bottom:18px;">Switching doesn't delete anything &mdash; your data for both is kept, so you can switch back anytime.</p>
+
           <div class="section-title" id="settingsSupportLabel">Support</div>
           <div class="field-group" style="max-width:280px;">
             <button class="btn btn-ghost" onclick="openFaqModal()">&#128172; Help &amp; FAQ</button>
@@ -1091,11 +1222,20 @@
       </div>
 
       <div class="navbar">
-        <button class="nav-btn active" data-tab="home" onclick="showTab('home')"><span class="nicon">&#8962;</span>Home</button>
-        <button class="nav-btn" data-tab="stock" onclick="showTab('stock')"><span class="nicon">&#128230;</span>Stock</button>
-        <button class="nav-btn" data-tab="sales" onclick="showTab('sales')"><span class="nicon">&#128200;</span>Sales</button>
-        <button class="nav-btn" data-tab="orders" onclick="showTab('orders')"><span class="nicon">&#128203;</span>Orders</button>
-        <button class="nav-btn" data-tab="debts" onclick="showTab('debts')"><span class="nicon">&#128179;</span>Debts</button>
+        <div id="navRegularMobile" style="display:flex; flex:1;">
+          <button class="nav-btn active" data-tab="home" onclick="showTab('home')"><span class="nicon">&#8962;</span>Home</button>
+          <button class="nav-btn" data-tab="stock" onclick="showTab('stock')"><span class="nicon">&#128230;</span>Stock</button>
+          <button class="nav-btn" data-tab="sales" onclick="showTab('sales')"><span class="nicon">&#128200;</span>Sales</button>
+          <button class="nav-btn" data-tab="orders" onclick="showTab('orders')"><span class="nicon">&#128203;</span>Orders</button>
+          <button class="nav-btn" data-tab="debts" onclick="showTab('debts')"><span class="nicon">&#128179;</span>Debts</button>
+        </div>
+        <div id="navDropshipMobile" style="display:none; flex:1;">
+          <button class="nav-btn active" data-tab="do-home" onclick="showTab('do-home')"><span class="nicon">&#8962;</span>Home</button>
+          <button class="nav-btn" data-tab="do-orders" onclick="showTab('do-orders')"><span class="nicon">&#128203;</span>Orders</button>
+          <button class="nav-btn" data-tab="do-wholesaler" onclick="showTab('do-wholesaler')"><span class="nicon">&#128230;</span>Wholesaler</button>
+          <button class="nav-btn" data-tab="do-profit" onclick="showTab('do-profit')"><span class="nicon">&#128200;</span>Profit</button>
+          <button class="nav-btn" data-tab="debts" onclick="showTab('debts')"><span class="nicon">&#128179;</span>Debts</button>
+        </div>
       </div>
     </div>
   </div>
@@ -1156,6 +1296,41 @@
     <div class="field-group"><label id="orderDescLabel">What did they order?</label><input id="orderDescription" placeholder="e.g. 2 skincare sets"></div>
     <div class="field-group"><label id="orderAmountLabel">Order value (&#8358;)</label><input id="orderAmount" type="number" inputmode="numeric" placeholder="e.g. 12000"></div>
     <div class="modal-actions"><button class="btn btn-primary" onclick="submitOrder()"><span id="btnSaveOrder">Save order</span></button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="doOrderModal">
+  <div class="modal-sheet">
+    <div class="icon-btn modal-close" onclick="closeModal('doOrderModal')">&#10005;</div>
+    <h2 id="doOrderModalTitle">Log customer order</h2>
+    <div class="modal-sub">Track what a customer wants, and what it'll cost you to source it.</div>
+    <input type="hidden" id="doOrderEditId" value="">
+    <div class="field-group"><label>Customer name</label><input id="doOrderCustomer" placeholder="e.g. Blessing"></div>
+    <div class="field-group"><label>What did they order?</label><input id="doOrderDescription" placeholder="e.g. Blue ankara dress, size M"></div>
+    <div class="field-group"><label>Price you'll charge them</label><input id="doOrderSellPrice" type="number" inputmode="numeric" placeholder="e.g. 12000"></div>
+    <div class="field-group"><label>Wholesaler cost (fill in once known)</label><input id="doOrderCostPrice" type="number" inputmode="numeric" placeholder="e.g. 8000"></div>
+    <div class="field-group">
+      <label>Stage</label>
+      <select id="doOrderStage">
+        <option value="pending">Pending &mdash; not yet ordered from wholesaler</option>
+        <option value="ordered">Ordered from wholesaler</option>
+        <option value="delivered">Delivered to customer</option>
+      </select>
+    </div>
+    <div style="display:flex; gap:16px; margin-bottom:16px;">
+      <label style="display:flex; align-items:center; gap:8px; font-size:13px; color:var(--ink-soft);">
+        <input type="checkbox" id="doOrderCustomerPaid" style="width:auto;"> Customer has paid
+      </label>
+    </div>
+    <div style="display:flex; gap:16px; margin-bottom:16px;">
+      <label style="display:flex; align-items:center; gap:8px; font-size:13px; color:var(--ink-soft);">
+        <input type="checkbox" id="doOrderWholesalerPaid" style="width:auto;"> You've paid the wholesaler
+      </label>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-danger-ghost" id="doOrderDeleteBtn" style="display:none;" onclick="deleteDoOrder()">Delete</button>
+      <button class="btn btn-primary" id="doOrderSaveBtn" onclick="submitDoOrder()">Save order</button>
+    </div>
   </div>
 </div>
 
@@ -1365,11 +1540,18 @@
 <script>
 let shopCode = null;
 let shopDocRef = null;
-let state = { products: [], sales: [], debts: [], orders: [], profile: {}, catalogue: {}, restock: {}, settings: {} };
+let state = { products: [], sales: [], debts: [], orders: [], dropshipOrders: [], profile: {}, catalogue: {}, restock: {}, settings: {} };
 let fbReady = false;
 let salesPeriod = 'week';
 let saleSelectedProductId = null;
 let authMode = 'login';
+let signupMode = 'regular';
+
+function setSignupMode(mode) {
+  signupMode = mode;
+  document.getElementById('signupModeRegular').classList.toggle('active', mode === 'regular');
+  document.getElementById('signupModeDropship').classList.toggle('active', mode === 'dropshipper');
+}
 let forgotShopRef = null;
 let forgotSecretAnswerHash = null;
 let profileMandatory = false;
@@ -2092,14 +2274,14 @@ async function enterShop() {
       }
       const secretAnswerHash = await hashPassword(secretAnswer);
       const chosenLanguage = document.getElementById('signupLanguageSelect').value;
-      const defaultSettings = { currency: 'NGN', theme: 'light', language: chosenLanguage };
+      const defaultSettings = { currency: 'NGN', theme: 'light', language: chosenLanguage, mode: signupMode };
       await setDoc(ref, {
         passwordHash: pwHash,
         secretQuestion, secretAnswerHash,
-        products: [], sales: [], debts: [], orders: [],
+        products: [], sales: [], debts: [], orders: [], dropshipOrders: [],
         profile: {}, catalogue: {}, restock: {}, settings: defaultSettings
       });
-      state = { products: [], sales: [], debts: [], orders: [], profile: {}, catalogue: {}, restock: {}, settings: defaultSettings };
+      state = { products: [], sales: [], debts: [], orders: [], dropshipOrders: [], profile: {}, catalogue: {}, restock: {}, settings: defaultSettings };
       profileMandatory = true;
       toast('Ledger created');
       recordLoginEvent(code, 'signup');
@@ -2120,6 +2302,7 @@ async function enterShop() {
         sales: data.sales || [],
         debts: data.debts || [],
         orders: data.orders || [],
+        dropshipOrders: data.dropshipOrders || [],
         profile: data.profile || {},
         catalogue: data.catalogue || {},
         restock: data.restock || {},
@@ -2163,15 +2346,42 @@ function enterMainScreen() {
 
   updateShopHeader();
   applyTranslations();
+  applyModeUI();
   renderAll();
 
+  const currentMode = (state.settings && state.settings.mode) || 'regular';
+  const defaultTab = currentMode === 'dropshipper' ? 'do-home' : 'home';
   const hashTab = (location.hash || '').replace('#', '');
-  const validTabs = ['home', 'stock', 'sales', 'orders', 'debts', 'settings'];
-  const startTab = validTabs.includes(hashTab) ? hashTab : 'home';
+  const validTabs = ['home', 'stock', 'sales', 'orders', 'debts', 'settings', 'do-home', 'do-orders', 'do-wholesaler', 'do-profit'];
+  const startTab = validTabs.includes(hashTab) ? hashTab : defaultTab;
   showTab(startTab, true);
   history.replaceState({ tab: startTab }, '', '#' + startTab);
 
   ensureExchangeRates().then(() => renderAll());
+}
+
+function applyModeUI() {
+  const mode = (state.settings && state.settings.mode) || 'regular';
+  const isDropship = mode === 'dropshipper';
+
+  document.getElementById('navRegular').style.display = isDropship ? 'none' : 'block';
+  document.getElementById('navDropship').style.display = isDropship ? 'block' : 'none';
+  document.getElementById('navRegularMobile').style.display = isDropship ? 'none' : 'flex';
+  document.getElementById('navDropshipMobile').style.display = isDropship ? 'flex' : 'none';
+
+  const modeRegularBtn = document.getElementById('modeToggleRegular');
+  const modeDropshipBtn = document.getElementById('modeToggleDropship');
+  if (modeRegularBtn) modeRegularBtn.classList.toggle('active', !isDropship);
+  if (modeDropshipBtn) modeDropshipBtn.classList.toggle('active', isDropship);
+}
+
+async function switchAppMode(mode) {
+  state.settings = { ...(state.settings || {}), mode };
+  await saveState('settings');
+  applyModeUI();
+  const defaultTab = mode === 'dropshipper' ? 'do-home' : 'home';
+  showTab(defaultTab);
+  toast(mode === 'dropshipper' ? 'Switched to Dropshipper mode' : 'Switched to Regular seller mode');
 }
 
 function saveSession(code, pwHash) {
@@ -2205,6 +2415,7 @@ async function tryAutoLogin() {
       sales: data.sales || [],
       debts: data.debts || [],
       orders: data.orders || [],
+      dropshipOrders: data.dropshipOrders || [],
       profile: data.profile || {},
       catalogue: data.catalogue || {},
       restock: data.restock || {},
@@ -2552,6 +2763,7 @@ function renderSettingsTab() {
   document.getElementById('theme-dark').classList.toggle('active', theme === 'dark');
   populateCurrencySelect('settingsCurrencySelect', (state.settings && state.settings.currency) || 'NGN');
   document.getElementById('settingsLanguageSelect').value = (state.settings && state.settings.language) || 'en';
+  applyModeUI();
 }
 
 async function setTheme(mode) {
@@ -2726,16 +2938,18 @@ function switchShop() {
 
 let lastActiveTabBeforeSettings = 'home';
 
+const ALL_TAB_IDS = ['home', 'stock', 'sales', 'orders', 'debts', 'do-home', 'do-orders', 'do-wholesaler', 'do-profit'];
+
 function showTab(name, skipHistory) {
   if (name === 'settings') {
-    const current = ['home', 'stock', 'sales', 'orders', 'debts'].find(
+    const current = ALL_TAB_IDS.find(
       t => document.getElementById('tab-' + t).style.display === 'block'
     );
     if (current) lastActiveTabBeforeSettings = current;
     // Leave the other tabs' content visible underneath the drawer/backdrop instead of hiding it
     document.getElementById('tab-settings').style.display = 'block';
   } else {
-    ['home', 'stock', 'sales', 'orders', 'debts'].forEach(t => {
+    ALL_TAB_IDS.forEach(t => {
       document.getElementById('tab-' + t).style.display = t === name ? 'block' : 'none';
     });
     document.getElementById('tab-settings').style.display = 'none';
@@ -2765,6 +2979,10 @@ function showTab(name, skipHistory) {
   if (name === 'orders') renderOrdersList();
   if (name === 'debts') renderDebtList();
   if (name === 'settings') renderSettingsTab();
+  if (name === 'do-home') renderDoHome();
+  if (name === 'do-orders') renderDoOrdersList();
+  if (name === 'do-wholesaler') renderDoWholesalerList();
+  if (name === 'do-profit') renderDoProfitTab();
 
   if (!skipHistory && shopCode) {
     history.pushState({ tab: name }, '', '#' + name);
@@ -2804,6 +3022,19 @@ function openModal(id) {
     document.getElementById('stockModalSub').textContent = t('stock_modal_sub_add');
     document.getElementById('stockSaveBtn').textContent = t('btn_save_item');
     document.getElementById('stockDeleteBtn').style.display = 'none';
+  }
+  if (id === 'doOrderModal') {
+    document.getElementById('doOrderEditId').value = '';
+    document.getElementById('doOrderCustomer').value = '';
+    document.getElementById('doOrderDescription').value = '';
+    document.getElementById('doOrderSellPrice').value = '';
+    document.getElementById('doOrderCostPrice').value = '';
+    document.getElementById('doOrderStage').value = 'pending';
+    document.getElementById('doOrderCustomerPaid').checked = false;
+    document.getElementById('doOrderWholesalerPaid').checked = false;
+    document.getElementById('doOrderModalTitle').textContent = 'Log customer order';
+    document.getElementById('doOrderSaveBtn').textContent = 'Save order';
+    document.getElementById('doOrderDeleteBtn').style.display = 'none';
   }
   document.getElementById(id).classList.add('active');
 }
@@ -2913,6 +3144,10 @@ function renderAll() {
   renderSalesTab();
   renderOrdersList();
   renderDebtList();
+  renderDoHome();
+  renderDoOrdersList();
+  renderDoWholesalerList();
+  renderDoProfitTab();
 }
 
 function periodStartDate(period) {
@@ -3429,6 +3664,393 @@ async function deleteDebt(id) {
   await saveState('debts');
   renderAll();
   toast('Debt deleted');
+}
+
+// ===================== DROPSHIPPER MODE =====================
+
+async function submitDoOrder() {
+  const editId = document.getElementById('doOrderEditId').value;
+  const customer = document.getElementById('doOrderCustomer').value.trim();
+  const description = document.getElementById('doOrderDescription').value.trim();
+  const sellPrice = Number(document.getElementById('doOrderSellPrice').value);
+  const costPriceRaw = document.getElementById('doOrderCostPrice').value;
+  const costPrice = costPriceRaw === '' ? null : Number(costPriceRaw);
+  const stage = document.getElementById('doOrderStage').value;
+  const customerPaid = document.getElementById('doOrderCustomerPaid').checked;
+  const wholesalerPaid = document.getElementById('doOrderWholesalerPaid').checked;
+
+  if (!customer || !description || !sellPrice || sellPrice <= 0) {
+    toast('Fill in the customer, description, and price to charge them');
+    return;
+  }
+
+  if (editId) {
+    const order = state.dropshipOrders.find(o => o.id === editId);
+    if (order) {
+      order.customer = customer;
+      order.description = description;
+      order.sellPrice = sellPrice;
+      order.costPrice = costPrice;
+      order.stage = stage;
+      order.customerPaid = customerPaid;
+      order.wholesalerPaid = wholesalerPaid;
+    }
+  } else {
+    state.dropshipOrders.push({
+      id: crypto.randomUUID(),
+      customer, description, sellPrice, costPrice, stage,
+      customerPaid, wholesalerPaid,
+      date: new Date().toISOString()
+    });
+  }
+
+  await saveState('dropshipOrders');
+  closeModal('doOrderModal');
+  renderAll();
+  toast(editId ? 'Order updated' : 'Order saved');
+}
+
+function editDoOrder(id) {
+  const order = state.dropshipOrders.find(o => o.id === id);
+  if (!order) return;
+  openModal('doOrderModal');
+  document.getElementById('doOrderEditId').value = id;
+  document.getElementById('doOrderCustomer').value = order.customer;
+  document.getElementById('doOrderDescription').value = order.description;
+  document.getElementById('doOrderSellPrice').value = order.sellPrice;
+  document.getElementById('doOrderCostPrice').value = order.costPrice != null ? order.costPrice : '';
+  document.getElementById('doOrderStage').value = order.stage || 'pending';
+  document.getElementById('doOrderCustomerPaid').checked = !!order.customerPaid;
+  document.getElementById('doOrderWholesalerPaid').checked = !!order.wholesalerPaid;
+  document.getElementById('doOrderModalTitle').textContent = 'Edit customer order';
+  document.getElementById('doOrderSaveBtn').textContent = 'Save changes';
+  document.getElementById('doOrderDeleteBtn').style.display = 'block';
+}
+
+async function deleteDoOrder() {
+  const editId = document.getElementById('doOrderEditId').value;
+  if (!editId) return;
+  state.dropshipOrders = state.dropshipOrders.filter(o => o.id !== editId);
+  await saveState('dropshipOrders');
+  closeModal('doOrderModal');
+  renderAll();
+  toast('Order deleted');
+}
+
+function doOrderStageBadge(order) {
+  if (order.stage === 'delivered') return { cls: 'ok', label: 'Delivered' };
+  if (order.stage === 'ordered') return { cls: 'pending', label: 'Ordered' };
+  return { cls: 'low', label: 'Pending' };
+}
+
+function renderDoHome() {
+  const orders = state.dropshipOrders || [];
+  const pending = orders.filter(o => o.stage === 'pending');
+  const pendingValue = pending.reduce((s, o) => s + Number(o.sellPrice || 0), 0);
+
+  const unpaidCustomer = orders.filter(o => !o.customerPaid).reduce((s, o) => s + Number(o.sellPrice || 0), 0);
+  const owedWholesaler = orders.filter(o => !o.wholesalerPaid && o.costPrice != null).reduce((s, o) => s + Number(o.costPrice || 0), 0);
+
+  const { start: weekStart } = periodRange('week');
+  const weekOrders = orders.filter(o => new Date(o.date) >= weekStart && o.costPrice != null);
+  const weekProfit = weekOrders.reduce((s, o) => s + (Number(o.sellPrice || 0) - Number(o.costPrice || 0)), 0);
+
+  document.getElementById('doStatPendingOrders').textContent = fmtMoney(pendingValue);
+  document.getElementById('doStatPendingOrdersCount').textContent = pending.length + (pending.length === 1 ? ' order' : ' orders');
+  document.getElementById('doStatUnpaidCustomer').textContent = fmtMoney(unpaidCustomer);
+  document.getElementById('doStatOwedWholesaler').textContent = fmtMoney(owedWholesaler);
+  document.getElementById('doStatProfitWeek').textContent = (weekProfit < 0 ? '- ' : '') + fmtMoney(Math.abs(weekProfit));
+
+  const recentEl = document.getElementById('doRecentOrdersList');
+  const recent = [...orders].reverse().slice(0, 5);
+  if (recent.length === 0) {
+    recentEl.innerHTML = '<div class="empty-state">No customer orders logged yet.</div>';
+  } else {
+    recentEl.innerHTML = recent.map(o => {
+      const badge = doOrderStageBadge(o);
+      return `
+        <div class="list-item" onclick="editDoOrder('${o.id}')" style="cursor:pointer;">
+          <div class="li-main">
+            <div class="li-title">${escapeHtml(o.customer)}</div>
+            <div class="li-sub">${escapeHtml(o.description)}</div>
+          </div>
+          <div class="li-right">
+            <div class="li-tag ${badge.cls}">${badge.label}</div>
+            <div class="profit-text" style="color:var(--ink-soft);">${fmtMoney(o.sellPrice)}</div>
+          </div>
+        </div>`;
+    }).join('');
+  }
+}
+
+function renderDoOrdersList() {
+  const query = (document.getElementById('doOrderSearchInput')?.value || '').trim().toLowerCase();
+  const orders = state.dropshipOrders || [];
+  const filtered = query
+    ? orders.filter(o => o.customer.toLowerCase().includes(query) || o.description.toLowerCase().includes(query))
+    : orders;
+
+  const el = document.getElementById('doOrdersList');
+  if (orders.length === 0) {
+    el.innerHTML = '<div class="empty-state">No customer orders yet. Tap + to log one.</div>';
+    return;
+  }
+  if (filtered.length === 0) {
+    el.innerHTML = '<div class="empty-state">No orders match your search.</div>';
+    return;
+  }
+  el.innerHTML = [...filtered].reverse().map(o => {
+    const badge = doOrderStageBadge(o);
+    const payTags = `${o.customerPaid ? '&#10003; Customer paid' : '&#10005; Customer unpaid'} &middot; ${o.wholesalerPaid ? '&#10003; Wholesaler paid' : '&#10005; Wholesaler unpaid'}`;
+    return `
+      <div class="list-item" onclick="editDoOrder('${o.id}')" style="cursor:pointer;">
+        <div class="li-main">
+          <div class="li-title">${escapeHtml(o.customer)}</div>
+          <div class="li-sub">${escapeHtml(o.description)}</div>
+          <div class="li-sub" style="margin-top:2px;">${payTags}</div>
+        </div>
+        <div class="li-right">
+          <div class="li-tag ${badge.cls}">${badge.label}</div>
+          <div class="profit-text" style="color:var(--ink-soft);">${fmtMoney(o.sellPrice)}</div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function buildDoWholesalerItems() {
+  return (state.dropshipOrders || []).filter(o => o.stage === 'pending');
+}
+
+function renderDoWholesalerList() {
+  const items = buildDoWholesalerItems();
+  const total = items.reduce((s, o) => s + Number(o.costPrice != null ? o.costPrice : o.sellPrice), 0);
+
+  document.getElementById('doWholesalerTotal').textContent = fmtMoney(total);
+  document.getElementById('doWholesalerCount').textContent = items.length + (items.length === 1 ? ' item' : ' items');
+
+  const noteField = document.getElementById('doWholesalerNote');
+  if (state.restock && state.restock.dropshipNote && !noteField.value) noteField.value = state.restock.dropshipNote;
+
+  const el = document.getElementById('doWholesalerList');
+  if (items.length === 0) {
+    el.innerHTML = '<div class="empty-state">No pending customer orders to send to a wholesaler right now.</div>';
+    return;
+  }
+  el.innerHTML = items.map(o => `
+    <div class="list-item">
+      <div class="li-main">
+        <div class="li-title">${escapeHtml(o.description)}</div>
+        <div class="li-sub">For ${escapeHtml(o.customer)}</div>
+      </div>
+      <div class="li-tag ok">${o.costPrice != null ? fmtMoney(o.costPrice) : 'Cost TBD'}</div>
+    </div>`).join('');
+}
+
+async function saveDoWholesalerNote() {
+  const note = document.getElementById('doWholesalerNote').value.trim();
+  state.restock = { ...(state.restock || {}), dropshipNote: note };
+  await saveState('restock');
+}
+
+function renderDoWholesalerTarget() {
+  const items = buildDoWholesalerItems();
+  if (items.length === 0) { toast('No pending orders to send right now'); return null; }
+
+  const shopDisplayName = (state.profile && state.profile.shopName) ? state.profile.shopName : shopCode;
+  const note = document.getElementById('doWholesalerNote').value.trim();
+
+  const target = document.getElementById('doWholesalerRenderTarget');
+  target.innerHTML = `
+    <div style="width:420px; background:#FBF8F3; font-family: 'Inter', sans-serif; padding:28px; border-radius:16px;">
+      <div style="font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:20px; color:#1F4B43;">${escapeHtml(shopDisplayName)}</div>
+      <div style="font-size:13px; color:#5B6B62; margin:2px 0 18px;">Wholesaler order &mdash; customer pre-orders</div>
+      ${note ? `<div style="font-size:13px; color:#5B6B62; margin-bottom:14px;">${escapeHtml(note)}</div>` : ''}
+      ${items.map(o => `
+        <div style="display:flex; justify-content:space-between; padding:12px 0; border-bottom:1px solid #E7E0D2;">
+          <span style="font-size:14.5px; color:#1F2A24;">${escapeHtml(o.description)}</span>
+          <span style="font-family:'Plus Jakarta Sans',sans-serif; font-weight:600; font-size:14.5px; color:#1F4B43;">${o.costPrice != null ? fmtMoney(o.costPrice) : 'TBD'}</span>
+        </div>`).join('')}
+      <div style="text-align:center; font-size:11px; color:#9AA69C; margin-top:18px;">Made with Ledger</div>
+    </div>`;
+  return target;
+}
+
+async function exportDoWholesalerImage() {
+  const target = renderDoWholesalerTarget();
+  if (!target) return;
+  await saveDoWholesalerNote();
+  try {
+    const canvas = await html2canvas(target.firstElementChild, { scale: 2, backgroundColor: '#FBF8F3' });
+    const link = document.createElement('a');
+    link.download = (shopCode || 'shop') + '-wholesaler-order.jpg';
+    link.href = canvas.toDataURL('image/jpeg', 0.92);
+    link.click();
+    toast('Order image downloaded');
+  } catch (e) {
+    toast("Couldn't generate the image. Try 'Copy as text' instead.");
+  } finally {
+    target.innerHTML = '';
+  }
+}
+
+async function exportDoWholesalerPDF() {
+  const target = renderDoWholesalerTarget();
+  if (!target) return;
+  await saveDoWholesalerNote();
+  try {
+    const canvas = await html2canvas(target.firstElementChild, { scale: 2, backgroundColor: '#FFFFFF' });
+    const imgData = canvas.toDataURL('image/png');
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'a4' });
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const imgWidth = pageWidth - 60;
+    const imgHeight = (canvas.height / canvas.width) * imgWidth;
+    pdf.addImage(imgData, 'PNG', 30, 30, imgWidth, imgHeight);
+    pdf.save((shopCode || 'shop') + '-wholesaler-order.pdf');
+    toast('Order PDF downloaded');
+  } catch (e) {
+    toast("Couldn't generate the PDF. Try again.");
+  } finally {
+    target.innerHTML = '';
+  }
+}
+
+async function exportDoWholesalerExcel() {
+  const items = buildDoWholesalerItems();
+  if (items.length === 0) { toast('No pending orders to send right now'); return; }
+  await saveDoWholesalerNote();
+  try {
+    const shopDisplayName = (state.profile && state.profile.shopName) ? state.profile.shopName : shopCode;
+    const note = document.getElementById('doWholesalerNote').value.trim();
+    const rows = [
+      ['Wholesaler Order \u2014 Customer Pre-Orders'],
+      ['Shop', shopDisplayName],
+      ['Note', note || ''],
+      [''],
+      ['Customer', 'Item', 'Cost']
+    ];
+    items.forEach(o => rows.push([o.customer, o.description, o.costPrice != null ? o.costPrice : 'TBD']));
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet(rows);
+    XLSX.utils.book_append_sheet(wb, ws, 'Wholesaler order');
+    XLSX.writeFile(wb, (shopCode || 'shop') + '-wholesaler-order.xlsx');
+    toast('Excel file downloaded');
+  } catch (e) {
+    toast("Couldn't generate the Excel file. Try again.");
+  }
+}
+
+async function copyDoWholesalerText() {
+  const items = buildDoWholesalerItems();
+  if (items.length === 0) { toast('No pending orders to send right now'); return; }
+  await saveDoWholesalerNote();
+  const shopDisplayName = (state.profile && state.profile.shopName) ? state.profile.shopName : shopCode;
+  const note = document.getElementById('doWholesalerNote').value.trim();
+  let text = `*${shopDisplayName} \u2014 Wholesaler Order*\n`;
+  if (note) text += note + '\n';
+  text += '\n';
+  items.forEach(o => { text += `${o.description} (for ${o.customer}) \u2014 ${o.costPrice != null ? fmtMoney(o.costPrice) : 'cost TBD'}\n`; });
+  try {
+    await navigator.clipboard.writeText(text);
+    toast('Order copied \u2014 paste it into WhatsApp');
+  } catch (e) {
+    toast("Couldn't copy automatically. Select and copy the text manually.");
+  }
+}
+
+let doProfitPeriod = 'week';
+let doProfitCustomStart = null;
+let doProfitCustomEnd = null;
+
+function setDoProfitPeriod(period) {
+  doProfitPeriod = period;
+  const sel = document.getElementById('doProfitPeriodSelect');
+  if (sel) sel.value = period;
+
+  const customGroup = document.getElementById('doProfitCustomRangeGroup');
+  if (period === 'custom') {
+    customGroup.style.display = 'block';
+    if (!doProfitCustomStart || !doProfitCustomEnd) {
+      const today = new Date();
+      const weekAgo = new Date();
+      weekAgo.setDate(weekAgo.getDate() - 7);
+      document.getElementById('doProfitCustomStart').value = weekAgo.toISOString().slice(0, 10);
+      document.getElementById('doProfitCustomEnd').value = today.toISOString().slice(0, 10);
+    }
+    if (doProfitCustomStart && doProfitCustomEnd) renderDoProfitTab();
+    return;
+  } else {
+    customGroup.style.display = 'none';
+  }
+  renderDoProfitTab();
+}
+
+function applyDoProfitCustomRange() {
+  const startVal = document.getElementById('doProfitCustomStart').value;
+  const endVal = document.getElementById('doProfitCustomEnd').value;
+  if (!startVal || !endVal) { toast('Pick both a start and end date'); return; }
+  if (new Date(startVal) > new Date(endVal)) { toast('Start date must be before the end date'); return; }
+  doProfitCustomStart = startVal;
+  doProfitCustomEnd = endVal;
+  doProfitPeriod = 'custom';
+  renderDoProfitTab();
+}
+
+function doProfitPeriodRange(period) {
+  if (period === 'custom' && doProfitCustomStart && doProfitCustomEnd) {
+    const s = new Date(doProfitCustomStart); s.setHours(0, 0, 0, 0);
+    const e = new Date(doProfitCustomEnd); e.setHours(23, 59, 59, 999);
+    return { start: s, end: e };
+  }
+  return periodRange(period === 'custom' ? 'week' : period);
+}
+
+function renderDoProfitTab() {
+  const { start, end } = doProfitPeriodRange(doProfitPeriod);
+  const orders = (state.dropshipOrders || []).filter(o => { const d = new Date(o.date); return d >= start && d < end; });
+  const known = orders.filter(o => o.costPrice != null);
+
+  const revenue = known.reduce((s, o) => s + Number(o.sellPrice || 0), 0);
+  const profit = known.reduce((s, o) => s + (Number(o.sellPrice || 0) - Number(o.costPrice || 0)), 0);
+
+  let label;
+  if (doProfitPeriod === 'custom' && doProfitCustomStart && doProfitCustomEnd) {
+    const opts = { month: 'short', day: 'numeric', year: 'numeric' };
+    label = new Date(doProfitCustomStart).toLocaleDateString(undefined, opts) + ' \u2013 ' + new Date(doProfitCustomEnd).toLocaleDateString(undefined, opts);
+  } else {
+    label = periodLabel(doProfitPeriod);
+  }
+
+  document.getElementById('doProfitRevenueLabel').textContent = 'Revenue \u2014 ' + label;
+  document.getElementById('doProfitLabel').textContent = 'Profit \u2014 ' + label;
+  document.getElementById('doStatRevenue').textContent = fmtMoney(revenue);
+  document.getElementById('doStatRevenueCount').textContent = known.length + (known.length === 1 ? ' order' : ' orders');
+
+  const profitEl = document.getElementById('doStatProfit');
+  profitEl.textContent = (profit < 0 ? '- ' : '') + fmtMoney(Math.abs(profit));
+  profitEl.className = 'value ' + (profit < 0 ? 'is-loss-value' : 'is-profit-value');
+
+  const el = document.getElementById('doProfitList');
+  if (known.length === 0) {
+    el.innerHTML = '<div class="empty-state">No orders with a known wholesaler cost in this period yet.</div>';
+    return;
+  }
+  el.innerHTML = [...known].reverse().map(o => {
+    const orderProfit = Number(o.sellPrice || 0) - Number(o.costPrice || 0);
+    const profitClass = orderProfit < 0 ? 'is-loss' : 'is-profit';
+    const profitLabelText = (orderProfit < 0 ? '- ' : '') + fmtMoney(Math.abs(orderProfit));
+    return `
+      <div class="list-item" onclick="editDoOrder('${o.id}')" style="cursor:pointer;">
+        <div class="li-main">
+          <div class="li-title">${escapeHtml(o.customer)}</div>
+          <div class="li-sub">${escapeHtml(o.description)} &middot; ${new Date(o.date).toLocaleDateString()}</div>
+        </div>
+        <div class="li-right">
+          <div class="li-tag ok">${fmtMoney(o.sellPrice)}</div>
+          <div class="profit-text ${profitClass}">${profitLabelText}</div>
+        </div>
+      </div>`;
+  }).join('');
 }
 
 async function copyPublicCatalogueLink() {
@@ -4116,6 +4738,7 @@ bindEnter(['restockNote'], saveRestockList);
 bindEnter(['restockNewItemName', 'restockNewItemQty'], addRestockCustomItem);
 bindEnter(['adminEmailInput', 'adminPasswordInput', 'adminConfirmPasswordInput'], submitAdminAuth);
 bindEnter(['newAdminEmail', 'newAdminPassword'], addNewAdmin);
+bindEnter(['doOrderCustomer', 'doOrderDescription', 'doOrderSellPrice', 'doOrderCostPrice'], submitDoOrder);
 
 renderFAQList('landingFaqList');
 
