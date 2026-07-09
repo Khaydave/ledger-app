@@ -564,6 +564,7 @@
     transition: color 0.15s, transform 0.15s;
   }
   .social-icon:hover { color: var(--primary); transform: translateY(-1px); }
+  .landing-footer .legal-link:hover { color: var(--primary); text-decoration: underline; }
 
   @media (min-width: 860px) {
     .landing-hero { grid-template-columns: 1fr 0.85fr; gap: 50px; padding: 80px 40px 60px; align-items: center; }
@@ -808,6 +809,11 @@
         <a href="https://x.com/ledgerstockapp" class="social-icon" aria-label="X (Twitter)" target="_blank" rel="noopener">
           <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
         </a>
+      </div>
+      <!-- Legal links: hrefs still placeholders (#) until finalized documents/links are provided -->
+      <div style="display:flex; gap:20px; font-size:12.5px; order:3;">
+        <a href="#" class="legal-link" style="color:var(--ink-faint); text-decoration:none;">Privacy Policy</a>
+        <a href="#" class="legal-link" style="color:var(--ink-faint); text-decoration:none;">Terms &amp; Conditions</a>
       </div>
     </footer>
   </div>
