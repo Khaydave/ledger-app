@@ -771,14 +771,14 @@
       </div>
       <!-- Social links: replace the href values below once accounts are created -->
       <div class="landing-social">
-        <a href="#" class="social-icon" aria-label="X (Twitter)" target="_blank" rel="noopener">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-        </a>
         <a href="#" class="social-icon" aria-label="Facebook" target="_blank" rel="noopener">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M13.5 21v-7.5h2.5l.5-3h-3V8.5c0-.9.25-1.5 1.55-1.5H16.5V4.25C16.2 4.2 15.2 4.1 14 4.1c-2.4 0-4 1.45-4 4.15V10.5H7.5v3H10V21h3.5z"/></svg>
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M13.5 21v-7.5h2.5l.5-3h-3V8.5c0-.9.25-1.5 1.55-1.5H16.5V4.25C16.2 4.2 15.2 4.1 14 4.1c-2.4 0-4 1.45-4 4.15V10.5H7.5v3H10V21h3.5z"/></svg>
         </a>
         <a href="#" class="social-icon" aria-label="Instagram" target="_blank" rel="noopener">
           <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="3.5" width="17" height="17" rx="4.5"/><circle cx="12" cy="12" r="3.6"/><circle cx="17" cy="7" r="1" fill="currentColor" stroke="none"/></svg>
+        </a>
+        <a href="#" class="social-icon" aria-label="X (Twitter)" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
         </a>
       </div>
     </footer>
@@ -944,11 +944,31 @@
             <h2 style="font-size:18px;" id="salesTabTitle">Sales</h2>
             <button class="icon-btn" onclick="openModal('saleModal')">&#43;</button>
           </div>
-          <div class="period-toggle">
-            <button id="period-day" onclick="setSalesPeriod('day')">Today</button>
-            <button id="period-week" class="active" onclick="setSalesPeriod('week')">This week</button>
-            <button id="period-month" onclick="setSalesPeriod('month')">This month</button>
-            <button id="period-year" onclick="setSalesPeriod('year')">This year</button>
+          <div class="field-group" style="max-width:220px;">
+            <select id="salesPeriodSelect" onchange="setSalesPeriod(this.value)">
+              <option value="day">Today</option>
+              <option value="yesterday">Yesterday</option>
+              <option value="week" selected>This week</option>
+              <option value="lastweek">Last week</option>
+              <option value="month">This month</option>
+              <option value="lastmonth">Last month</option>
+              <option value="year">This year</option>
+              <option value="lastyear">Last year</option>
+              <option value="custom">Custom range&hellip;</option>
+            </select>
+          </div>
+          <div id="salesCustomRangeGroup" style="display:none; max-width:320px; margin-bottom:16px;">
+            <div style="display:flex; gap:8px; align-items:end;">
+              <div class="field-group" style="margin-bottom:0; flex:1;">
+                <label style="font-size:11px;">From</label>
+                <input type="date" id="salesCustomStart">
+              </div>
+              <div class="field-group" style="margin-bottom:0; flex:1;">
+                <label style="font-size:11px;">To</label>
+                <input type="date" id="salesCustomEnd">
+              </div>
+              <button class="icon-btn" onclick="applyCustomSalesRange()" title="Apply">&#10003;</button>
+            </div>
           </div>
           <div class="stat-row" style="margin-bottom:16px;">
             <div class="stat-card">
@@ -1175,7 +1195,8 @@
         <button class="btn btn-ghost" onclick="backToCatalogueEdit()"><span id="btnBackCatalogue">Back to edit</span></button>
         <button class="btn btn-primary" onclick="confirmCatalogueSave()"><span id="btnConfirmSaveCatalogue">Confirm &amp; save</span></button>
       </div>
-      <button class="btn btn-primary" style="margin-top:10px;" onclick="confirmCatalogueExport()"><span id="btnConfirmExportCatalogue">Confirm &amp; export as image</span></button>
+      <button class="btn btn-primary" style="margin-top:10px;" onclick="confirmCatalogueExport()"><span id="btnConfirmExportCatalogue">Confirm &amp; export as JPEG</span></button>
+      <button class="btn btn-primary" style="margin-top:10px;" onclick="confirmCataloguePDF()"><span id="btnConfirmPdfCatalogue">Confirm &amp; export as PDF</span></button>
       <button class="btn btn-ghost" style="margin-top:10px;" onclick="confirmCatalogueCopy()"><span id="btnConfirmCopyCatalogue">Confirm &amp; copy as text</span></button>
     </div>
 
@@ -1217,7 +1238,9 @@
         <button class="btn btn-ghost" onclick="backToRestockEdit()"><span id="btnBackRestock">Back to edit</span></button>
         <button class="btn btn-primary" onclick="confirmRestockSave()"><span id="btnConfirmSaveRestock">Confirm &amp; save</span></button>
       </div>
-      <button class="btn btn-primary" style="margin-top:10px;" onclick="confirmRestockExport()"><span id="btnConfirmExportRestock">Confirm &amp; export as image</span></button>
+      <button class="btn btn-primary" style="margin-top:10px;" onclick="confirmRestockExport()"><span id="btnConfirmExportRestock">Confirm &amp; export as JPEG</span></button>
+      <button class="btn btn-primary" style="margin-top:10px;" onclick="confirmRestockPDF()"><span id="btnConfirmPdfRestock">Confirm &amp; export as PDF</span></button>
+      <button class="btn btn-primary" style="margin-top:10px;" onclick="confirmRestockExcel()"><span id="btnConfirmExcelRestock">Confirm &amp; export as Excel</span></button>
       <button class="btn btn-ghost" style="margin-top:10px;" onclick="confirmRestockCopy()"><span id="btnConfirmCopyRestock">Confirm &amp; copy as text</span></button>
     </div>
 
@@ -1424,7 +1447,9 @@ const TRANSLATIONS = {
     btn_review_catalogue: 'Review selection',
     btn_back: 'Back to edit',
     btn_confirm_save: 'Confirm & save',
-    btn_confirm_export: 'Confirm & export as image',
+    btn_confirm_export: 'Confirm & export as JPEG',
+    btn_confirm_pdf: 'Confirm & export as PDF',
+    btn_confirm_excel: 'Confirm & export as Excel',
     btn_confirm_copy: 'Confirm & copy as text',
     btn_review_restock: 'Review order',
     empty_no_stores: 'No other stores remembered on this device yet.',
@@ -1522,7 +1547,9 @@ const TRANSLATIONS = {
     btn_review_catalogue: 'Vérifier la sélection',
     btn_back: 'Retour à la modification',
     btn_confirm_save: 'Confirmer et enregistrer',
-    btn_confirm_export: 'Confirmer et exporter en image',
+    btn_confirm_export: 'Confirmer et exporter en JPEG',
+    btn_confirm_pdf: 'Confirmer et exporter en PDF',
+    btn_confirm_excel: 'Confirmer et exporter en Excel',
     btn_confirm_copy: 'Confirmer et copier en texte',
     btn_review_restock: 'Vérifier la commande',
     empty_no_stores: 'Aucune autre boutique mémorisée sur cet appareil pour l\'instant.',
@@ -1620,7 +1647,9 @@ const TRANSLATIONS = {
     btn_review_catalogue: 'Revisar selección',
     btn_back: 'Volver a editar',
     btn_confirm_save: 'Confirmar y guardar',
-    btn_confirm_export: 'Confirmar y exportar como imagen',
+    btn_confirm_export: 'Confirmar y exportar como JPEG',
+    btn_confirm_pdf: 'Confirmar y exportar como PDF',
+    btn_confirm_excel: 'Confirmar y exportar como Excel',
     btn_confirm_copy: 'Confirmar y copiar como texto',
     btn_review_restock: 'Revisar pedido',
     empty_no_stores: 'Ninguna otra tienda recordada en este dispositivo todavía.',
@@ -1718,7 +1747,9 @@ const TRANSLATIONS = {
     btn_review_catalogue: 'Auswahl überprüfen',
     btn_back: 'Zurück zur Bearbeitung',
     btn_confirm_save: 'Bestätigen & speichern',
-    btn_confirm_export: 'Bestätigen & als Bild exportieren',
+    btn_confirm_export: 'Bestätigen & als JPEG exportieren',
+    btn_confirm_pdf: 'Bestätigen & als PDF exportieren',
+    btn_confirm_excel: 'Bestätigen & als Excel exportieren',
     btn_confirm_copy: 'Bestätigen & als Text kopieren',
     btn_review_restock: 'Bestellung überprüfen',
     empty_no_stores: 'Noch keine weiteren Läden auf diesem Gerät gespeichert.',
@@ -1816,7 +1847,9 @@ const TRANSLATIONS = {
     btn_review_catalogue: '查看所选内容',
     btn_back: '返回编辑',
     btn_confirm_save: '确认并保存',
-    btn_confirm_export: '确认并导出为图片',
+    btn_confirm_export: '确认并导出为JPEG',
+    btn_confirm_pdf: '确认并导出为PDF',
+    btn_confirm_excel: '确认并导出为Excel',
     btn_confirm_copy: '确认并复制为文本',
     btn_review_restock: '查看订单',
     empty_no_stores: '此设备上还没有记住其他店铺。',
@@ -1882,9 +1915,9 @@ function applyTranslations() {
     restockReviewTitle: 'restock_review_title', restockReviewSub: 'restock_review_sub',
     btnSaveOrder: 'btn_save_order', btnSaveDebt: 'btn_save_debt', btnSaveProfile: 'btn_save_profile',
     btnReviewCatalogue: 'btn_review_catalogue', btnBackCatalogue: 'btn_back', btnConfirmSaveCatalogue: 'btn_confirm_save',
-    btnConfirmExportCatalogue: 'btn_confirm_export', btnConfirmCopyCatalogue: 'btn_confirm_copy',
+    btnConfirmExportCatalogue: 'btn_confirm_export', btnConfirmPdfCatalogue: 'btn_confirm_pdf', btnConfirmCopyCatalogue: 'btn_confirm_copy',
     btnReviewRestock: 'btn_review_restock', btnBackRestock: 'btn_back', btnConfirmSaveRestock: 'btn_confirm_save',
-    btnConfirmExportRestock: 'btn_confirm_export', btnConfirmCopyRestock: 'btn_confirm_copy'
+    btnConfirmExportRestock: 'btn_confirm_export', btnConfirmPdfRestock: 'btn_confirm_pdf', btnConfirmExcelRestock: 'btn_confirm_excel', btnConfirmCopyRestock: 'btn_confirm_copy'
   };
   Object.keys(idMap).forEach(id => {
     const el = document.getElementById(id);
@@ -2777,6 +2810,74 @@ function periodStartDate(period) {
   return d;
 }
 
+let customRangeStart = null;
+let customRangeEnd = null;
+
+function periodRange(period) {
+  const now = new Date();
+  const start = new Date(now);
+  let end = new Date(now);
+  end.setTime(end.getTime() + 1); // inclusive of "now"
+
+  switch (period) {
+    case 'day':
+      start.setHours(0, 0, 0, 0);
+      break;
+    case 'yesterday':
+      start.setDate(start.getDate() - 1); start.setHours(0, 0, 0, 0);
+      end = new Date(start); end.setDate(end.getDate() + 1);
+      break;
+    case 'week':
+      start.setDate(start.getDate() - 7);
+      break;
+    case 'lastweek':
+      start.setDate(start.getDate() - 14);
+      end = new Date(now); end.setDate(end.getDate() - 7);
+      break;
+    case 'month':
+      start.setDate(start.getDate() - 30);
+      break;
+    case 'lastmonth':
+      start.setDate(start.getDate() - 60);
+      end = new Date(now); end.setDate(end.getDate() - 30);
+      break;
+    case 'year':
+      start.setDate(start.getDate() - 365);
+      break;
+    case 'lastyear':
+      start.setDate(start.getDate() - 730);
+      end = new Date(now); end.setDate(end.getDate() - 365);
+      break;
+    case 'custom':
+      if (customRangeStart && customRangeEnd) {
+        const s = new Date(customRangeStart); s.setHours(0, 0, 0, 0);
+        const e = new Date(customRangeEnd); e.setHours(23, 59, 59, 999);
+        return { start: s, end: e };
+      }
+      start.setDate(start.getDate() - 7);
+      break;
+    default:
+      start.setDate(start.getDate() - 7);
+  }
+  return { start, end };
+}
+
+function periodLabel(period) {
+  if (period === 'custom' && customRangeStart && customRangeEnd) {
+    const opts = { month: 'short', day: 'numeric', year: 'numeric' };
+    const s = new Date(customRangeStart).toLocaleDateString(undefined, opts);
+    const e = new Date(customRangeEnd).toLocaleDateString(undefined, opts);
+    return s + ' \u2013 ' + e;
+  }
+  const labels = {
+    day: 'today', yesterday: 'yesterday',
+    week: 'this week', lastweek: 'last week',
+    month: 'this month', lastmonth: 'last month',
+    year: 'this year', lastyear: 'last year'
+  };
+  return labels[period] || 'this week';
+}
+
 function renderDashboard() {
   const totalItems = state.products.reduce((s, p) => s + Number(p.qty), 0);
   document.getElementById('statItems').textContent = totalItems;
@@ -2856,18 +2957,46 @@ function renderStockList() {
 
 function setSalesPeriod(period) {
   salesPeriod = period;
-  ['day', 'week', 'month', 'year'].forEach(p => {
-    document.getElementById('period-' + p).classList.toggle('active', p === period);
-  });
+  const sel = document.getElementById('salesPeriodSelect');
+  if (sel) sel.value = period;
+
+  const customGroup = document.getElementById('salesCustomRangeGroup');
+  if (period === 'custom') {
+    customGroup.style.display = 'block';
+    if (!customRangeStart || !customRangeEnd) {
+      const today = new Date();
+      const weekAgo = new Date();
+      weekAgo.setDate(weekAgo.getDate() - 7);
+      document.getElementById('salesCustomStart').value = weekAgo.toISOString().slice(0, 10);
+      document.getElementById('salesCustomEnd').value = today.toISOString().slice(0, 10);
+    }
+    if (customRangeStart && customRangeEnd) {
+      renderSalesTab();
+    }
+    return;
+  } else {
+    customGroup.style.display = 'none';
+  }
+  renderSalesTab();
+}
+
+function applyCustomSalesRange() {
+  const startVal = document.getElementById('salesCustomStart').value;
+  const endVal = document.getElementById('salesCustomEnd').value;
+  if (!startVal || !endVal) { toast('Pick both a start and end date'); return; }
+  if (new Date(startVal) > new Date(endVal)) { toast('Start date must be before the end date'); return; }
+  customRangeStart = startVal;
+  customRangeEnd = endVal;
+  salesPeriod = 'custom';
   renderSalesTab();
 }
 
 function renderSalesTab() {
-  const start = periodStartDate(salesPeriod);
-  const filtered = state.sales.filter(s => new Date(s.date) >= start);
+  const { start, end } = periodRange(salesPeriod);
+  const filtered = state.sales.filter(s => { const d = new Date(s.date); return d >= start && d < end; });
   const total = filtered.reduce((s, x) => s + Number(x.total), 0);
   const totalProfit = filtered.reduce((s, x) => s + Number(x.profit || 0), 0);
-  const label = salesPeriod === 'day' ? 'today' : salesPeriod === 'week' ? 'this week' : salesPeriod === 'month' ? 'this month' : 'this year';
+  const label = periodLabel(salesPeriod);
 
   document.getElementById('salesPeriodLabel').textContent = 'Total sales \u2014 ' + label;
   document.getElementById('salesProfitLabel').textContent = 'Profit \u2014 ' + label;
@@ -3299,15 +3428,19 @@ async function confirmCatalogueExport() {
   closeModal('catalogueModal');
 }
 
+async function confirmCataloguePDF() {
+  await exportCataloguePDF();
+  closeModal('catalogueModal');
+}
+
 async function confirmCatalogueCopy() {
   await copyCatalogueText();
   closeModal('catalogueModal');
 }
 
-async function exportCatalogueImage() {
+function renderCatalogueTarget() {
   const items = buildCatalogueItems();
-  if (items.length === 0) { toast('Select at least one item first'); return; }
-  await saveCatalogue();
+  if (items.length === 0) { toast('Select at least one item first'); return null; }
 
   const shopDisplayName = (state.profile && state.profile.shopName) ? state.profile.shopName : shopCode;
   const note = document.getElementById('catalogueNote').value.trim();
@@ -3328,16 +3461,46 @@ async function exportCatalogueImage() {
         </div>`).join('')}
       <div style="text-align:center; font-size:11px; color:#9AA69C; margin-top:18px;">Made with Ledger</div>
     </div>`;
+  return target;
+}
+
+async function exportCatalogueImage() {
+  const target = renderCatalogueTarget();
+  if (!target) return;
+  await saveCatalogue();
 
   try {
     const canvas = await html2canvas(target.firstElementChild, { scale: 2, backgroundColor: '#FBF8F3' });
     const link = document.createElement('a');
-    link.download = (shopCode || 'catalogue') + '-catalogue.png';
-    link.href = canvas.toDataURL('image/png');
+    link.download = (shopCode || 'catalogue') + '-catalogue.jpg';
+    link.href = canvas.toDataURL('image/jpeg', 0.92);
     link.click();
     toast('Catalogue image downloaded');
   } catch (e) {
     toast("Couldn't generate the image. Try 'Copy as text' instead.");
+  } finally {
+    target.innerHTML = '';
+  }
+}
+
+async function exportCataloguePDF() {
+  const target = renderCatalogueTarget();
+  if (!target) return;
+  await saveCatalogue();
+
+  try {
+    const canvas = await html2canvas(target.firstElementChild, { scale: 2, backgroundColor: '#FFFFFF' });
+    const imgData = canvas.toDataURL('image/png');
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'a4' });
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const imgWidth = pageWidth - 60;
+    const imgHeight = (canvas.height / canvas.width) * imgWidth;
+    pdf.addImage(imgData, 'PNG', 30, 30, imgWidth, imgHeight);
+    pdf.save((shopCode || 'catalogue') + '-catalogue.pdf');
+    toast('Catalogue PDF downloaded');
+  } catch (e) {
+    toast("Couldn't generate the PDF. Try again.");
   } finally {
     target.innerHTML = '';
   }
@@ -3497,6 +3660,16 @@ async function confirmRestockExport() {
   closeModal('restockModal');
 }
 
+async function confirmRestockPDF() {
+  await exportRestockPDF();
+  closeModal('restockModal');
+}
+
+async function confirmRestockExcel() {
+  await exportRestockExcel();
+  closeModal('restockModal');
+}
+
 async function confirmRestockCopy() {
   await copyRestockText();
   closeModal('restockModal');
@@ -3508,10 +3681,9 @@ function buildRestockItems() {
   return combined;
 }
 
-async function exportRestockImage() {
+function renderRestockTarget() {
   const items = buildRestockItems();
-  if (items.length === 0) { toast('Add at least one item first'); return; }
-  await saveRestockList();
+  if (items.length === 0) { toast('Add at least one item first'); return null; }
 
   const shopDisplayName = (state.profile && state.profile.shopName) ? state.profile.shopName : shopCode;
   const note = document.getElementById('restockNote').value.trim();
@@ -3529,18 +3701,76 @@ async function exportRestockImage() {
         </div>`).join('')}
       <div style="text-align:center; font-size:11px; color:#9AA69C; margin-top:18px;">Made with Ledger</div>
     </div>`;
+  return target;
+}
+
+async function exportRestockImage() {
+  const target = renderRestockTarget();
+  if (!target) return;
+  await saveRestockList();
 
   try {
     const canvas = await html2canvas(target.firstElementChild, { scale: 2, backgroundColor: '#FBF8F3' });
     const link = document.createElement('a');
-    link.download = (shopCode || 'shop') + '-restock-order.png';
-    link.href = canvas.toDataURL('image/png');
+    link.download = (shopCode || 'shop') + '-restock-order.jpg';
+    link.href = canvas.toDataURL('image/jpeg', 0.92);
     link.click();
     toast('Order image downloaded');
   } catch (e) {
     toast("Couldn't generate the image. Try 'Copy as text' instead.");
   } finally {
     target.innerHTML = '';
+  }
+}
+
+async function exportRestockPDF() {
+  const target = renderRestockTarget();
+  if (!target) return;
+  await saveRestockList();
+
+  try {
+    const canvas = await html2canvas(target.firstElementChild, { scale: 2, backgroundColor: '#FFFFFF' });
+    const imgData = canvas.toDataURL('image/png');
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'a4' });
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const imgWidth = pageWidth - 60;
+    const imgHeight = (canvas.height / canvas.width) * imgWidth;
+    pdf.addImage(imgData, 'PNG', 30, 30, imgWidth, imgHeight);
+    pdf.save((shopCode || 'shop') + '-restock-order.pdf');
+    toast('Order PDF downloaded');
+  } catch (e) {
+    toast("Couldn't generate the PDF. Try again.");
+  } finally {
+    target.innerHTML = '';
+  }
+}
+
+async function exportRestockExcel() {
+  const items = buildRestockItems();
+  if (items.length === 0) { toast('Add at least one item first'); return; }
+  await saveRestockList();
+
+  try {
+    const shopDisplayName = (state.profile && state.profile.shopName) ? state.profile.shopName : shopCode;
+    const note = document.getElementById('restockNote').value.trim();
+
+    const rows = [
+      ['Restock Order'],
+      ['Shop', shopDisplayName],
+      ['Note', note || ''],
+      [''],
+      ['Item', 'Quantity']
+    ];
+    items.forEach(p => rows.push([p.name, p.qty]));
+
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet(rows);
+    XLSX.utils.book_append_sheet(wb, ws, 'Restock order');
+    XLSX.writeFile(wb, (shopCode || 'shop') + '-restock-order.xlsx');
+    toast('Order Excel file downloaded');
+  } catch (e) {
+    toast("Couldn't generate the Excel file. Try again.");
   }
 }
 
