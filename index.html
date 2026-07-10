@@ -3154,6 +3154,12 @@ function switchShop() {
   document.getElementById('onboarding').classList.add('active');
   document.getElementById('shopCodeInput').value = '';
   document.getElementById('shopPasswordInput').value = '';
+  document.getElementById('signupConfirmPassword').value = '';
+  document.getElementById('secretAnswerInput').value = '';
+  document.getElementById('secretQuestionSelect').selectedIndex = 0;
+  document.getElementById('signupLanguageSelect').value = 'en';
+  setSignupMode('regular');
+  setAuthMode('login');
   shopCode = null;
   shopDocRef = null;
   clearSession();
