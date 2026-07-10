@@ -9,7 +9,7 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
   import {
-    getFirestore, doc, getDoc, setDoc, updateDoc,
+    getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc,
     collection, getCountFromServer, query, orderBy, limit, getDocs, addDoc,
     serverTimestamp, increment
   } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -28,7 +28,7 @@
   const db = getFirestore(fbApp);
 
   window.__firestore = {
-    db, doc, getDoc, setDoc, updateDoc,
+    db, doc, getDoc, setDoc, updateDoc, deleteDoc,
     collection, getCountFromServer, query, orderBy, limit, getDocs, addDoc,
     serverTimestamp, increment
   };
@@ -867,12 +867,12 @@
         </select>
       </div>
       <div class="field-group">
-        <label>What kind of shop is this?</label>
+        <label id="signupShopTypeLabel">What kind of shop is this?</label>
         <div class="auth-toggle" style="margin-bottom:0;">
           <button type="button" id="signupModeRegular" class="active" onclick="setSignupMode('regular')">Regular seller</button>
           <button type="button" id="signupModeDropship" onclick="setSignupMode('dropshipper')">Dropshipper</button>
         </div>
-        <p class="hint" style="margin-top:6px;">You can switch this anytime later in Settings &mdash; this is just where you start.</p>
+        <p class="hint" style="margin-top:6px;" id="signupShopTypeHint">You can switch this anytime later in Settings &mdash; this is just where you start.</p>
       </div>
     </div>
 
@@ -1055,36 +1055,36 @@
         <div id="tab-do-home" class="tabpanel" style="display:none;">
           <div class="stat-row" style="margin-bottom:18px;">
             <div class="stat-card">
-              <div class="label">Pending customer orders</div>
+              <div class="label" id="doLabelPendingOrders">Pending customer orders</div>
               <div class="value" id="doStatPendingOrders">&#8358;0</div>
               <div class="sub" id="doStatPendingOrdersCount">0 orders</div>
             </div>
             <div class="stat-card">
-              <div class="label">Unpaid from customers</div>
+              <div class="label" id="doLabelUnpaidCustomer">Unpaid from customers</div>
               <div class="value danger" id="doStatUnpaidCustomer">&#8358;0</div>
             </div>
           </div>
           <div class="stat-row" style="margin-bottom:18px;">
             <div class="stat-card">
-              <div class="label">Wholesaler cost (not yet delivered)</div>
+              <div class="label" id="doLabelOwedWholesaler">Wholesaler cost (not yet delivered)</div>
               <div class="value danger" id="doStatOwedWholesaler">&#8358;0</div>
             </div>
             <div class="stat-card">
-              <div class="label">Profit this week</div>
+              <div class="label" id="doLabelProfitWeek">Profit this week</div>
               <div class="value" id="doStatProfitWeek">&#8358;0</div>
             </div>
           </div>
           <div class="quick-actions">
-            <button class="quick-btn" onclick="openModal('doOrderModal')"><span class="qicon">&#43;</span>Log customer order</button>
-            <button class="quick-btn secondary" onclick="showTab('do-wholesaler')"><span class="qicon">&#128230;</span>Wholesaler list</button>
+            <button class="quick-btn" onclick="openModal('doOrderModal')"><span class="qicon">&#43;</span><span id="doQaLogOrder">Log customer order</span></button>
+            <button class="quick-btn secondary" onclick="showTab('do-wholesaler')"><span class="qicon">&#128230;</span><span id="doQaWholesalerList">Wholesaler list</span></button>
           </div>
-          <div class="section-title">Recent orders</div>
+          <div class="section-title" id="doSectionRecentOrders">Recent orders</div>
           <div id="doRecentOrdersList"></div>
         </div>
 
         <div id="tab-do-orders" class="tabpanel" style="display:none;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin: 6px 0 14px;">
-            <h2 style="font-size:18px;">Customer orders</h2>
+            <h2 style="font-size:18px;" id="doOrdersTabTitle">Customer orders</h2>
             <button class="icon-btn" onclick="openModal('doOrderModal')">&#43;</button>
           </div>
           <div class="search-box">
@@ -1096,15 +1096,15 @@
 
         <div id="tab-do-wholesaler" class="tabpanel" style="display:none;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin: 6px 0 14px;">
-            <h2 style="font-size:18px;">Wholesaler list</h2>
+            <h2 style="font-size:18px;" id="doWholesalerTabTitle">Wholesaler list</h2>
           </div>
-          <p class="hint" style="margin-bottom:14px;">Every pending customer order, ready to send to your wholesaler.</p>
+          <p class="hint" style="margin-bottom:14px;" id="doWholesalerHint">Every pending customer order, ready to send to your wholesaler.</p>
           <div class="field-group" style="max-width:260px;">
-            <label>Wholesaler's currency</label>
+            <label id="doWholesalerCurrencyLabel">Wholesaler's currency</label>
             <select id="doWholesalerCurrencySelect" onchange="changeDoWholesalerCurrency()"></select>
           </div>
           <div class="stat-card" style="margin-bottom:16px;">
-            <div class="label">Total to order</div>
+            <div class="label" id="doLabelTotalToOrder">Total to order</div>
             <div class="value" id="doWholesalerTotal">&#8358;0</div>
             <div class="sub" id="doWholesalerCount">0 items</div>
           </div>
@@ -1114,14 +1114,14 @@
             <button class="btn btn-ghost" onclick="exportDoWholesalerPDF()">&#128196; PDF</button>
             <button class="btn btn-ghost" onclick="exportDoWholesalerExcel()">&#128202; Excel</button>
           </div>
-          <button class="btn btn-ghost" style="margin-bottom:16px;" onclick="copyDoWholesalerText()">Copy as text</button>
+          <button class="btn btn-ghost" style="margin-bottom:16px;" onclick="copyDoWholesalerText()"><span id="doBtnCopyText">Copy as text</span></button>
           <div id="doWholesalerList"></div>
           <div id="doWholesalerRenderTarget" style="position:absolute; left:-9999px; top:0;"></div>
         </div>
 
         <div id="tab-do-profit" class="tabpanel" style="display:none;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin: 6px 0 14px;">
-            <h2 style="font-size:18px;">Profit</h2>
+            <h2 style="font-size:18px;" id="doProfitTabTitle">Profit</h2>
           </div>
           <div class="field-group" style="max-width:220px;">
             <select id="doProfitPeriodSelect" onchange="setDoProfitPeriod(this.value)">
@@ -1205,12 +1205,12 @@
             <button class="btn btn-ghost" onclick="openSummaryModal()">&#128202; View ledger summary</button>
           </div>
 
-          <div class="section-title">Shop type</div>
+          <div class="section-title" id="settingsShopTypeLabel">Shop type</div>
           <div class="period-toggle" style="max-width:280px;">
             <button id="modeToggleRegular" class="active" onclick="switchAppMode('regular')">Regular seller</button>
             <button id="modeToggleDropship" onclick="switchAppMode('dropshipper')">Dropshipper</button>
           </div>
-          <p class="hint" style="margin-bottom:18px;">Switching doesn't delete anything &mdash; your data for both is kept, so you can switch back anytime.</p>
+          <p class="hint" style="margin-bottom:18px;" id="modeSwitchHint">Switching doesn't delete anything &mdash; your data for both is kept, so you can switch back anytime.</p>
 
           <div class="section-title" id="settingsSupportLabel">Support</div>
           <div class="field-group" style="max-width:280px;">
@@ -1219,6 +1219,11 @@
 
           <div style="margin-top:28px; padding-top:20px; border-top:1px solid var(--border); max-width:280px;">
             <button class="btn btn-danger-ghost" id="settingsLogoutBtn" onclick="switchShop()">Log out</button>
+          </div>
+
+          <div style="margin-top:14px; max-width:280px;">
+            <button class="btn btn-danger-ghost" onclick="openDeleteAccountModal()"><span id="deleteAccountLabel">Delete account</span></button>
+            <p class="hint" style="margin-top:8px;" id="deleteAccountHint">This permanently deletes your shop and all its data. This cannot be undone.</p>
           </div>
         </div>
 
@@ -1307,24 +1312,24 @@
   <div class="modal-sheet">
     <div class="icon-btn modal-close" onclick="closeModal('doOrderModal')">&#10005;</div>
     <h2 id="doOrderModalTitle">Log customer order</h2>
-    <div class="modal-sub">Track what a customer wants, and what it'll cost you to source it.</div>
+    <div class="modal-sub" id="doOrderModalSub">Track what a customer wants, and what it'll cost you to source it.</div>
     <input type="hidden" id="doOrderEditId" value="">
-    <div class="field-group"><label>Customer name</label><input id="doOrderCustomer" placeholder="e.g. Blessing"></div>
-    <div class="field-group"><label>What did they order?</label><input id="doOrderDescription" placeholder="e.g. Blue ankara dress, size M"></div>
-    <div class="field-group"><label>Quantity</label><input id="doOrderQty" type="number" inputmode="numeric" placeholder="e.g. 1" value="1"></div>
-    <div class="field-group"><label>Price you'll charge them (total)</label><input id="doOrderSellPrice" type="number" inputmode="numeric" placeholder="e.g. 12000"></div>
-    <div class="field-group"><label>Wholesaler cost (fill in once known)</label><input id="doOrderCostPrice" type="number" inputmode="numeric" placeholder="e.g. 8000"></div>
+    <div class="field-group"><label id="doOrderCustomerLabel">Customer name</label><input id="doOrderCustomer" placeholder="e.g. Blessing"></div>
+    <div class="field-group"><label id="doOrderDescLabel">What did they order?</label><input id="doOrderDescription" placeholder="e.g. Blue ankara dress, size M"></div>
+    <div class="field-group"><label id="doOrderQtyLabel">Quantity</label><input id="doOrderQty" type="number" inputmode="numeric" placeholder="e.g. 1" value="1"></div>
+    <div class="field-group"><label id="doOrderSellPriceLabel">Price you'll charge them (total)</label><input id="doOrderSellPrice" type="number" inputmode="numeric" placeholder="e.g. 12000"></div>
+    <div class="field-group"><label id="doOrderCostPriceLabel">Wholesaler cost (fill in once known)</label><input id="doOrderCostPrice" type="number" inputmode="numeric" placeholder="e.g. 8000"></div>
     <div class="field-group">
-      <label>Stage</label>
+      <label id="doOrderStageLabel">Stage</label>
       <select id="doOrderStage">
-        <option value="pending">Pending &mdash; not yet ordered from wholesaler</option>
-        <option value="ordered">Ordered from wholesaler</option>
-        <option value="delivered">Delivered to customer</option>
+        <option value="pending" id="doStageOptPending">Pending &mdash; not yet ordered from wholesaler</option>
+        <option value="ordered" id="doStageOptOrdered">Ordered from wholesaler</option>
+        <option value="delivered" id="doStageOptDelivered">Delivered to customer</option>
       </select>
     </div>
-    <p class="hint" style="margin-bottom:16px;">New orders start as unpaid. Once saved, tap the payment tag on the order to mark it paid or unpaid.</p>
+    <p class="hint" style="margin-bottom:16px;" id="doOrderPaidHint">New orders start as unpaid. Once saved, tap the payment tag on the order to mark it paid or unpaid.</p>
     <div class="modal-actions">
-      <button class="btn btn-danger-ghost" id="doOrderDeleteBtn" style="display:none;" onclick="deleteDoOrder()">Delete</button>
+      <button class="btn btn-danger-ghost" id="doOrderDeleteBtn" style="display:none;" onclick="deleteDoOrder()"><span id="doOrderDeleteBtnLabel">Delete</span></button>
       <button class="btn btn-primary" id="doOrderSaveBtn" onclick="submitDoOrder()">Save order</button>
     </div>
   </div>
@@ -1531,6 +1536,22 @@
   </div>
 </div>
 
+<div class="modal-overlay" id="deleteAccountModal">
+  <div class="modal-sheet">
+    <div class="icon-btn modal-close" onclick="closeModal('deleteAccountModal')">&#10005;</div>
+    <h2>Delete your account?</h2>
+    <div class="modal-sub">This permanently deletes your shop code, stock, sales, orders, debts, and everything else tied to this account. There is no way to undo this.</div>
+    <div class="field-group">
+      <label>Type your shop code (<span id="deleteAccountShopCodeDisplay"></span>) to confirm</label>
+      <input id="deleteAccountConfirmInput" placeholder="Type your shop code exactly" autocomplete="off">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('deleteAccountModal')">Cancel</button>
+      <button class="btn btn-danger-ghost" onclick="confirmDeleteAccount()">Permanently delete</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -1702,7 +1723,44 @@ const TRANSLATIONS = {
     btn_log_sale: 'Log sale',
     nav_settings: 'Settings',
     btn_select_all: 'Select all',
-    btn_deselect_all: 'Deselect all'
+    btn_deselect_all: 'Deselect all',
+    doLabelPendingOrders: 'Pending customer orders',
+    doLabelUnpaidCustomer: 'Unpaid from customers',
+    doLabelOwedWholesaler: 'Wholesaler cost (not yet delivered)',
+    doLabelProfitWeek: 'Profit this week',
+    doQaLogOrder: 'Log customer order',
+    doQaWholesalerList: 'Wholesaler list',
+    doSectionRecentOrders: 'Recent orders',
+    doOrdersTabTitle: 'Customer orders',
+    doWholesalerTabTitle: 'Wholesaler list',
+    doWholesalerHint: 'Every pending customer order, ready to send to your wholesaler.',
+    doWholesalerCurrencyLabel: 'Wholesaler\'s currency',
+    doLabelTotalToOrder: 'Total to order',
+    doBtnCopyText: 'Copy as text',
+    doProfitTabTitle: 'Profit',
+    doOrderModalSub: 'Track what a customer wants, and what it\'ll cost you to source it.',
+    doOrderCustomerLabel: 'Customer name',
+    doOrderDescLabel: 'What did they order?',
+    doOrderQtyLabel: 'Quantity',
+    doOrderSellPriceLabel: 'Price you\'ll charge them (total)',
+    doOrderCostPriceLabel: 'Wholesaler cost (fill in once known)',
+    doOrderStageLabel: 'Stage',
+    doStageOptPending: 'Pending — not yet ordered from wholesaler',
+    doStageOptOrdered: 'Ordered from wholesaler',
+    doStageOptDelivered: 'Delivered to customer',
+    doOrderPaidHint: 'New orders start as unpaid. Once saved, tap the payment tag on the order to mark it paid or unpaid.',
+    settingsShopTypeLabel: 'Shop type',
+    modeRegular: 'Regular seller',
+    modeDropshipper: 'Dropshipper',
+    modeSwitchHint: 'Switching doesn\'t delete anything — your data for both is kept, so you can switch back anytime.',
+    signupShopTypeLabel: 'What kind of shop is this?',
+    signupShopTypeHint: 'You can switch this anytime later in Settings — this is just where you start.',
+    doOrderModalTitleAdd: 'Log customer order',
+    doOrderModalTitleEdit: 'Edit customer order',
+    doOrderSaveBtnAdd: 'Save order',
+    doOrderSaveBtnEdit: 'Save changes',
+    deleteAccountLabel: 'Delete account',
+    deleteAccountHint: 'This permanently deletes your shop and all its data. This cannot be undone.'
   },
   fr: {
     nav_home: 'Accueil',
@@ -1802,7 +1860,44 @@ const TRANSLATIONS = {
     btn_log_sale: 'Enregistrer la vente',
     nav_settings: 'Paramètres',
     btn_select_all: 'Tout sélectionner',
-    btn_deselect_all: 'Tout désélectionner'
+    btn_deselect_all: 'Tout désélectionner',
+    doLabelPendingOrders: 'Commandes clients en attente',
+    doLabelUnpaidCustomer: 'Impayé par les clients',
+    doLabelOwedWholesaler: 'Coût grossiste (non livré)',
+    doLabelProfitWeek: 'Profit cette semaine',
+    doQaLogOrder: 'Enregistrer une commande client',
+    doQaWholesalerList: 'Liste grossiste',
+    doSectionRecentOrders: 'Commandes récentes',
+    doOrdersTabTitle: 'Commandes clients',
+    doWholesalerTabTitle: 'Liste grossiste',
+    doWholesalerHint: 'Chaque commande client en attente, prête à envoyer à votre grossiste.',
+    doWholesalerCurrencyLabel: 'Devise du grossiste',
+    doLabelTotalToOrder: 'Total à commander',
+    doBtnCopyText: 'Copier en texte',
+    doProfitTabTitle: 'Profit',
+    doOrderModalSub: 'Suivez ce qu\'un client veut, et ce que cela vous coûtera.',
+    doOrderCustomerLabel: 'Nom du client',
+    doOrderDescLabel: 'Qu\'ont-ils commandé ?',
+    doOrderQtyLabel: 'Quantité',
+    doOrderSellPriceLabel: 'Prix que vous leur facturerez (total)',
+    doOrderCostPriceLabel: 'Coût grossiste (à remplir une fois connu)',
+    doOrderStageLabel: 'Étape',
+    doStageOptPending: 'En attente — pas encore commandé au grossiste',
+    doStageOptOrdered: 'Commandé au grossiste',
+    doStageOptDelivered: 'Livré au client',
+    doOrderPaidHint: 'Les nouvelles commandes commencent impayées. Une fois enregistré, appuyez sur l\'étiquette de paiement pour la marquer payée ou impayée.',
+    settingsShopTypeLabel: 'Type de boutique',
+    modeRegular: 'Vendeur classique',
+    modeDropshipper: 'Dropshipper',
+    modeSwitchHint: 'Changer ne supprime rien — vos données des deux modes sont conservées, vous pouvez donc revenir en arrière à tout moment.',
+    signupShopTypeLabel: 'Quel type de boutique est-ce ?',
+    signupShopTypeHint: 'Vous pouvez changer cela plus tard dans les paramètres — ce n\'est que votre point de départ.',
+    doOrderModalTitleAdd: 'Enregistrer une commande client',
+    doOrderModalTitleEdit: 'Modifier la commande client',
+    doOrderSaveBtnAdd: 'Enregistrer la commande',
+    doOrderSaveBtnEdit: 'Enregistrer les modifications',
+    deleteAccountLabel: 'Supprimer le compte',
+    deleteAccountHint: 'Cela supprime définitivement votre boutique et toutes ses données. Cette action est irréversible.'
   },
   es: {
     nav_home: 'Inicio',
@@ -1902,7 +1997,44 @@ const TRANSLATIONS = {
     btn_log_sale: 'Registrar venta',
     nav_settings: 'Ajustes',
     btn_select_all: 'Seleccionar todo',
-    btn_deselect_all: 'Deseleccionar todo'
+    btn_deselect_all: 'Deseleccionar todo',
+    doLabelPendingOrders: 'Pedidos de clientes pendientes',
+    doLabelUnpaidCustomer: 'Sin pagar por clientes',
+    doLabelOwedWholesaler: 'Costo del mayorista (no entregado)',
+    doLabelProfitWeek: 'Ganancia esta semana',
+    doQaLogOrder: 'Registrar pedido de cliente',
+    doQaWholesalerList: 'Lista del mayorista',
+    doSectionRecentOrders: 'Pedidos recientes',
+    doOrdersTabTitle: 'Pedidos de clientes',
+    doWholesalerTabTitle: 'Lista del mayorista',
+    doWholesalerHint: 'Cada pedido de cliente pendiente, listo para enviar a tu mayorista.',
+    doWholesalerCurrencyLabel: 'Moneda del mayorista',
+    doLabelTotalToOrder: 'Total a pedir',
+    doBtnCopyText: 'Copiar como texto',
+    doProfitTabTitle: 'Ganancia',
+    doOrderModalSub: 'Registra lo que quiere un cliente y cuánto te costará conseguirlo.',
+    doOrderCustomerLabel: 'Nombre del cliente',
+    doOrderDescLabel: '¿Qué pidieron?',
+    doOrderQtyLabel: 'Cantidad',
+    doOrderSellPriceLabel: 'Precio que les cobrarás (total)',
+    doOrderCostPriceLabel: 'Costo del mayorista (completar cuando se sepa)',
+    doOrderStageLabel: 'Etapa',
+    doStageOptPending: 'Pendiente — aún no pedido al mayorista',
+    doStageOptOrdered: 'Pedido al mayorista',
+    doStageOptDelivered: 'Entregado al cliente',
+    doOrderPaidHint: 'Los pedidos nuevos comienzan como no pagados. Una vez guardado, toca la etiqueta de pago para marcarlo pagado o no pagado.',
+    settingsShopTypeLabel: 'Tipo de tienda',
+    modeRegular: 'Vendedor normal',
+    modeDropshipper: 'Dropshipper',
+    modeSwitchHint: 'Cambiar no elimina nada — tus datos de ambos modos se conservan, así que puedes volver cuando quieras.',
+    signupShopTypeLabel: '¿Qué tipo de tienda es esta?',
+    signupShopTypeHint: 'Puedes cambiar esto más tarde en Ajustes — esto es solo tu punto de partida.',
+    doOrderModalTitleAdd: 'Registrar pedido de cliente',
+    doOrderModalTitleEdit: 'Editar pedido de cliente',
+    doOrderSaveBtnAdd: 'Guardar pedido',
+    doOrderSaveBtnEdit: 'Guardar cambios',
+    deleteAccountLabel: 'Eliminar cuenta',
+    deleteAccountHint: 'Esto elimina permanentemente tu tienda y todos sus datos. Esta acción no se puede deshacer.'
   },
   de: {
     nav_home: 'Start',
@@ -2002,7 +2134,44 @@ const TRANSLATIONS = {
     btn_log_sale: 'Verkauf erfassen',
     nav_settings: 'Einstellungen',
     btn_select_all: 'Alle auswählen',
-    btn_deselect_all: 'Alle abwählen'
+    btn_deselect_all: 'Alle abwählen',
+    doLabelPendingOrders: 'Offene Kundenbestellungen',
+    doLabelUnpaidCustomer: 'Unbezahlt von Kunden',
+    doLabelOwedWholesaler: 'Großhändlerkosten (noch nicht geliefert)',
+    doLabelProfitWeek: 'Gewinn diese Woche',
+    doQaLogOrder: 'Kundenbestellung erfassen',
+    doQaWholesalerList: 'Großhändlerliste',
+    doSectionRecentOrders: 'Letzte Bestellungen',
+    doOrdersTabTitle: 'Kundenbestellungen',
+    doWholesalerTabTitle: 'Großhändlerliste',
+    doWholesalerHint: 'Jede offene Kundenbestellung, bereit zum Senden an deinen Großhändler.',
+    doWholesalerCurrencyLabel: 'Währung des Großhändlers',
+    doLabelTotalToOrder: 'Gesamt zu bestellen',
+    doBtnCopyText: 'Als Text kopieren',
+    doProfitTabTitle: 'Gewinn',
+    doOrderModalSub: 'Erfasse, was ein Kunde will, und was es dich kosten wird.',
+    doOrderCustomerLabel: 'Kundenname',
+    doOrderDescLabel: 'Was haben sie bestellt?',
+    doOrderQtyLabel: 'Menge',
+    doOrderSellPriceLabel: 'Preis, den du berechnest (gesamt)',
+    doOrderCostPriceLabel: 'Großhändlerkosten (sobald bekannt eintragen)',
+    doOrderStageLabel: 'Phase',
+    doStageOptPending: 'Ausstehend — noch nicht beim Großhändler bestellt',
+    doStageOptOrdered: 'Beim Großhändler bestellt',
+    doStageOptDelivered: 'An Kunden geliefert',
+    doOrderPaidHint: 'Neue Bestellungen starten als unbezahlt. Nach dem Speichern tippe auf das Zahlungs-Tag, um als bezahlt oder unbezahlt zu markieren.',
+    settingsShopTypeLabel: 'Shop-Typ',
+    modeRegular: 'Regulärer Verkäufer',
+    modeDropshipper: 'Dropshipper',
+    modeSwitchHint: 'Der Wechsel löscht nichts — deine Daten für beide Modi bleiben erhalten, du kannst also jederzeit zurückwechseln.',
+    signupShopTypeLabel: 'Was für ein Shop ist das?',
+    signupShopTypeHint: 'Du kannst das später jederzeit in den Einstellungen ändern — das ist nur dein Ausgangspunkt.',
+    doOrderModalTitleAdd: 'Kundenbestellung erfassen',
+    doOrderModalTitleEdit: 'Kundenbestellung bearbeiten',
+    doOrderSaveBtnAdd: 'Bestellung speichern',
+    doOrderSaveBtnEdit: 'Änderungen speichern',
+    deleteAccountLabel: 'Konto löschen',
+    deleteAccountHint: 'Dies löscht deinen Shop und alle Daten dauerhaft. Dies kann nicht rückgängig gemacht werden.'
   },
   zh: {
     nav_home: '首页',
@@ -2102,7 +2271,44 @@ const TRANSLATIONS = {
     btn_log_sale: '记录销售',
     nav_settings: '设置',
     btn_select_all: '全选',
-    btn_deselect_all: '取消全选'
+    btn_deselect_all: '取消全选',
+    doLabelPendingOrders: '待处理客户订单',
+    doLabelUnpaidCustomer: '客户未付款',
+    doLabelOwedWholesaler: '批发商成本（尚未交付）',
+    doLabelProfitWeek: '本周利润',
+    doQaLogOrder: '记录客户订单',
+    doQaWholesalerList: '批发商清单',
+    doSectionRecentOrders: '最近订单',
+    doOrdersTabTitle: '客户订单',
+    doWholesalerTabTitle: '批发商清单',
+    doWholesalerHint: '每个待处理客户订单，准备发送给您的批发商。',
+    doWholesalerCurrencyLabel: '批发商货币',
+    doLabelTotalToOrder: '订购总额',
+    doBtnCopyText: '复制为文本',
+    doProfitTabTitle: '利润',
+    doOrderModalSub: '记录客户想要什么，以及您获取它需要多少成本。',
+    doOrderCustomerLabel: '客户姓名',
+    doOrderDescLabel: '他们订了什么？',
+    doOrderQtyLabel: '数量',
+    doOrderSellPriceLabel: '您向他们收取的价格（总价）',
+    doOrderCostPriceLabel: '批发商成本（确定后填写）',
+    doOrderStageLabel: '阶段',
+    doStageOptPending: '待处理—尚未向批发商下单',
+    doStageOptOrdered: '已向批发商下单',
+    doStageOptDelivered: '已交付给客户',
+    doOrderPaidHint: '新订单默认为未付款。保存后，点击付款标签即可标记为已付款或未付款。',
+    settingsShopTypeLabel: '店铺类型',
+    modeRegular: '普通卖家',
+    modeDropshipper: '代发货',
+    modeSwitchHint: '切换不会删除任何数据—两种模式的数据都会保留，因此您可以随时切回。',
+    signupShopTypeLabel: '这是什么类型的店铺？',
+    signupShopTypeHint: '您可以稍后在设置中随时切换—这只是您的起点。',
+    doOrderModalTitleAdd: '记录客户订单',
+    doOrderModalTitleEdit: '编辑客户订单',
+    doOrderSaveBtnAdd: '保存订单',
+    doOrderSaveBtnEdit: '保存更改',
+    deleteAccountLabel: '删除账户',
+    deleteAccountHint: '这将永久删除您的店铺及其所有数据。此操作无法撤销。'
   }
 };
 
@@ -2147,7 +2353,21 @@ function applyTranslations() {
     btnReviewCatalogue: 'btn_review_catalogue', btnBackCatalogue: 'btn_back', btnConfirmSaveCatalogue: 'btn_confirm_save',
     btnConfirmExportCatalogue: 'btn_confirm_export', btnConfirmPdfCatalogue: 'btn_confirm_pdf', btnConfirmCopyCatalogue: 'btn_confirm_copy',
     btnReviewRestock: 'btn_review_restock', btnBackRestock: 'btn_back', btnConfirmSaveRestock: 'btn_confirm_save',
-    btnConfirmExportRestock: 'btn_confirm_export', btnConfirmPdfRestock: 'btn_confirm_pdf', btnConfirmExcelRestock: 'btn_confirm_excel', btnConfirmCopyRestock: 'btn_confirm_copy'
+    btnConfirmExportRestock: 'btn_confirm_export', btnConfirmPdfRestock: 'btn_confirm_pdf', btnConfirmExcelRestock: 'btn_confirm_excel', btnConfirmCopyRestock: 'btn_confirm_copy',
+    doLabelPendingOrders: 'doLabelPendingOrders', doLabelUnpaidCustomer: 'doLabelUnpaidCustomer',
+    doLabelOwedWholesaler: 'doLabelOwedWholesaler', doLabelProfitWeek: 'doLabelProfitWeek',
+    doQaLogOrder: 'doQaLogOrder', doQaWholesalerList: 'doQaWholesalerList', doSectionRecentOrders: 'doSectionRecentOrders',
+    doOrdersTabTitle: 'doOrdersTabTitle', doWholesalerTabTitle: 'doWholesalerTabTitle', doWholesalerHint: 'doWholesalerHint',
+    doWholesalerCurrencyLabel: 'doWholesalerCurrencyLabel', doLabelTotalToOrder: 'doLabelTotalToOrder',
+    doBtnCopyText: 'doBtnCopyText', doProfitTabTitle: 'doProfitTabTitle',
+    doOrderModalSub: 'doOrderModalSub', doOrderCustomerLabel: 'doOrderCustomerLabel', doOrderDescLabel: 'doOrderDescLabel',
+    doOrderQtyLabel: 'doOrderQtyLabel', doOrderSellPriceLabel: 'doOrderSellPriceLabel', doOrderCostPriceLabel: 'doOrderCostPriceLabel',
+    doOrderStageLabel: 'doOrderStageLabel', doStageOptPending: 'doStageOptPending', doStageOptOrdered: 'doStageOptOrdered',
+    doStageOptDelivered: 'doStageOptDelivered', doOrderPaidHint: 'doOrderPaidHint', doOrderDeleteBtnLabel: 'btn_delete',
+    settingsShopTypeLabel: 'settingsShopTypeLabel', modeToggleRegular: 'modeRegular', modeToggleDropship: 'modeDropshipper',
+    modeSwitchHint: 'modeSwitchHint', signupShopTypeLabel: 'signupShopTypeLabel', signupShopTypeHint: 'signupShopTypeHint',
+    signupModeRegular: 'modeRegular', signupModeDropship: 'modeDropshipper',
+    deleteAccountLabel: 'deleteAccountLabel', deleteAccountHint: 'deleteAccountHint'
   };
   Object.keys(idMap).forEach(id => {
     const el = document.getElementById(id);
@@ -2940,6 +3160,31 @@ function switchShop() {
   history.replaceState({}, '', location.pathname);
 }
 
+function openDeleteAccountModal() {
+  document.getElementById('deleteAccountShopCodeDisplay').textContent = shopCode;
+  document.getElementById('deleteAccountConfirmInput').value = '';
+  openModal('deleteAccountModal');
+}
+
+async function confirmDeleteAccount() {
+  const typed = document.getElementById('deleteAccountConfirmInput').value.trim().toLowerCase();
+  if (typed !== shopCode) {
+    toast('That doesn\'t match your shop code. Nothing was deleted.');
+    return;
+  }
+
+  try {
+    await waitForFirebase();
+    const { deleteDoc } = window.__firestore;
+    await deleteDoc(shopDocRef);
+    toast('Account deleted');
+    closeModal('deleteAccountModal');
+    switchShop();
+  } catch (e) {
+    toast("Couldn't delete your account. Check your connection and try again.");
+  }
+}
+
 let lastActiveTabBeforeSettings = 'home';
 
 const ALL_TAB_IDS = ['home', 'stock', 'sales', 'orders', 'debts', 'do-home', 'do-orders', 'do-wholesaler', 'do-profit'];
@@ -3035,8 +3280,8 @@ function openModal(id) {
     document.getElementById('doOrderSellPrice').value = '';
     document.getElementById('doOrderCostPrice').value = '';
     document.getElementById('doOrderStage').value = 'pending';
-    document.getElementById('doOrderModalTitle').textContent = 'Log customer order';
-    document.getElementById('doOrderSaveBtn').textContent = 'Save order';
+    document.getElementById('doOrderModalTitle').textContent = t('doOrderModalTitleAdd');
+    document.getElementById('doOrderSaveBtn').textContent = t('doOrderSaveBtnAdd');
     document.getElementById('doOrderDeleteBtn').style.display = 'none';
   }
   document.getElementById(id).classList.add('active');
@@ -3764,8 +4009,8 @@ function editDoOrder(id) {
   document.getElementById('doOrderSellPrice').value = order.sellPrice;
   document.getElementById('doOrderCostPrice').value = order.costPrice != null ? order.costPrice : '';
   document.getElementById('doOrderStage').value = order.stage || 'pending';
-  document.getElementById('doOrderModalTitle').textContent = 'Edit customer order';
-  document.getElementById('doOrderSaveBtn').textContent = 'Save changes';
+  document.getElementById('doOrderModalTitle').textContent = t('doOrderModalTitleEdit');
+  document.getElementById('doOrderSaveBtn').textContent = t('doOrderSaveBtnEdit');
   document.getElementById('doOrderDeleteBtn').style.display = 'block';
 }
 
@@ -4823,6 +5068,7 @@ bindEnter(['restockNewItemName', 'restockNewItemQty'], addRestockCustomItem);
 bindEnter(['adminEmailInput', 'adminPasswordInput', 'adminConfirmPasswordInput'], submitAdminAuth);
 bindEnter(['newAdminEmail', 'newAdminPassword'], addNewAdmin);
 bindEnter(['doOrderCustomer', 'doOrderDescription', 'doOrderSellPrice', 'doOrderCostPrice'], submitDoOrder);
+bindEnter(['deleteAccountConfirmInput'], confirmDeleteAccount);
 
 renderFAQList('landingFaqList');
 
