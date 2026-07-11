@@ -997,25 +997,25 @@
           </div>
           <div class="field-group" style="max-width:220px;">
             <select id="salesPeriodSelect" onchange="setSalesPeriod(this.value)">
-              <option value="day">Today</option>
-              <option value="yesterday">Yesterday</option>
-              <option value="week" selected>This week</option>
-              <option value="lastweek">Last week</option>
-              <option value="month">This month</option>
-              <option value="lastmonth">Last month</option>
-              <option value="year">This year</option>
-              <option value="lastyear">Last year</option>
-              <option value="custom">Custom range&hellip;</option>
+              <option value="day" id="salesPeriodOptToday">Today</option>
+              <option value="yesterday" id="salesPeriodOptYesterday">Yesterday</option>
+              <option value="week" selected id="salesPeriodOptWeek">This week</option>
+              <option value="lastweek" id="salesPeriodOptLastweek">Last week</option>
+              <option value="month" id="salesPeriodOptMonth">This month</option>
+              <option value="lastmonth" id="salesPeriodOptLastmonth">Last month</option>
+              <option value="year" id="salesPeriodOptYear">This year</option>
+              <option value="lastyear" id="salesPeriodOptLastyear">Last year</option>
+              <option value="custom" id="salesPeriodOptCustom">Custom range&hellip;</option>
             </select>
           </div>
           <div id="salesCustomRangeGroup" style="display:none; max-width:320px; margin-bottom:16px;">
             <div style="display:flex; gap:8px; align-items:end;">
               <div class="field-group" style="margin-bottom:0; flex:1;">
-                <label style="font-size:11px;">From</label>
+                <label style="font-size:11px;" id="salesFromLabel">From</label>
                 <input type="date" id="salesCustomStart">
               </div>
               <div class="field-group" style="margin-bottom:0; flex:1;">
-                <label style="font-size:11px;">To</label>
+                <label style="font-size:11px;" id="salesToLabel">To</label>
                 <input type="date" id="salesCustomEnd">
               </div>
               <button class="icon-btn" onclick="applyCustomSalesRange()" title="Apply">&#10003;</button>
@@ -1125,25 +1125,25 @@
           </div>
           <div class="field-group" style="max-width:220px;">
             <select id="doProfitPeriodSelect" onchange="setDoProfitPeriod(this.value)">
-              <option value="day">Today</option>
-              <option value="yesterday">Yesterday</option>
-              <option value="week" selected>This week</option>
-              <option value="lastweek">Last week</option>
-              <option value="month">This month</option>
-              <option value="lastmonth">Last month</option>
-              <option value="year">This year</option>
-              <option value="lastyear">Last year</option>
-              <option value="custom">Custom range&hellip;</option>
+              <option value="day" id="doPeriodOptToday">Today</option>
+              <option value="yesterday" id="doPeriodOptYesterday">Yesterday</option>
+              <option value="week" selected id="doPeriodOptWeek">This week</option>
+              <option value="lastweek" id="doPeriodOptLastweek">Last week</option>
+              <option value="month" id="doPeriodOptMonth">This month</option>
+              <option value="lastmonth" id="doPeriodOptLastmonth">Last month</option>
+              <option value="year" id="doPeriodOptYear">This year</option>
+              <option value="lastyear" id="doPeriodOptLastyear">Last year</option>
+              <option value="custom" id="doPeriodOptCustom">Custom range&hellip;</option>
             </select>
           </div>
           <div id="doProfitCustomRangeGroup" style="display:none; max-width:320px; margin-bottom:16px;">
             <div style="display:flex; gap:8px; align-items:end;">
               <div class="field-group" style="margin-bottom:0; flex:1;">
-                <label style="font-size:11px;">From</label>
+                <label style="font-size:11px;" id="doProfitFromLabel">From</label>
                 <input type="date" id="doProfitCustomStart">
               </div>
               <div class="field-group" style="margin-bottom:0; flex:1;">
-                <label style="font-size:11px;">To</label>
+                <label style="font-size:11px;" id="doProfitToLabel">To</label>
                 <input type="date" id="doProfitCustomEnd">
               </div>
               <button class="icon-btn" onclick="applyDoProfitCustomRange()" title="Apply">&#10003;</button>
@@ -1760,7 +1760,26 @@ const TRANSLATIONS = {
     doOrderSaveBtnAdd: 'Save order',
     doOrderSaveBtnEdit: 'Save changes',
     deleteAccountLabel: 'Delete account',
-    deleteAccountHint: 'This permanently deletes your shop and all its data. This cannot be undone.'
+    deleteAccountHint: 'This permanently deletes your shop and all its data. This cannot be undone.',
+    doPeriodOptToday: 'Today',
+    doPeriodOptYesterday: 'Yesterday',
+    doPeriodOptWeek: 'This week',
+    doPeriodOptLastweek: 'Last week',
+    doPeriodOptMonth: 'This month',
+    doPeriodOptLastmonth: 'Last month',
+    doPeriodOptYear: 'This year',
+    doPeriodOptLastyear: 'Last year',
+    doPeriodOptCustom: 'Custom range…',
+    doProfitFromLabel: 'From',
+    doProfitToLabel: 'To',
+    do_revenue_prefix: 'Revenue',
+    do_profit_prefix: 'Profit',
+    do_order_singular: 'order',
+    do_order_plural: 'orders',
+    do_profit_empty: 'No orders with a known wholesaler cost in this period yet.',
+    sales_total_prefix: 'Total sales',
+    sale_singular: 'sale',
+    sale_plural: 'sales'
   },
   fr: {
     nav_home: 'Accueil',
@@ -1897,7 +1916,26 @@ const TRANSLATIONS = {
     doOrderSaveBtnAdd: 'Enregistrer la commande',
     doOrderSaveBtnEdit: 'Enregistrer les modifications',
     deleteAccountLabel: 'Supprimer le compte',
-    deleteAccountHint: 'Cela supprime définitivement votre boutique et toutes ses données. Cette action est irréversible.'
+    deleteAccountHint: 'Cela supprime définitivement votre boutique et toutes ses données. Cette action est irréversible.',
+    doPeriodOptToday: 'Aujourd\'hui',
+    doPeriodOptYesterday: 'Hier',
+    doPeriodOptWeek: 'Cette semaine',
+    doPeriodOptLastweek: 'La semaine dernière',
+    doPeriodOptMonth: 'Ce mois-ci',
+    doPeriodOptLastmonth: 'Le mois dernier',
+    doPeriodOptYear: 'Cette année',
+    doPeriodOptLastyear: 'L\'année dernière',
+    doPeriodOptCustom: 'Période personnalisée…',
+    doProfitFromLabel: 'Du',
+    doProfitToLabel: 'Au',
+    do_revenue_prefix: 'Chiffre d\'affaires',
+    do_profit_prefix: 'Profit',
+    do_order_singular: 'commande',
+    do_order_plural: 'commandes',
+    do_profit_empty: 'Aucune commande avec un coût grossiste connu pour cette période.',
+    sales_total_prefix: 'Total des ventes',
+    sale_singular: 'vente',
+    sale_plural: 'ventes'
   },
   es: {
     nav_home: 'Inicio',
@@ -2034,7 +2072,26 @@ const TRANSLATIONS = {
     doOrderSaveBtnAdd: 'Guardar pedido',
     doOrderSaveBtnEdit: 'Guardar cambios',
     deleteAccountLabel: 'Eliminar cuenta',
-    deleteAccountHint: 'Esto elimina permanentemente tu tienda y todos sus datos. Esta acción no se puede deshacer.'
+    deleteAccountHint: 'Esto elimina permanentemente tu tienda y todos sus datos. Esta acción no se puede deshacer.',
+    doPeriodOptToday: 'Hoy',
+    doPeriodOptYesterday: 'Ayer',
+    doPeriodOptWeek: 'Esta semana',
+    doPeriodOptLastweek: 'La semana pasada',
+    doPeriodOptMonth: 'Este mes',
+    doPeriodOptLastmonth: 'El mes pasado',
+    doPeriodOptYear: 'Este año',
+    doPeriodOptLastyear: 'El año pasado',
+    doPeriodOptCustom: 'Rango personalizado…',
+    doProfitFromLabel: 'Desde',
+    doProfitToLabel: 'Hasta',
+    do_revenue_prefix: 'Ingresos',
+    do_profit_prefix: 'Ganancia',
+    do_order_singular: 'pedido',
+    do_order_plural: 'pedidos',
+    do_profit_empty: 'No hay pedidos con un costo de mayorista conocido en este período.',
+    sales_total_prefix: 'Ventas totales',
+    sale_singular: 'venta',
+    sale_plural: 'ventas'
   },
   de: {
     nav_home: 'Start',
@@ -2171,7 +2228,26 @@ const TRANSLATIONS = {
     doOrderSaveBtnAdd: 'Bestellung speichern',
     doOrderSaveBtnEdit: 'Änderungen speichern',
     deleteAccountLabel: 'Konto löschen',
-    deleteAccountHint: 'Dies löscht deinen Shop und alle Daten dauerhaft. Dies kann nicht rückgängig gemacht werden.'
+    deleteAccountHint: 'Dies löscht deinen Shop und alle Daten dauerhaft. Dies kann nicht rückgängig gemacht werden.',
+    doPeriodOptToday: 'Heute',
+    doPeriodOptYesterday: 'Gestern',
+    doPeriodOptWeek: 'Diese Woche',
+    doPeriodOptLastweek: 'Letzte Woche',
+    doPeriodOptMonth: 'Diesen Monat',
+    doPeriodOptLastmonth: 'Letzten Monat',
+    doPeriodOptYear: 'Dieses Jahr',
+    doPeriodOptLastyear: 'Letztes Jahr',
+    doPeriodOptCustom: 'Benutzerdefinierter Zeitraum…',
+    doProfitFromLabel: 'Von',
+    doProfitToLabel: 'Bis',
+    do_revenue_prefix: 'Umsatz',
+    do_profit_prefix: 'Gewinn',
+    do_order_singular: 'Bestellung',
+    do_order_plural: 'Bestellungen',
+    do_profit_empty: 'Keine Bestellungen mit bekannten Großhändlerkosten in diesem Zeitraum.',
+    sales_total_prefix: 'Gesamtumsatz',
+    sale_singular: 'Verkauf',
+    sale_plural: 'Verkäufe'
   },
   zh: {
     nav_home: '首页',
@@ -2308,7 +2384,26 @@ const TRANSLATIONS = {
     doOrderSaveBtnAdd: '保存订单',
     doOrderSaveBtnEdit: '保存更改',
     deleteAccountLabel: '删除账户',
-    deleteAccountHint: '这将永久删除您的店铺及其所有数据。此操作无法撤销。'
+    deleteAccountHint: '这将永久删除您的店铺及其所有数据。此操作无法撤销。',
+    doPeriodOptToday: '今天',
+    doPeriodOptYesterday: '昨天',
+    doPeriodOptWeek: '本周',
+    doPeriodOptLastweek: '上周',
+    doPeriodOptMonth: '本月',
+    doPeriodOptLastmonth: '上月',
+    doPeriodOptYear: '今年',
+    doPeriodOptLastyear: '去年',
+    doPeriodOptCustom: '自定义时段…',
+    doProfitFromLabel: '从',
+    doProfitToLabel: '到',
+    do_revenue_prefix: '收入',
+    do_profit_prefix: '利润',
+    do_order_singular: '订单',
+    do_order_plural: '订单',
+    do_profit_empty: '此时段内没有已知批发成本的订单。',
+    sales_total_prefix: '销售总额',
+    sale_singular: '笔销售',
+    sale_plural: '笔销售'
   }
 };
 
@@ -2367,7 +2462,17 @@ function applyTranslations() {
     settingsShopTypeLabel: 'settingsShopTypeLabel', modeToggleRegular: 'modeRegular', modeToggleDropship: 'modeDropshipper',
     modeSwitchHint: 'modeSwitchHint', signupShopTypeLabel: 'signupShopTypeLabel', signupShopTypeHint: 'signupShopTypeHint',
     signupModeRegular: 'modeRegular', signupModeDropship: 'modeDropshipper',
-    deleteAccountLabel: 'deleteAccountLabel', deleteAccountHint: 'deleteAccountHint'
+    deleteAccountLabel: 'deleteAccountLabel', deleteAccountHint: 'deleteAccountHint',
+    doPeriodOptToday: 'doPeriodOptToday', doPeriodOptYesterday: 'doPeriodOptYesterday',
+    doPeriodOptWeek: 'doPeriodOptWeek', doPeriodOptLastweek: 'doPeriodOptLastweek',
+    doPeriodOptMonth: 'doPeriodOptMonth', doPeriodOptLastmonth: 'doPeriodOptLastmonth',
+    doPeriodOptYear: 'doPeriodOptYear', doPeriodOptLastyear: 'doPeriodOptLastyear',
+    doPeriodOptCustom: 'doPeriodOptCustom', doProfitFromLabel: 'doProfitFromLabel', doProfitToLabel: 'doProfitToLabel',
+    salesPeriodOptToday: 'doPeriodOptToday', salesPeriodOptYesterday: 'doPeriodOptYesterday',
+    salesPeriodOptWeek: 'doPeriodOptWeek', salesPeriodOptLastweek: 'doPeriodOptLastweek',
+    salesPeriodOptMonth: 'doPeriodOptMonth', salesPeriodOptLastmonth: 'doPeriodOptLastmonth',
+    salesPeriodOptYear: 'doPeriodOptYear', salesPeriodOptLastyear: 'doPeriodOptLastyear',
+    salesPeriodOptCustom: 'doPeriodOptCustom', salesFromLabel: 'doProfitFromLabel', salesToLabel: 'doProfitToLabel'
   };
   Object.keys(idMap).forEach(id => {
     const el = document.getElementById(id);
@@ -2383,6 +2488,10 @@ function applyTranslations() {
   renderSalesTab();
   renderOrdersList();
   renderDebtList();
+  renderDoHome();
+  renderDoOrdersList();
+  renderDoWholesalerList();
+  renderDoProfitTab();
 }
 
 const FX_CACHE_KEY = 'ledger_fx_rates';
@@ -3494,13 +3603,13 @@ function periodLabel(period) {
     const e = new Date(customRangeEnd).toLocaleDateString(undefined, opts);
     return s + ' \u2013 ' + e;
   }
-  const labels = {
-    day: 'today', yesterday: 'yesterday',
-    week: 'this week', lastweek: 'last week',
-    month: 'this month', lastmonth: 'last month',
-    year: 'this year', lastyear: 'last year'
+  const map = {
+    day: 'doPeriodOptToday', yesterday: 'doPeriodOptYesterday',
+    week: 'doPeriodOptWeek', lastweek: 'doPeriodOptLastweek',
+    month: 'doPeriodOptMonth', lastmonth: 'doPeriodOptLastmonth',
+    year: 'doPeriodOptYear', lastyear: 'doPeriodOptLastyear'
   };
-  return labels[period] || 'this week';
+  return t(map[period] || 'doPeriodOptWeek');
 }
 
 function renderDashboard() {
@@ -3623,10 +3732,10 @@ function renderSalesTab() {
   const totalProfit = filtered.reduce((s, x) => s + Number(x.profit || 0), 0);
   const label = periodLabel(salesPeriod);
 
-  document.getElementById('salesPeriodLabel').textContent = 'Total sales \u2014 ' + label;
-  document.getElementById('salesProfitLabel').textContent = 'Profit \u2014 ' + label;
+  document.getElementById('salesPeriodLabel').textContent = t('sales_total_prefix') + ' \u2014 ' + label;
+  document.getElementById('salesProfitLabel').textContent = t('do_profit_prefix') + ' \u2014 ' + label;
   document.getElementById('statSalesTotal').textContent = fmtMoney(total);
-  document.getElementById('statSalesCount').textContent = filtered.length + (filtered.length === 1 ? ' sale' : ' sales');
+  document.getElementById('statSalesCount').textContent = filtered.length + ' ' + (filtered.length === 1 ? t('sale_singular') : t('sale_plural'));
 
   const profitEl = document.getElementById('statSalesProfit');
   if (profitEl) {
@@ -4340,6 +4449,16 @@ function doProfitPeriodRange(period) {
   return periodRange(period === 'custom' ? 'week' : period);
 }
 
+function doPeriodLabel(period) {
+  const map = {
+    day: 'doPeriodOptToday', yesterday: 'doPeriodOptYesterday',
+    week: 'doPeriodOptWeek', lastweek: 'doPeriodOptLastweek',
+    month: 'doPeriodOptMonth', lastmonth: 'doPeriodOptLastmonth',
+    year: 'doPeriodOptYear', lastyear: 'doPeriodOptLastyear'
+  };
+  return t(map[period] || 'doPeriodOptWeek');
+}
+
 function renderDoProfitTab() {
   const { start, end } = doProfitPeriodRange(doProfitPeriod);
   const orders = (state.dropshipOrders || []).filter(o => { const d = new Date(o.date); return d >= start && d < end; });
@@ -4353,13 +4472,13 @@ function renderDoProfitTab() {
     const opts = { month: 'short', day: 'numeric', year: 'numeric' };
     label = new Date(doProfitCustomStart).toLocaleDateString(undefined, opts) + ' \u2013 ' + new Date(doProfitCustomEnd).toLocaleDateString(undefined, opts);
   } else {
-    label = periodLabel(doProfitPeriod);
+    label = doPeriodLabel(doProfitPeriod);
   }
 
-  document.getElementById('doProfitRevenueLabel').textContent = 'Revenue \u2014 ' + label;
-  document.getElementById('doProfitLabel').textContent = 'Profit \u2014 ' + label;
+  document.getElementById('doProfitRevenueLabel').textContent = t('do_revenue_prefix') + ' \u2014 ' + label;
+  document.getElementById('doProfitLabel').textContent = t('do_profit_prefix') + ' \u2014 ' + label;
   document.getElementById('doStatRevenue').textContent = fmtMoney(revenue);
-  document.getElementById('doStatRevenueCount').textContent = known.length + (known.length === 1 ? ' order' : ' orders');
+  document.getElementById('doStatRevenueCount').textContent = known.length + ' ' + (known.length === 1 ? t('do_order_singular') : t('do_order_plural'));
 
   const profitEl = document.getElementById('doStatProfit');
   profitEl.textContent = (profit < 0 ? '- ' : '') + fmtMoney(Math.abs(profit));
@@ -4367,7 +4486,7 @@ function renderDoProfitTab() {
 
   const el = document.getElementById('doProfitList');
   if (known.length === 0) {
-    el.innerHTML = '<div class="empty-state">No orders with a known wholesaler cost in this period yet.</div>';
+    el.innerHTML = '<div class="empty-state">' + t('do_profit_empty') + '</div>';
     return;
   }
   el.innerHTML = [...known].reverse().map(o => {
