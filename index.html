@@ -914,6 +914,7 @@
         <button class="nav-btn" data-tab="sales" onclick="showTab('sales')"><span class="nicon">&#128200;</span>Sales</button>
         <button class="nav-btn" data-tab="orders" onclick="showTab('orders')"><span class="nicon">&#128203;</span>Orders</button>
         <button class="nav-btn" data-tab="debts" onclick="showTab('debts')"><span class="nicon">&#128179;</span>Debts</button>
+        <button class="nav-btn" data-tab="expenses" onclick="showTab('expenses')"><span class="nicon">&#129534;</span>Expenses</button>
       </div>
       <div id="navDropship" style="display:none;">
         <button class="nav-btn active" data-tab="do-home" onclick="showTab('do-home')"><span class="nicon">&#8962;</span>Home</button>
@@ -921,6 +922,7 @@
         <button class="nav-btn" data-tab="do-wholesaler" onclick="showTab('do-wholesaler')"><span class="nicon">&#128230;</span>Wholesaler List</button>
         <button class="nav-btn" data-tab="do-profit" onclick="showTab('do-profit')"><span class="nicon">&#128200;</span>Profit</button>
         <button class="nav-btn" data-tab="debts" onclick="showTab('debts')"><span class="nicon">&#128179;</span>Debts</button>
+        <button class="nav-btn" data-tab="expenses" onclick="showTab('expenses')"><span class="nicon">&#129534;</span>Expenses</button>
       </div>
       <div style="flex:1;"></div>
       <button onclick="openProfileModal()"><span class="nicon">&#128100;</span>Profile</button>
@@ -1175,6 +1177,45 @@
           <div id="debtList"></div>
         </div>
 
+        <div id="tab-expenses" class="tabpanel" style="display:none;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin: 6px 0 14px;">
+            <h2 style="font-size:18px;" id="expensesTabTitle">Expenses</h2>
+            <button class="icon-btn" onclick="openModal('expenseModal')">&#43;</button>
+          </div>
+          <div class="field-group" style="max-width:220px;">
+            <select id="expensesPeriodSelect" onchange="setExpensesPeriod(this.value)">
+              <option value="day" id="expPeriodOptToday">Today</option>
+              <option value="yesterday" id="expPeriodOptYesterday">Yesterday</option>
+              <option value="week" selected id="expPeriodOptWeek">This week</option>
+              <option value="lastweek" id="expPeriodOptLastweek">Last week</option>
+              <option value="month" id="expPeriodOptMonth">This month</option>
+              <option value="lastmonth" id="expPeriodOptLastmonth">Last month</option>
+              <option value="year" id="expPeriodOptYear">This year</option>
+              <option value="lastyear" id="expPeriodOptLastyear">Last year</option>
+              <option value="custom" id="expPeriodOptCustom">Custom range&hellip;</option>
+            </select>
+          </div>
+          <div id="expensesCustomRangeGroup" style="display:none; max-width:320px; margin-bottom:16px;">
+            <div style="display:flex; gap:8px; align-items:end;">
+              <div class="field-group" style="margin-bottom:0; flex:1;">
+                <label style="font-size:11px;" id="expFromLabel">From</label>
+                <input type="date" id="expensesCustomStart">
+              </div>
+              <div class="field-group" style="margin-bottom:0; flex:1;">
+                <label style="font-size:11px;" id="expToLabel">To</label>
+                <input type="date" id="expensesCustomEnd">
+              </div>
+              <button class="icon-btn" onclick="applyExpensesCustomRange()" title="Apply">&#10003;</button>
+            </div>
+          </div>
+          <div class="stat-card" style="margin-bottom:16px;">
+            <div class="label" id="expensesPeriodLabel">Total expenses &mdash; this week</div>
+            <div class="value danger" id="statExpensesTotal">&#8358;0</div>
+            <div class="sub" id="statExpensesCount">0 expenses</div>
+          </div>
+          <div id="expensesList"></div>
+        </div>
+
         <div id="tab-settings" class="tabpanel" style="display:none;">
           <h2 style="font-size:18px; margin: 6px 0 18px;" id="settingsTabTitle">Settings</h2>
 
@@ -1237,6 +1278,7 @@
           <button class="nav-btn" data-tab="sales" onclick="showTab('sales')"><span class="nicon">&#128200;</span>Sales</button>
           <button class="nav-btn" data-tab="orders" onclick="showTab('orders')"><span class="nicon">&#128203;</span>Orders</button>
           <button class="nav-btn" data-tab="debts" onclick="showTab('debts')"><span class="nicon">&#128179;</span>Debts</button>
+          <button class="nav-btn" data-tab="expenses" onclick="showTab('expenses')"><span class="nicon">&#129534;</span>Expenses</button>
         </div>
         <div id="navDropshipMobile" style="display:none; flex:1;">
           <button class="nav-btn active" data-tab="do-home" onclick="showTab('do-home')"><span class="nicon">&#8962;</span>Home</button>
@@ -1244,6 +1286,7 @@
           <button class="nav-btn" data-tab="do-wholesaler" onclick="showTab('do-wholesaler')"><span class="nicon">&#128230;</span>Wholesaler</button>
           <button class="nav-btn" data-tab="do-profit" onclick="showTab('do-profit')"><span class="nicon">&#128200;</span>Profit</button>
           <button class="nav-btn" data-tab="debts" onclick="showTab('debts')"><span class="nicon">&#128179;</span>Debts</button>
+          <button class="nav-btn" data-tab="expenses" onclick="showTab('expenses')"><span class="nicon">&#129534;</span>Expenses</button>
         </div>
       </div>
     </div>
@@ -1343,6 +1386,33 @@
     <div class="field-group"><label id="debtNameLabel">Customer name</label><input id="debtName" placeholder="e.g. Blessing"></div>
     <div class="field-group"><label id="debtAmountLabel">Amount owed (&#8358;)</label><input id="debtAmount" type="number" inputmode="numeric" placeholder="e.g. 5000"></div>
     <div class="modal-actions"><button class="btn btn-primary" onclick="submitDebt()"><span id="btnSaveDebt">Save</span></button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="expenseModal">
+  <div class="modal-sheet">
+    <div class="icon-btn modal-close" onclick="closeModal('expenseModal')">&#10005;</div>
+    <h2 id="expenseModalTitle">Log an expense</h2>
+    <div class="modal-sub" id="expenseModalSub">Rent, transport, packaging &mdash; anything it costs to run the business.</div>
+    <input type="hidden" id="expenseEditId" value="">
+    <div class="field-group">
+      <label id="expenseCategoryLabel">Category</label>
+      <select id="expenseCategory">
+        <option value="rent" id="expCatRent">Rent</option>
+        <option value="transport" id="expCatTransport">Transport</option>
+        <option value="utilities" id="expCatUtilities">Utilities</option>
+        <option value="packaging" id="expCatPackaging">Packaging</option>
+        <option value="salaries" id="expCatSalaries">Salaries</option>
+        <option value="airtime_data" id="expCatAirtime">Airtime &amp; Data</option>
+        <option value="other" id="expCatOther">Other</option>
+      </select>
+    </div>
+    <div class="field-group"><label id="expenseDescLabel">Description</label><input id="expenseDescription" placeholder="e.g. Bike rider for deliveries"></div>
+    <div class="field-group"><label id="expenseAmountLabel">Amount</label><input id="expenseAmount" type="number" inputmode="numeric" placeholder="e.g. 3000"></div>
+    <div class="modal-actions">
+      <button class="btn btn-danger-ghost" id="expenseDeleteBtn" style="display:none;" onclick="deleteExpense()"><span id="expenseDeleteBtnLabel">Delete</span></button>
+      <button class="btn btn-primary" id="expenseSaveBtn" onclick="submitExpense()">Save expense</button>
+    </div>
   </div>
 </div>
 
@@ -1516,6 +1586,14 @@
           <div class="value" id="summaryPeriodSalesCount">0</div>
         </div>
       </div>
+
+      <div class="stat-row">
+        <div class="stat-card">
+          <div class="label" id="summaryExpensesLabel">Total expenses</div>
+          <div class="value danger" id="summaryExpenses">&#8358;0</div>
+          <div class="sub" id="summaryExpensesCount">0 expenses</div>
+        </div>
+      </div>
     </div>
 
     <div class="section-title">Export this summary</div>
@@ -1557,7 +1635,7 @@
 <script>
 let shopCode = null;
 let shopDocRef = null;
-let state = { products: [], sales: [], debts: [], orders: [], dropshipOrders: [], dropshipDebts: [], profile: {}, catalogue: {}, restock: {}, settings: {} };
+let state = { products: [], sales: [], debts: [], orders: [], dropshipOrders: [], dropshipDebts: [], expenses: [], profile: {}, catalogue: {}, restock: {}, settings: {} };
 let fbReady = false;
 let salesPeriod = 'week';
 let saleSelectedProductId = null;
@@ -1814,7 +1892,28 @@ const TRANSLATIONS = {
     profile_title_normal: 'Your profile',
     profile_sub_mandatory: 'Before you start logging stock and sales, tell us a bit about your shop. Name, shop name, and location are required.',
     profile_sub_normal: 'This is just for you — helps keep things personal if you run more than one shop.',
-    label_switch: 'Switch'
+    label_switch: 'Switch',
+    expensesTabTitle: 'Expenses',
+    expenseModalSub: 'Rent, transport, packaging — anything it costs to run the business.',
+    expenseCategoryLabel: 'Category',
+    expCatRent: 'Rent',
+    expCatTransport: 'Transport',
+    expCatUtilities: 'Utilities',
+    expCatPackaging: 'Packaging',
+    expCatSalaries: 'Salaries',
+    expCatAirtime: 'Airtime & Data',
+    expCatOther: 'Other',
+    expenseDescLabel: 'Description',
+    expenseAmountLabel: 'Amount',
+    summaryExpensesLabel: 'Total expenses',
+    expense_modal_title_add: 'Log an expense',
+    expense_modal_title_edit: 'Edit expense',
+    expense_save_btn_add: 'Save expense',
+    expense_save_btn_edit: 'Save changes',
+    expenses_total_prefix: 'Total expenses',
+    expense_singular: 'expense',
+    expense_plural: 'expenses',
+    expenses_empty: 'No expenses logged for this period yet.'
   },
   fr: {
     nav_home: 'Accueil',
@@ -2005,7 +2104,28 @@ const TRANSLATIONS = {
     profile_title_normal: 'Votre profil',
     profile_sub_mandatory: 'Avant de commencer à enregistrer votre stock et vos ventes, parlez-nous un peu de votre boutique. Le nom, le nom de la boutique et l\'emplacement sont requis.',
     profile_sub_normal: 'Ceci est juste pour vous — utile si vous gérez plusieurs boutiques.',
-    label_switch: 'Changer'
+    label_switch: 'Changer',
+    expensesTabTitle: 'Dépenses',
+    expenseModalSub: 'Loyer, transport, emballage — tout ce qu\'il en coûte de faire tourner l\'activité.',
+    expenseCategoryLabel: 'Catégorie',
+    expCatRent: 'Loyer',
+    expCatTransport: 'Transport',
+    expCatUtilities: 'Services publics',
+    expCatPackaging: 'Emballage',
+    expCatSalaries: 'Salaires',
+    expCatAirtime: 'Crédit téléphonique et données',
+    expCatOther: 'Autre',
+    expenseDescLabel: 'Description',
+    expenseAmountLabel: 'Montant',
+    summaryExpensesLabel: 'Dépenses totales',
+    expense_modal_title_add: 'Enregistrer une dépense',
+    expense_modal_title_edit: 'Modifier la dépense',
+    expense_save_btn_add: 'Enregistrer la dépense',
+    expense_save_btn_edit: 'Enregistrer les modifications',
+    expenses_total_prefix: 'Dépenses totales',
+    expense_singular: 'dépense',
+    expense_plural: 'dépenses',
+    expenses_empty: 'Aucune dépense enregistrée pour cette période.'
   },
   es: {
     nav_home: 'Inicio',
@@ -2196,7 +2316,28 @@ const TRANSLATIONS = {
     profile_title_normal: 'Tu perfil',
     profile_sub_mandatory: 'Antes de empezar a registrar tu inventario y ventas, cuéntanos un poco sobre tu tienda. El nombre, el nombre de la tienda y la ubicación son obligatorios.',
     profile_sub_normal: 'Esto es solo para ti — ayuda a mantener las cosas personales si administras más de una tienda.',
-    label_switch: 'Cambiar'
+    label_switch: 'Cambiar',
+    expensesTabTitle: 'Gastos',
+    expenseModalSub: 'Alquiler, transporte, empaque — todo lo que cuesta operar el negocio.',
+    expenseCategoryLabel: 'Categoría',
+    expCatRent: 'Alquiler',
+    expCatTransport: 'Transporte',
+    expCatUtilities: 'Servicios públicos',
+    expCatPackaging: 'Empaque',
+    expCatSalaries: 'Salarios',
+    expCatAirtime: 'Datos y saldo telefónico',
+    expCatOther: 'Otro',
+    expenseDescLabel: 'Descripción',
+    expenseAmountLabel: 'Monto',
+    summaryExpensesLabel: 'Gastos totales',
+    expense_modal_title_add: 'Registrar un gasto',
+    expense_modal_title_edit: 'Editar gasto',
+    expense_save_btn_add: 'Guardar gasto',
+    expense_save_btn_edit: 'Guardar cambios',
+    expenses_total_prefix: 'Gastos totales',
+    expense_singular: 'gasto',
+    expense_plural: 'gastos',
+    expenses_empty: 'Aún no hay gastos registrados en este período.'
   },
   de: {
     nav_home: 'Start',
@@ -2387,7 +2528,28 @@ const TRANSLATIONS = {
     profile_title_normal: 'Dein Profil',
     profile_sub_mandatory: 'Bevor du mit der Erfassung von Lagerbestand und Verkäufen beginnst, erzähl uns etwas über deinen Shop. Name, Shop-Name und Standort sind erforderlich.',
     profile_sub_normal: 'Das ist nur für dich — nützlich, wenn du mehr als einen Shop führst.',
-    label_switch: 'Wechseln'
+    label_switch: 'Wechseln',
+    expensesTabTitle: 'Ausgaben',
+    expenseModalSub: 'Miete, Transport, Verpackung — alles, was der Betrieb des Geschäfts kostet.',
+    expenseCategoryLabel: 'Kategorie',
+    expCatRent: 'Miete',
+    expCatTransport: 'Transport',
+    expCatUtilities: 'Nebenkosten',
+    expCatPackaging: 'Verpackung',
+    expCatSalaries: 'Gehälter',
+    expCatAirtime: 'Guthaben & Daten',
+    expCatOther: 'Sonstiges',
+    expenseDescLabel: 'Beschreibung',
+    expenseAmountLabel: 'Betrag',
+    summaryExpensesLabel: 'Gesamtausgaben',
+    expense_modal_title_add: 'Ausgabe erfassen',
+    expense_modal_title_edit: 'Ausgabe bearbeiten',
+    expense_save_btn_add: 'Ausgabe speichern',
+    expense_save_btn_edit: 'Änderungen speichern',
+    expenses_total_prefix: 'Gesamtausgaben',
+    expense_singular: 'Ausgabe',
+    expense_plural: 'Ausgaben',
+    expenses_empty: 'Noch keine Ausgaben für diesen Zeitraum erfasst.'
   },
   zh: {
     nav_home: '首页',
@@ -2578,7 +2740,28 @@ const TRANSLATIONS = {
     profile_title_normal: '您的个人资料',
     profile_sub_mandatory: '在开始记录库存和销售之前，请告诉我们一些关于您店铺的信息。姓名、店铺名称和地址为必填项。',
     profile_sub_normal: '这仅供您个人使用—如果您经营不止一家店铺，这有助于保持个性化。',
-    label_switch: '切换'
+    label_switch: '切换',
+    expensesTabTitle: '支出',
+    expenseModalSub: '房租、交通、包装—经营业务的任何成本。',
+    expenseCategoryLabel: '类别',
+    expCatRent: '房租',
+    expCatTransport: '交通',
+    expCatUtilities: '水电费',
+    expCatPackaging: '包装',
+    expCatSalaries: '工资',
+    expCatAirtime: '话费与流量',
+    expCatOther: '其他',
+    expenseDescLabel: '描述',
+    expenseAmountLabel: '金额',
+    summaryExpensesLabel: '总支出',
+    expense_modal_title_add: '记录支出',
+    expense_modal_title_edit: '编辑支出',
+    expense_save_btn_add: '保存支出',
+    expense_save_btn_edit: '保存更改',
+    expenses_total_prefix: '总支出',
+    expense_singular: '笔支出',
+    expense_plural: '笔支出',
+    expenses_empty: '此时段内还没有支出记录。'
   }
 };
 
@@ -2647,7 +2830,18 @@ function applyTranslations() {
     salesPeriodOptWeek: 'doPeriodOptWeek', salesPeriodOptLastweek: 'doPeriodOptLastweek',
     salesPeriodOptMonth: 'doPeriodOptMonth', salesPeriodOptLastmonth: 'doPeriodOptLastmonth',
     salesPeriodOptYear: 'doPeriodOptYear', salesPeriodOptLastyear: 'doPeriodOptLastyear',
-    salesPeriodOptCustom: 'doPeriodOptCustom', salesFromLabel: 'doProfitFromLabel', salesToLabel: 'doProfitToLabel'
+    salesPeriodOptCustom: 'doPeriodOptCustom', salesFromLabel: 'doProfitFromLabel', salesToLabel: 'doProfitToLabel',
+    expensesTabTitle: 'expensesTabTitle',
+    expPeriodOptToday: 'doPeriodOptToday', expPeriodOptYesterday: 'doPeriodOptYesterday',
+    expPeriodOptWeek: 'doPeriodOptWeek', expPeriodOptLastweek: 'doPeriodOptLastweek',
+    expPeriodOptMonth: 'doPeriodOptMonth', expPeriodOptLastmonth: 'doPeriodOptLastmonth',
+    expPeriodOptYear: 'doPeriodOptYear', expPeriodOptLastyear: 'doPeriodOptLastyear',
+    expPeriodOptCustom: 'doPeriodOptCustom', expFromLabel: 'doProfitFromLabel', expToLabel: 'doProfitToLabel',
+    expenseModalSub: 'expenseModalSub', expenseCategoryLabel: 'expenseCategoryLabel',
+    expCatRent: 'expCatRent', expCatTransport: 'expCatTransport', expCatUtilities: 'expCatUtilities',
+    expCatPackaging: 'expCatPackaging', expCatSalaries: 'expCatSalaries', expCatAirtime: 'expCatAirtime', expCatOther: 'expCatOther',
+    expenseDescLabel: 'expenseDescLabel', expenseAmountLabel: 'expenseAmountLabel',
+    expenseDeleteBtnLabel: 'btn_delete', summaryExpensesLabel: 'summaryExpensesLabel'
   };
   Object.keys(idMap).forEach(id => {
     const el = document.getElementById(id);
@@ -2664,6 +2858,7 @@ function applyTranslations() {
   renderSalesTab();
   renderOrdersList();
   renderDebtList();
+  renderExpensesTab();
   renderDoHome();
   renderDoOrdersList();
   renderDoWholesalerList();
@@ -2784,10 +2979,10 @@ async function enterShop() {
       await setDoc(ref, {
         passwordHash: pwHash,
         secretQuestion, secretAnswerHash,
-        products: [], sales: [], debts: [], orders: [], dropshipOrders: [], dropshipDebts: [],
+        products: [], sales: [], debts: [], orders: [], dropshipOrders: [], dropshipDebts: [], expenses: [],
         profile: {}, catalogue: {}, restock: {}, settings: defaultSettings
       });
-      state = { products: [], sales: [], debts: [], orders: [], dropshipOrders: [], dropshipDebts: [], profile: {}, catalogue: {}, restock: {}, settings: defaultSettings };
+      state = { products: [], sales: [], debts: [], orders: [], dropshipOrders: [], dropshipDebts: [], expenses: [], profile: {}, catalogue: {}, restock: {}, settings: defaultSettings };
       profileMandatory = true;
       toast('Ledger created');
       recordLoginEvent(code, 'signup');
@@ -2810,7 +3005,10 @@ async function enterShop() {
         orders: data.orders || [],
         dropshipOrders: data.dropshipOrders || [],
       dropshipDebts: data.dropshipDebts || [],
+      expenses: data.expenses || [],
         dropshipDebts: data.dropshipDebts || [],
+      expenses: data.expenses || [],
+        expenses: data.expenses || [],
         profile: data.profile || {},
         catalogue: data.catalogue || {},
         restock: data.restock || {},
@@ -2925,6 +3123,7 @@ async function tryAutoLogin() {
       orders: data.orders || [],
       dropshipOrders: data.dropshipOrders || [],
       dropshipDebts: data.dropshipDebts || [],
+      expenses: data.expenses || [],
       profile: data.profile || {},
       catalogue: data.catalogue || {},
       restock: data.restock || {},
@@ -3476,7 +3675,7 @@ async function confirmDeleteAccount() {
 
 let lastActiveTabBeforeSettings = 'home';
 
-const ALL_TAB_IDS = ['home', 'stock', 'sales', 'orders', 'debts', 'do-home', 'do-orders', 'do-wholesaler', 'do-profit'];
+const ALL_TAB_IDS = ['home', 'stock', 'sales', 'orders', 'debts', 'expenses', 'do-home', 'do-orders', 'do-wholesaler', 'do-profit'];
 
 function showTab(name, skipHistory) {
   if (name === 'settings') {
@@ -3516,6 +3715,7 @@ function showTab(name, skipHistory) {
   if (name === 'sales') renderSalesTab();
   if (name === 'orders') renderOrdersList();
   if (name === 'debts') renderDebtList();
+  if (name === 'expenses') renderExpensesTab();
   if (name === 'settings') renderSettingsTab();
   if (name === 'do-home') renderDoHome();
   if (name === 'do-orders') renderDoOrdersList();
@@ -3572,6 +3772,15 @@ function openModal(id) {
     document.getElementById('doOrderModalTitle').textContent = t('doOrderModalTitleAdd');
     document.getElementById('doOrderSaveBtn').textContent = t('doOrderSaveBtnAdd');
     document.getElementById('doOrderDeleteBtn').style.display = 'none';
+  }
+  if (id === 'expenseModal') {
+    document.getElementById('expenseEditId').value = '';
+    document.getElementById('expenseCategory').value = 'rent';
+    document.getElementById('expenseDescription').value = '';
+    document.getElementById('expenseAmount').value = '';
+    document.getElementById('expenseModalTitle').textContent = t('expense_modal_title_add');
+    document.getElementById('expenseSaveBtn').textContent = t('expense_save_btn_add');
+    document.getElementById('expenseDeleteBtn').style.display = 'none';
   }
   document.getElementById(id).classList.add('active');
 }
@@ -3703,6 +3912,7 @@ function renderAll() {
   renderSalesTab();
   renderOrdersList();
   renderDebtList();
+  renderExpensesTab();
   renderDoHome();
   renderDoOrdersList();
   renderDoWholesalerList();
@@ -3903,7 +4113,9 @@ function renderSalesTab() {
   const { start, end } = periodRange(salesPeriod);
   const filtered = state.sales.filter(s => { const d = new Date(s.date); return d >= start && d < end; });
   const total = filtered.reduce((s, x) => s + Number(x.total), 0);
-  const totalProfit = filtered.reduce((s, x) => s + Number(x.profit || 0), 0);
+  const grossProfit = filtered.reduce((s, x) => s + Number(x.profit || 0), 0);
+  const periodExpenses = totalExpensesInRange(start, end);
+  const totalProfit = grossProfit - periodExpenses;
   const label = periodLabel(salesPeriod);
 
   document.getElementById('salesPeriodLabel').textContent = t('sales_total_prefix') + ' \u2014 ' + label;
@@ -4244,6 +4456,147 @@ async function deleteDebt(id) {
   toast('Debt deleted');
 }
 
+// ===================== EXPENSES =====================
+
+let expensesPeriod = 'week';
+let expensesCustomStart = null;
+let expensesCustomEnd = null;
+
+function setExpensesPeriod(period) {
+  expensesPeriod = period;
+  const sel = document.getElementById('expensesPeriodSelect');
+  if (sel) sel.value = period;
+
+  const customGroup = document.getElementById('expensesCustomRangeGroup');
+  if (period === 'custom') {
+    customGroup.style.display = 'block';
+    if (!expensesCustomStart || !expensesCustomEnd) {
+      const today = new Date();
+      const weekAgo = new Date();
+      weekAgo.setDate(weekAgo.getDate() - 7);
+      document.getElementById('expensesCustomStart').value = weekAgo.toISOString().slice(0, 10);
+      document.getElementById('expensesCustomEnd').value = today.toISOString().slice(0, 10);
+    }
+    if (expensesCustomStart && expensesCustomEnd) renderExpensesTab();
+    return;
+  } else {
+    customGroup.style.display = 'none';
+  }
+  renderExpensesTab();
+}
+
+function applyExpensesCustomRange() {
+  const startVal = document.getElementById('expensesCustomStart').value;
+  const endVal = document.getElementById('expensesCustomEnd').value;
+  if (!startVal || !endVal) { toast('Pick both a start and end date'); return; }
+  if (new Date(startVal) > new Date(endVal)) { toast('Start date must be before the end date'); return; }
+  expensesCustomStart = startVal;
+  expensesCustomEnd = endVal;
+  expensesPeriod = 'custom';
+  renderExpensesTab();
+}
+
+function expensesPeriodRangeFor(period) {
+  if (period === 'custom' && expensesCustomStart && expensesCustomEnd) {
+    const s = new Date(expensesCustomStart); s.setHours(0, 0, 0, 0);
+    const e = new Date(expensesCustomEnd); e.setHours(23, 59, 59, 999);
+    return { start: s, end: e };
+  }
+  return periodRange(period === 'custom' ? 'week' : period);
+}
+
+function expensesInRange(start, end) {
+  return (state.expenses || []).filter(x => { const d = new Date(x.date); return d >= start && d < end; });
+}
+
+function totalExpensesInRange(start, end) {
+  return expensesInRange(start, end).reduce((s, x) => s + Number(x.amount || 0), 0);
+}
+
+function expenseCategoryLabel(cat) {
+  const map = {
+    rent: 'expCatRent', transport: 'expCatTransport', utilities: 'expCatUtilities',
+    packaging: 'expCatPackaging', salaries: 'expCatSalaries', airtime_data: 'expCatAirtime', other: 'expCatOther'
+  };
+  return t(map[cat] || 'expCatOther');
+}
+
+function renderExpensesTab() {
+  const { start, end } = expensesPeriodRangeFor(expensesPeriod);
+  const filtered = expensesInRange(start, end);
+  const total = filtered.reduce((s, x) => s + Number(x.amount || 0), 0);
+
+  let label;
+  if (expensesPeriod === 'custom' && expensesCustomStart && expensesCustomEnd) {
+    const opts = { month: 'short', day: 'numeric', year: 'numeric' };
+    label = new Date(expensesCustomStart).toLocaleDateString(undefined, opts) + ' \u2013 ' + new Date(expensesCustomEnd).toLocaleDateString(undefined, opts);
+  } else {
+    label = doPeriodLabel(expensesPeriod);
+  }
+
+  document.getElementById('expensesPeriodLabel').textContent = t('expenses_total_prefix') + ' \u2014 ' + label;
+  document.getElementById('statExpensesTotal').textContent = fmtMoney(total);
+  document.getElementById('statExpensesCount').textContent = filtered.length + ' ' + (filtered.length === 1 ? t('expense_singular') : t('expense_plural'));
+
+  const el = document.getElementById('expensesList');
+  if (filtered.length === 0) {
+    el.innerHTML = '<div class="empty-state">' + t('expenses_empty') + '</div>';
+    return;
+  }
+  el.innerHTML = [...filtered].reverse().map(x => `
+    <div class="list-item" onclick="editExpense('${x.id}')" style="cursor:pointer;">
+      <div class="li-main">
+        <div class="li-title">${escapeHtml(x.description || expenseCategoryLabel(x.category))}</div>
+        <div class="li-sub">${expenseCategoryLabel(x.category)} &middot; ${new Date(x.date).toLocaleDateString()}</div>
+      </div>
+      <div class="li-tag owe">${fmtMoney(x.amount)}</div>
+    </div>`).join('');
+}
+
+async function submitExpense() {
+  const editId = document.getElementById('expenseEditId').value;
+  const category = document.getElementById('expenseCategory').value;
+  const description = document.getElementById('expenseDescription').value.trim();
+  const amount = Number(document.getElementById('expenseAmount').value);
+
+  if (!amount || amount <= 0) { toast('Enter a valid amount'); return; }
+
+  if (editId) {
+    const exp = state.expenses.find(x => x.id === editId);
+    if (exp) { exp.category = category; exp.description = description; exp.amount = amount; }
+  } else {
+    state.expenses.push({ id: crypto.randomUUID(), category, description, amount, date: new Date().toISOString() });
+  }
+
+  await saveState('expenses');
+  closeModal('expenseModal');
+  renderAll();
+  toast(editId ? 'Expense updated' : 'Expense logged');
+}
+
+function editExpense(id) {
+  const exp = state.expenses.find(x => x.id === id);
+  if (!exp) return;
+  openModal('expenseModal');
+  document.getElementById('expenseEditId').value = id;
+  document.getElementById('expenseCategory').value = exp.category || 'other';
+  document.getElementById('expenseDescription').value = exp.description || '';
+  document.getElementById('expenseAmount').value = exp.amount;
+  document.getElementById('expenseModalTitle').textContent = t('expense_modal_title_edit');
+  document.getElementById('expenseSaveBtn').textContent = t('expense_save_btn_edit');
+  document.getElementById('expenseDeleteBtn').style.display = 'block';
+}
+
+async function deleteExpense() {
+  const editId = document.getElementById('expenseEditId').value;
+  if (!editId) return;
+  state.expenses = state.expenses.filter(x => x.id !== editId);
+  await saveState('expenses');
+  closeModal('expenseModal');
+  renderAll();
+  toast('Expense deleted');
+}
+
 // ===================== DROPSHIPPER MODE =====================
 
 async function submitDoOrder() {
@@ -4337,9 +4690,10 @@ function renderDoHome() {
   const notYetDelivered = orders.filter(o => o.stage !== 'delivered' && o.costPrice != null);
   const owedWholesaler = notYetDelivered.reduce((s, o) => s + Number(o.costPrice || 0), 0);
 
-  const { start: weekStart } = periodRange('week');
+  const { start: weekStart, end: weekEnd } = periodRange('week');
   const weekOrders = orders.filter(o => new Date(o.date) >= weekStart && o.costPrice != null);
-  const weekProfit = weekOrders.reduce((s, o) => s + (Number(o.sellPrice || 0) - Number(o.costPrice || 0)), 0);
+  const weekGrossProfit = weekOrders.reduce((s, o) => s + (Number(o.sellPrice || 0) - Number(o.costPrice || 0)), 0);
+  const weekProfit = weekGrossProfit - totalExpensesInRange(weekStart, weekEnd);
 
   document.getElementById('doStatPendingOrders').textContent = fmtMoney(pendingValue);
   document.getElementById('doStatPendingOrdersCount').textContent = pending.length + ' ' + (pending.length === 1 ? t('do_order_singular') : t('do_order_plural'));
@@ -4639,7 +4993,8 @@ function renderDoProfitTab() {
   const known = orders.filter(o => o.costPrice != null);
 
   const revenue = known.reduce((s, o) => s + Number(o.sellPrice || 0), 0);
-  const profit = known.reduce((s, o) => s + (Number(o.sellPrice || 0) - Number(o.costPrice || 0)), 0);
+  const grossProfit = known.reduce((s, o) => s + (Number(o.sellPrice || 0) - Number(o.costPrice || 0)), 0);
+  const profit = grossProfit - totalExpensesInRange(start, end);
 
   let label;
   if (doProfitPeriod === 'custom' && doProfitCustomStart && doProfitCustomEnd) {
@@ -5178,7 +5533,11 @@ function computeSummary(period) {
   const { start, end, label } = summaryPeriodRange(period);
   const salesInRange = state.sales.filter(s => { const d = new Date(s.date); return d >= start && d < end; });
   const totalRevenue = salesInRange.reduce((s, x) => s + Number(x.total), 0);
-  const totalProfit = salesInRange.reduce((s, x) => s + Number(x.profit || 0), 0);
+  const grossProfit = salesInRange.reduce((s, x) => s + Number(x.profit || 0), 0);
+
+  const expensesInPeriod = expensesInRange(start, end);
+  const totalExpenses = expensesInPeriod.reduce((s, x) => s + Number(x.amount || 0), 0);
+  const totalProfit = grossProfit - totalExpenses;
 
   const pendingOrders = state.orders.filter(o => !o.fulfilled);
   const pendingOrdersValue = pendingOrders.reduce((s, o) => s + Number(o.amount), 0);
@@ -5195,6 +5554,7 @@ function computeSummary(period) {
     pendingOrdersValue, pendingOrdersCount: pendingOrders.length,
     debtsOwed, debtsCount: debtsUnpaid.length,
     stockValue, stockItems,
+    totalExpenses, expensesCount: expensesInPeriod.length,
     salesInRange
   };
 }
@@ -5238,6 +5598,9 @@ function renderSummaryModal() {
   document.getElementById('summaryStockCount').textContent = s.stockItems + ' items';
 
   document.getElementById('summaryPeriodSalesCount').textContent = String(s.salesCount);
+
+  document.getElementById('summaryExpenses').textContent = fmtMoney(s.totalExpenses);
+  document.getElementById('summaryExpensesCount').textContent = s.expensesCount + (s.expensesCount === 1 ? ' expense' : ' expenses');
 }
 
 async function exportSummaryImage() {
@@ -5286,6 +5649,7 @@ function exportSummaryExcel() {
       ['Period', (summaryPeriod === 'month' ? 'Monthly' : 'Yearly') + ' \u2014 ' + s.label],
       ['', ''],
       ['Total sales revenue', s.totalRevenue],
+      ['Total expenses', s.totalExpenses],
       ['Total profit', s.totalProfit],
       ['Sales logged in period', s.salesCount],
       ['', ''],
@@ -5368,6 +5732,7 @@ bindEnter(['adminEmailInput', 'adminPasswordInput', 'adminConfirmPasswordInput']
 bindEnter(['newAdminEmail', 'newAdminPassword'], addNewAdmin);
 bindEnter(['doOrderCustomer', 'doOrderDescription', 'doOrderSellPrice', 'doOrderCostPrice'], submitDoOrder);
 bindEnter(['deleteAccountConfirmInput'], confirmDeleteAccount);
+bindEnter(['expenseDescription', 'expenseAmount'], submitExpense);
 
 renderFAQList('landingFaqList');
 
