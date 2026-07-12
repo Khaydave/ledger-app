@@ -1635,7 +1635,7 @@
 <script>
 let shopCode = null;
 let shopDocRef = null;
-let state = { products: [], sales: [], debts: [], orders: [], dropshipOrders: [], dropshipDebts: [], expenses: [], profile: {}, catalogue: {}, restock: {}, settings: {} };
+let state = { products: [], sales: [], debts: [], orders: [], dropshipOrders: [], dropshipDebts: [], expenses: [], dropshipExpenses: [], profile: {}, catalogue: {}, restock: {}, settings: {} };
 let fbReady = false;
 let salesPeriod = 'week';
 let saleSelectedProductId = null;
@@ -2984,10 +2984,10 @@ async function enterShop() {
       await setDoc(ref, {
         passwordHash: pwHash,
         secretQuestion, secretAnswerHash,
-        products: [], sales: [], debts: [], orders: [], dropshipOrders: [], dropshipDebts: [], expenses: [],
+        products: [], sales: [], debts: [], orders: [], dropshipOrders: [], dropshipDebts: [], expenses: [], dropshipExpenses: [],
         profile: {}, catalogue: {}, restock: {}, settings: defaultSettings
       });
-      state = { products: [], sales: [], debts: [], orders: [], dropshipOrders: [], dropshipDebts: [], expenses: [], profile: {}, catalogue: {}, restock: {}, settings: defaultSettings };
+      state = { products: [], sales: [], debts: [], orders: [], dropshipOrders: [], dropshipDebts: [], expenses: [], dropshipExpenses: [], profile: {}, catalogue: {}, restock: {}, settings: defaultSettings };
       profileMandatory = true;
       toast('Ledger created');
       recordLoginEvent(code, 'signup');
@@ -3011,8 +3011,10 @@ async function enterShop() {
         dropshipOrders: data.dropshipOrders || [],
       dropshipDebts: data.dropshipDebts || [],
       expenses: data.expenses || [],
+      dropshipExpenses: data.dropshipExpenses || [],
         dropshipDebts: data.dropshipDebts || [],
       expenses: data.expenses || [],
+      dropshipExpenses: data.dropshipExpenses || [],
         expenses: data.expenses || [],
         profile: data.profile || {},
         catalogue: data.catalogue || {},
@@ -3129,6 +3131,7 @@ async function tryAutoLogin() {
       dropshipOrders: data.dropshipOrders || [],
       dropshipDebts: data.dropshipDebts || [],
       expenses: data.expenses || [],
+      dropshipExpenses: data.dropshipExpenses || [],
       profile: data.profile || {},
       catalogue: data.catalogue || {},
       restock: data.restock || {},
@@ -4209,6 +4212,21 @@ function setActiveDebts(arr) {
 function activeDebtsStateKey() {
   return isDropshipMode() ? 'dropshipDebts' : 'debts';
 }
+function getActiveExpenses() {
+  if (isDropshipMode()) {
+    if (!state.dropshipExpenses) state.dropshipExpenses = [];
+    return state.dropshipExpenses;
+  }
+  if (!state.expenses) state.expenses = [];
+  return state.expenses;
+}
+function setActiveExpenses(arr) {
+  if (isDropshipMode()) state.dropshipExpenses = arr;
+  else state.expenses = arr;
+}
+function activeExpensesStateKey() {
+  return isDropshipMode() ? 'dropshipExpenses' : 'expenses';
+}
 
 function renderDebtList() {
   const debts = getActiveDebts();
@@ -4511,7 +4529,7 @@ function expensesPeriodRangeFor(period) {
 }
 
 function expensesInRange(start, end) {
-  return (state.expenses || []).filter(x => { const d = new Date(x.date); return d >= start && d < end; });
+  return getActiveExpenses().filter(x => { const d = new Date(x.date); return d >= start && d < end; });
 }
 
 function totalExpensesInRange(start, end) {
@@ -4567,20 +4585,20 @@ async function submitExpense() {
   if (!amount || amount <= 0) { toast('Enter a valid amount'); return; }
 
   if (editId) {
-    const exp = state.expenses.find(x => x.id === editId);
+    const exp = getActiveExpenses().find(x => x.id === editId);
     if (exp) { exp.category = category; exp.description = description; exp.amount = amount; }
   } else {
-    state.expenses.push({ id: crypto.randomUUID(), category, description, amount, date: new Date().toISOString() });
+    getActiveExpenses().push({ id: crypto.randomUUID(), category, description, amount, date: new Date().toISOString() });
   }
 
-  await saveState('expenses');
+  await saveState(activeExpensesStateKey());
   closeModal('expenseModal');
   renderAll();
   toast(editId ? 'Expense updated' : 'Expense logged');
 }
 
 function editExpense(id) {
-  const exp = state.expenses.find(x => x.id === id);
+  const exp = getActiveExpenses().find(x => x.id === id);
   if (!exp) return;
   openModal('expenseModal');
   document.getElementById('expenseEditId').value = id;
@@ -4595,8 +4613,8 @@ function editExpense(id) {
 async function deleteExpense() {
   const editId = document.getElementById('expenseEditId').value;
   if (!editId) return;
-  state.expenses = state.expenses.filter(x => x.id !== editId);
-  await saveState('expenses');
+  setActiveExpenses(getActiveExpenses().filter(x => x.id !== editId));
+  await saveState(activeExpensesStateKey());
   closeModal('expenseModal');
   renderAll();
   toast('Expense deleted');
