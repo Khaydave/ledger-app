@@ -1809,7 +1809,12 @@ const TRANSLATIONS = {
     confirm_unsaved_catalogue: 'You have unsaved changes to your catalogue. Close without saving?',
     label_caption: 'Caption',
     label_no_stock_yet: 'No stock items yet',
-    confirm_unsaved_restock: 'You have unsaved changes to this order. Close without saving?'
+    confirm_unsaved_restock: 'You have unsaved changes to this order. Close without saving?',
+    profile_title_mandatory: 'Finish setting up your shop',
+    profile_title_normal: 'Your profile',
+    profile_sub_mandatory: 'Before you start logging stock and sales, tell us a bit about your shop. Name, shop name, and location are required.',
+    profile_sub_normal: 'This is just for you — helps keep things personal if you run more than one shop.',
+    label_switch: 'Switch'
   },
   fr: {
     nav_home: 'Accueil',
@@ -1995,7 +2000,12 @@ const TRANSLATIONS = {
     confirm_unsaved_catalogue: 'Vous avez des modifications non enregistrées dans votre catalogue. Fermer sans enregistrer ?',
     label_caption: 'Légende',
     label_no_stock_yet: 'Aucun article en stock pour l\'instant',
-    confirm_unsaved_restock: 'Vous avez des modifications non enregistrées sur cette commande. Fermer sans enregistrer ?'
+    confirm_unsaved_restock: 'Vous avez des modifications non enregistrées sur cette commande. Fermer sans enregistrer ?',
+    profile_title_mandatory: 'Terminez la configuration de votre boutique',
+    profile_title_normal: 'Votre profil',
+    profile_sub_mandatory: 'Avant de commencer à enregistrer votre stock et vos ventes, parlez-nous un peu de votre boutique. Le nom, le nom de la boutique et l\'emplacement sont requis.',
+    profile_sub_normal: 'Ceci est juste pour vous — utile si vous gérez plusieurs boutiques.',
+    label_switch: 'Changer'
   },
   es: {
     nav_home: 'Inicio',
@@ -2181,7 +2191,12 @@ const TRANSLATIONS = {
     confirm_unsaved_catalogue: 'Tienes cambios sin guardar en tu catálogo. ¿Cerrar sin guardar?',
     label_caption: 'Descripción',
     label_no_stock_yet: 'Aún no hay artículos en inventario',
-    confirm_unsaved_restock: 'Tienes cambios sin guardar en este pedido. ¿Cerrar sin guardar?'
+    confirm_unsaved_restock: 'Tienes cambios sin guardar en este pedido. ¿Cerrar sin guardar?',
+    profile_title_mandatory: 'Termina de configurar tu tienda',
+    profile_title_normal: 'Tu perfil',
+    profile_sub_mandatory: 'Antes de empezar a registrar tu inventario y ventas, cuéntanos un poco sobre tu tienda. El nombre, el nombre de la tienda y la ubicación son obligatorios.',
+    profile_sub_normal: 'Esto es solo para ti — ayuda a mantener las cosas personales si administras más de una tienda.',
+    label_switch: 'Cambiar'
   },
   de: {
     nav_home: 'Start',
@@ -2367,7 +2382,12 @@ const TRANSLATIONS = {
     confirm_unsaved_catalogue: 'Du hast ungespeicherte Änderungen an deinem Katalog. Ohne Speichern schließen?',
     label_caption: 'Bildunterschrift',
     label_no_stock_yet: 'Noch keine Lagerartikel',
-    confirm_unsaved_restock: 'Du hast ungespeicherte Änderungen an dieser Bestellung. Ohne Speichern schließen?'
+    confirm_unsaved_restock: 'Du hast ungespeicherte Änderungen an dieser Bestellung. Ohne Speichern schließen?',
+    profile_title_mandatory: 'Richte deinen Shop fertig ein',
+    profile_title_normal: 'Dein Profil',
+    profile_sub_mandatory: 'Bevor du mit der Erfassung von Lagerbestand und Verkäufen beginnst, erzähl uns etwas über deinen Shop. Name, Shop-Name und Standort sind erforderlich.',
+    profile_sub_normal: 'Das ist nur für dich — nützlich, wenn du mehr als einen Shop führst.',
+    label_switch: 'Wechseln'
   },
   zh: {
     nav_home: '首页',
@@ -2553,7 +2573,12 @@ const TRANSLATIONS = {
     confirm_unsaved_catalogue: '您的目录有未保存的更改。不保存并关闭？',
     label_caption: '描述',
     label_no_stock_yet: '还没有库存项目',
-    confirm_unsaved_restock: '您的订单有未保存的更改。不保存并关闭？'
+    confirm_unsaved_restock: '您的订单有未保存的更改。不保存并关闭？',
+    profile_title_mandatory: '完成店铺设置',
+    profile_title_normal: '您的个人资料',
+    profile_sub_mandatory: '在开始记录库存和销售之前，请告诉我们一些关于您店铺的信息。姓名、店铺名称和地址为必填项。',
+    profile_sub_normal: '这仅供您个人使用—如果您经营不止一家店铺，这有助于保持个性化。',
+    label_switch: '切换'
   }
 };
 
@@ -3297,10 +3322,8 @@ function openProfileModal(mandatory) {
   delete preview.dataset.pending;
 
   document.getElementById('profileModalClose').style.display = mandatory ? 'none' : 'flex';
-  document.getElementById('profileModalTitle').textContent = mandatory ? 'Finish setting up your shop' : 'Your profile';
-  document.getElementById('profileModalSub').textContent = mandatory
-    ? "Before you start logging stock and sales, tell us a bit about your shop. Name, shop name, and location are required."
-    : "This is just for you \u2014 helps keep things personal if you run more than one shop.";
+  document.getElementById('profileModalTitle').textContent = mandatory ? t('profile_title_mandatory') : t('profile_title_normal');
+  document.getElementById('profileModalSub').textContent = mandatory ? t('profile_sub_mandatory') : t('profile_sub_normal');
   document.getElementById('profileStoresSection').style.display = mandatory ? 'none' : 'block';
 
   if (!mandatory) renderProfileStoresList();
@@ -3397,7 +3420,7 @@ function renderProfileStoresList() {
         <div class="li-title">${escapeHtml(s.shopName)}</div>
         <div class="li-sub">${escapeHtml(s.code)}</div>
       </div>
-      <div class="li-tag ok">Switch</div>
+      <div class="li-tag ok">${t('label_switch')}</div>
     </div>`).join('');
 }
 
