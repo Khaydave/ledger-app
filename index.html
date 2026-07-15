@@ -173,8 +173,10 @@
   }
   .avatar-circle img { width: 100%; height: 100%; object-fit: cover; }
   .avatar-circle span { font-family: 'Plus Jakarta Sans'; font-weight: 600; color: var(--primary); font-size: 13px; }
+  .avatar-circle span svg { width: 16px; height: 16px; display: block; }
   .avatar-upload { width: 84px; height: 84px; border-radius: 50%; margin: 0 auto 16px; }
   .avatar-upload span { font-size: 26px; }
+  .avatar-upload span svg { width: 30px; height: 30px; }
   .topbar-actions { display: flex; gap: 8px; align-items: center; }
   #onboarding .btn { max-width: 280px; }
 
@@ -280,6 +282,7 @@
     font-family: 'Inter'; font-size: 13px; font-weight: 500; color: var(--ink-soft);
   }
   .period-toggle button.active { background: var(--primary); color: #fff; }
+  .period-toggle button svg { width: 14px; height: 14px; vertical-align: -2px; margin-right: 2px; }
 
   /* BOTTOM NAV (mobile) */
   .navbar {
@@ -556,7 +559,9 @@
   .feature-card .ficon {
     width: 40px; height: 40px; border-radius: 11px; background: var(--primary-tint);
     display: flex; align-items: center; justify-content: center; font-size: 18px; margin-bottom: 14px;
+    color: var(--primary);
   }
+  .feature-card .ficon svg { width: 20px; height: 20px; }
   .feature-card h3 { font-size: 15.5px; font-weight: 600; margin-bottom: 6px; }
   .feature-card p { font-size: 13px; color: var(--ink-soft); line-height: 1.55; margin: 0; }
 
@@ -731,14 +736,14 @@
   <div id="publicCatalogueScreen" class="screen">
     <div class="public-cat-wrap" id="publicCatWrap">
       <div class="public-cat-header">
-        <div class="avatar-circle" id="publicCatAvatar" style="margin:0 auto 14px;"><span>&#128230;</span></div>
+        <div class="avatar-circle" id="publicCatAvatar" style="margin:0 auto 14px;"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></span></div>
         <h1 id="publicCatShopName">Loading...</h1>
         <div class="loc" id="publicCatLocation"></div>
       </div>
       <div id="publicCatNote" style="display:none;" class="public-cat-note"></div>
       <div id="publicCatList"></div>
       <a id="publicCatWhatsapp" class="whatsapp-cta" style="display:none;" href="#" target="_blank" rel="noopener">
-        <span>&#128172;</span><span id="publicCatWhatsappText">Message on WhatsApp</span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></span><span id="publicCatWhatsappText">Message on WhatsApp</span>
       </a>
       <div class="public-cat-footer"><span id="publicCatMadeWith">Made with</span> <a href="?" onclick="event.preventDefault(); location.href = location.pathname;">Ledger</a></div>
     </div>
@@ -793,22 +798,22 @@
       <p class="section-sub">No clutter, no features you'll never touch &mdash; just the parts of running a shop that are easy to lose track of.</p>
       <div class="feature-grid">
         <div class="feature-card">
-          <div class="ficon">&#128230;</div>
+          <div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg></div>
           <h3>Stock, always current</h3>
           <p>Know exactly what's left and what's running low, updated the moment you log a sale.</p>
         </div>
         <div class="feature-card">
-          <div class="ficon">&#128200;</div>
+          <div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg></div>
           <h3>Sales &amp; orders</h3>
           <p>Log every sale in seconds and keep pending orders from slipping through the cracks.</p>
         </div>
         <div class="feature-card">
-          <div class="ficon">&#128179;</div>
+          <div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></div>
           <h3>Debts, remembered</h3>
           <p>Never forget who paid later, and who still owes you.</p>
         </div>
         <div class="feature-card">
-          <div class="ficon">&#128196;</div>
+          <div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
           <h3>Shareable catalogue</h3>
           <p>Turn your stock into a clean price list you can send straight to customers.</p>
         </div>
@@ -948,7 +953,7 @@
 
   <div class="modal-overlay" id="forgotModal">
     <div class="modal-sheet">
-      <div class="icon-btn modal-close" onclick="closeModal('forgotModal')">&#10005;</div>
+      <div class="icon-btn modal-close" onclick="closeModal('forgotModal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
       <h2 id="forgotModalTitle">Reset your password</h2>
       <div class="modal-sub" id="forgotStep1Sub">Enter your shop code to get started.</div>
 
@@ -999,7 +1004,7 @@
         <div class="shopname"><img src="data:image/png;base64,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" style="width:18px; height:18px; object-fit:contain; border-radius:5px; vertical-align:-3px; margin-right:5px;" alt="Ledger">Ledger for <b id="shopNameLabel"></b></div>
         <div class="topbar-actions">
           <div class="avatar-circle" id="topbarAvatar" onclick="openProfileModal()"><span>+</span></div>
-          <div class="icon-btn" onclick="showTab('settings')" id="mobileSettingsBtn">&#9881;</div>
+          <div class="icon-btn" onclick="showTab('settings')" id="mobileSettingsBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
         </div>
       </div>
 
@@ -1042,8 +1047,8 @@
           <div style="display:flex; justify-content:space-between; align-items:center; margin: 6px 0 14px;">
             <h2 style="font-size:18px;" id="stockTabTitle">Your stock</h2>
             <div style="display:flex; gap:8px;">
-              <button class="icon-btn" onclick="openRestockModal()" title="Order from wholesaler">&#128722;</button>
-              <button class="icon-btn" onclick="openCatalogueModal()" title="Build catalogue">&#128196;</button>
+              <button class="icon-btn" onclick="openRestockModal()" title="Order from wholesaler"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></button>
+              <button class="icon-btn" onclick="openCatalogueModal()" title="Build catalogue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></button>
               <button class="icon-btn" onclick="openModal('stockModal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
             </div>
           </div>
@@ -1300,8 +1305,8 @@
 
           <div class="section-title" style="margin-top:0;" id="settingsAppearanceLabel">Appearance</div>
           <div class="period-toggle" style="max-width:280px;">
-            <button id="theme-light" class="active" onclick="setTheme('light')">&#9728; Light</button>
-            <button id="theme-dark" onclick="setTheme('dark')">&#9790; Dark</button>
+            <button id="theme-light" class="active" onclick="setTheme('light')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg> Light</button>
+            <button id="theme-dark" onclick="setTheme('dark')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg> Dark</button>
           </div>
 
           <div class="section-title" id="settingsCurrencyLabel">Currency</div>
@@ -1322,7 +1327,7 @@
 
           <div class="section-title" id="settingsReportsLabel">Reports</div>
           <div class="field-group" style="max-width:280px;">
-            <button class="btn btn-ghost" onclick="openSummaryModal()">&#128202; View ledger summary</button>
+            <button class="btn btn-ghost" onclick="openSummaryModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg> View ledger summary</button>
           </div>
 
           <div class="section-title" id="settingsShopTypeLabel">Shop type</div>
@@ -1334,10 +1339,10 @@
 
           <div class="section-title" id="settingsSupportLabel">Support</div>
           <div class="field-group" style="max-width:280px;">
-            <button class="btn btn-ghost" onclick="openFaqModal()">&#128172; Help &amp; FAQ</button>
+            <button class="btn btn-ghost" onclick="openFaqModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg> Help &amp; FAQ</button>
           </div>
           <div class="field-group" style="max-width:280px;">
-            <button class="btn btn-ghost" onclick="replayWalkthrough()"><span id="wtReplayLabel">&#128064; Take the tour again</span></button>
+            <button class="btn btn-ghost" onclick="replayWalkthrough()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><span id="wtReplayLabel">Take the tour again</span></button>
           </div>
 
           <div style="margin-top:28px; padding-top:20px; border-top:1px solid var(--border); max-width:280px;">
@@ -1395,7 +1400,7 @@
 
 <div class="modal-overlay" id="stockModal">
   <div class="modal-sheet">
-    <div class="icon-btn modal-close" onclick="closeModal('stockModal')">&#10005;</div>
+    <div class="icon-btn modal-close" onclick="closeModal('stockModal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
     <h2 id="stockModalTitle">Add stock</h2>
     <div class="modal-sub" id="stockModalSub">Add a new item, or add more of one you already have.</div>
     <input type="hidden" id="stockEditId" value="">
@@ -1412,7 +1417,7 @@
 
 <div class="modal-overlay" id="saleModal">
   <div class="modal-sheet">
-    <div class="icon-btn modal-close" onclick="closeModal('saleModal')">&#10005;</div>
+    <div class="icon-btn modal-close" onclick="closeModal('saleModal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
     <h2 id="saleModalTitle">Log a sale</h2>
     <div class="modal-sub" id="saleModalSub">This reduces the item's stock automatically.</div>
     <input type="hidden" id="saleEditId" value="">
@@ -1440,7 +1445,7 @@
 
 <div class="modal-overlay" id="orderModal">
   <div class="modal-sheet">
-    <div class="icon-btn modal-close" onclick="closeModal('orderModal')">&#10005;</div>
+    <div class="icon-btn modal-close" onclick="closeModal('orderModal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
     <h2 id="orderModalTitle">Log an order</h2>
     <div class="modal-sub" id="orderModalSub">For orders a customer has placed but you haven't fulfilled or been paid for yet.</div>
     <div class="field-group"><label id="orderCustomerLabel">Customer name</label><input id="orderCustomer" placeholder="e.g. Blessing"></div>
@@ -1452,7 +1457,7 @@
 
 <div class="modal-overlay" id="doOrderModal">
   <div class="modal-sheet">
-    <div class="icon-btn modal-close" onclick="closeModal('doOrderModal')">&#10005;</div>
+    <div class="icon-btn modal-close" onclick="closeModal('doOrderModal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
     <h2 id="doOrderModalTitle">Log customer order</h2>
     <div class="modal-sub" id="doOrderModalSub">Track what a customer wants, and what it'll cost you to source it.</div>
     <input type="hidden" id="doOrderEditId" value="">
@@ -1479,7 +1484,7 @@
 
 <div class="modal-overlay" id="debtModal">
   <div class="modal-sheet">
-    <div class="icon-btn modal-close" onclick="closeModal('debtModal')">&#10005;</div>
+    <div class="icon-btn modal-close" onclick="closeModal('debtModal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
     <h2 id="debtModalTitle">Add a debt</h2>
     <div class="modal-sub" id="debtModalSub">Track a customer who paid later, or hasn't paid yet.</div>
     <div class="field-group"><label id="debtNameLabel">Customer name</label><input id="debtName" placeholder="e.g. Blessing"></div>
@@ -1490,7 +1495,7 @@
 
 <div class="modal-overlay" id="expenseModal">
   <div class="modal-sheet">
-    <div class="icon-btn modal-close" onclick="closeModal('expenseModal')">&#10005;</div>
+    <div class="icon-btn modal-close" onclick="closeModal('expenseModal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
     <h2 id="expenseModalTitle">Log an expense</h2>
     <div class="modal-sub" id="expenseModalSub">Rent, transport, packaging &mdash; anything it costs to run the business.</div>
     <input type="hidden" id="expenseEditId" value="">
@@ -1517,11 +1522,11 @@
 
 <div class="modal-overlay" id="profileModal">
   <div class="modal-sheet">
-    <div class="icon-btn modal-close" id="profileModalClose" onclick="closeModal('profileModal')">&#10005;</div>
+    <div class="icon-btn modal-close" id="profileModalClose" onclick="closeModal('profileModal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
     <h2 id="profileModalTitle">Your profile</h2>
     <div class="modal-sub" id="profileModalSub">This is just for you &mdash; helps keep things personal if you run more than one shop.</div>
 
-    <div class="avatar-circle avatar-upload" id="profileAvatarPreview" onclick="document.getElementById('profilePicInput').click()"><span>&#128247;</span></div>
+    <div class="avatar-circle avatar-upload" id="profileAvatarPreview" onclick="document.getElementById('profilePicInput').click()"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></span></div>
     <input type="file" id="profilePicInput" accept="image/*" style="display:none;" onchange="handleProfilePicUpload(event)">
     <p class="hint" style="text-align:center; margin:0 auto 16px; max-width:none;">Tap the circle to add a photo</p>
 
@@ -1551,7 +1556,7 @@
 
 <div class="modal-overlay" id="catalogueModal">
   <div class="modal-sheet" style="max-width: 480px;">
-    <div class="icon-btn modal-close" onclick="closeCatalogueModal()">&#10005;</div>
+    <div class="icon-btn modal-close" onclick="closeCatalogueModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
 
     <div id="catalogueEditView">
       <h2 id="catalogueModalTitle">Build your catalogue</h2>
@@ -1568,7 +1573,7 @@
       <div class="modal-actions">
         <button class="btn btn-primary" onclick="showCatalogueReview()"><span id="btnReviewCatalogue">Review selection</span></button>
       </div>
-      <button class="btn btn-ghost" style="margin-top:10px;" onclick="copyPublicCatalogueLink()">&#128279; Copy public catalogue link</button>
+      <button class="btn btn-ghost" style="margin-top:10px;" onclick="copyPublicCatalogueLink()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> Copy public catalogue link</button>
     </div>
 
     <div id="catalogueReviewView" style="display:none;">
@@ -1590,7 +1595,7 @@
 
 <div class="modal-overlay" id="restockModal">
   <div class="modal-sheet" style="max-width: 480px;">
-    <div class="icon-btn modal-close" onclick="closeRestockModal()">&#10005;</div>
+    <div class="icon-btn modal-close" onclick="closeRestockModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
 
     <div id="restockEditView">
       <h2 id="restockModalTitle">Order from wholesaler</h2>
@@ -1634,7 +1639,7 @@
 
 <div class="modal-overlay" id="summaryModal">
   <div class="modal-sheet" style="max-width: 520px;">
-    <div class="icon-btn modal-close" onclick="closeModal('summaryModal')">&#10005;</div>
+    <div class="icon-btn modal-close" onclick="closeModal('summaryModal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
     <h2>Ledger summary</h2>
     <div class="modal-sub">A full snapshot of your account &mdash; sales, profit, orders, debts, and stock.</div>
 
@@ -1697,16 +1702,16 @@
 
     <div class="section-title">Export this summary</div>
     <div class="modal-actions">
-      <button class="btn btn-ghost" onclick="exportSummaryPDF()">&#128196; PDF</button>
-      <button class="btn btn-ghost" onclick="exportSummaryImage()">&#128247; JPEG</button>
-      <button class="btn btn-ghost" onclick="exportSummaryExcel()">&#128202; Excel</button>
+      <button class="btn btn-ghost" onclick="exportSummaryPDF()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> PDF</button>
+      <button class="btn btn-ghost" onclick="exportSummaryImage()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg> JPEG</button>
+      <button class="btn btn-ghost" onclick="exportSummaryExcel()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg> Excel</button>
     </div>
   </div>
 </div>
 
 <div class="modal-overlay" id="faqModal">
   <div class="modal-sheet" style="max-width: 520px;">
-    <div class="icon-btn modal-close" onclick="closeModal('faqModal')">&#10005;</div>
+    <div class="icon-btn modal-close" onclick="closeModal('faqModal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
     <h2>Help &amp; FAQ</h2>
     <div class="modal-sub">Common questions about using Ledger.</div>
     <div class="faq-list" id="modalFaqList"></div>
@@ -1715,7 +1720,7 @@
 
 <div class="modal-overlay" id="deleteAccountModal">
   <div class="modal-sheet">
-    <div class="icon-btn modal-close" onclick="closeModal('deleteAccountModal')">&#10005;</div>
+    <div class="icon-btn modal-close" onclick="closeModal('deleteAccountModal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
     <h2>Delete your account?</h2>
     <div class="modal-sub">This permanently deletes your shop code, stock, sales, orders, debts, and everything else tied to this account. There is no way to undo this.</div>
     <div class="field-group">
@@ -3804,7 +3809,7 @@ function openProfileModal(mandatory) {
   document.getElementById('profilePhone').value = p.phone || '';
   document.getElementById('profileEmail').value = p.email || '';
   const preview = document.getElementById('profileAvatarPreview');
-  preview.innerHTML = p.profilePic ? `<img src="${p.profilePic}">` : '<span>&#128247;</span>';
+  preview.innerHTML = p.profilePic ? `<img src="${p.profilePic}">` : '<span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></span>';
   delete preview.dataset.pending;
 
   document.getElementById('profileModalClose').style.display = mandatory ? 'none' : 'flex';
