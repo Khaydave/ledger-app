@@ -233,6 +233,10 @@
     text-align: center; padding: 30px 16px; color: var(--ink-faint); font-size: 13px;
     background: var(--surface); border: 1px dashed var(--border); border-radius: var(--radius);
   }
+  .empty-state.with-icon { padding: 28px 16px 26px; }
+  .empty-state-icon { margin: 0 auto 12px; width: 56px; height: 56px; }
+  .empty-state-icon svg { width: 100%; height: 100%; }
+  .empty-state-text { font-size: 13px; color: var(--ink-faint); max-width: 260px; margin: 0 auto; line-height: 1.5; }
 
   .search-box { position: relative; margin-bottom: 14px; }
   .search-box input { padding-left: 36px; }
@@ -3484,7 +3488,7 @@ async function showPublicCatalogue(code) {
     }
 
     if (items.length === 0) {
-      listEl.innerHTML = '<div class="empty-state">' + t('catalogue_empty_items') + '</div>';
+      listEl.innerHTML = emptyStateHTML('box', t('catalogue_empty_items'));
     } else {
       listEl.innerHTML = items.map(p => `
         <div class="public-cat-item">
@@ -3730,7 +3734,7 @@ function renderProfileStoresList() {
   const el = document.getElementById('profileStoresList');
   const shops = getKnownShops().filter(s => s.code !== shopCode);
   if (shops.length === 0) {
-    el.innerHTML = '<div class="empty-state">' + t('empty_no_stores') + '</div>';
+    el.innerHTML = emptyStateHTML('shop', t('empty_no_stores'));
     return;
   }
   el.innerHTML = shops.map(s => `
@@ -3986,6 +3990,20 @@ function fmtWholesalerMoney(n) {
   return symbol + formatted;
 }
 
+const EMPTY_STATE_ICONS = {
+  box: '<svg viewBox="0 0 64 64" fill="none" stroke="#C7D0CA" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 24 L32 14 L56 24 L56 46 L32 56 L8 46 Z"/><path d="M8 24 L32 34 L56 24"/><path d="M32 34 L32 56"/><circle cx="46" cy="16" r="3" fill="#E8A33D" stroke="none"/></svg>',
+  receipt: '<svg viewBox="0 0 64 64" fill="none" stroke="#C7D0CA" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8 H48 V52 L44 48 L40 52 L36 48 L32 52 L28 48 L24 52 L20 48 L16 52 Z"/><line x1="22" y1="20" x2="42" y2="20"/><line x1="22" y1="28" x2="42" y2="28"/><line x1="22" y1="36" x2="34" y2="36"/><circle cx="44" cy="14" r="3" fill="#E8A33D" stroke="none"/></svg>',
+  clipboard: '<svg viewBox="0 0 64 64" fill="none" stroke="#C7D0CA" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="14" y="12" width="36" height="44" rx="4"/><rect x="24" y="8" width="16" height="8" rx="2" fill="#FBF8F3"/><line x1="21" y1="28" x2="43" y2="28"/><line x1="21" y1="36" x2="43" y2="36"/><line x1="21" y1="44" x2="35" y2="44"/><circle cx="46" cy="20" r="3" fill="#E8A33D" stroke="none"/></svg>',
+  wallet: '<svg viewBox="0 0 64 64" fill="none" stroke="#C7D0CA" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="18" width="48" height="34" rx="6"/><path d="M8 28 H56"/><circle cx="46" cy="38" r="4"/><circle cx="44" cy="14" r="3" fill="#E8A33D" stroke="none"/></svg>',
+  chart: '<svg viewBox="0 0 64 64" fill="none" stroke="#C7D0CA" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 52 V12"/><path d="M12 52 H52"/><path d="M18 44 L28 44 L36 44 L46 44" stroke-dasharray="1 6"/><circle cx="46" cy="20" r="3" fill="#E8A33D" stroke="none"/></svg>',
+  shop: '<svg viewBox="0 0 64 64" fill="none" stroke="#C7D0CA" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 24 L14 10 H50 L54 24"/><path d="M10 24 V52 H54 V24"/><path d="M10 24 H54"/><rect x="26" y="36" width="12" height="16"/><circle cx="46" cy="16" r="3" fill="#E8A33D" stroke="none"/></svg>'
+};
+
+function emptyStateHTML(iconType, message) {
+  const icon = EMPTY_STATE_ICONS[iconType] || EMPTY_STATE_ICONS.box;
+  return `<div class="empty-state with-icon"><div class="empty-state-icon">${icon}</div><div class="empty-state-text">${message}</div></div>`;
+}
+
 function escapeHtml(str) {
   const div = document.createElement('div');
   div.textContent = str;
@@ -4212,7 +4230,7 @@ function renderDashboard() {
   const lowStock = state.products.filter(p => Number(p.qty) <= 2);
   const lowEl = document.getElementById('lowStockList');
   if (lowStock.length === 0) {
-    lowEl.innerHTML = '<div class="empty-state">' + t('empty_no_low_stock') + '</div>';
+    lowEl.innerHTML = emptyStateHTML('box', t('empty_no_low_stock'));
   } else {
     lowEl.innerHTML = lowStock.map(p => `
       <div class="list-item">
@@ -4227,7 +4245,7 @@ function renderDashboard() {
   const recent = [...state.sales].reverse().slice(0, 5);
   const recEl = document.getElementById('recentSalesList');
   if (recent.length === 0) {
-    recEl.innerHTML = '<div class="empty-state">' + t('empty_no_sales_yet') + '</div>';
+    recEl.innerHTML = emptyStateHTML('receipt', t('empty_no_sales_yet'));
   } else {
     recEl.innerHTML = recent.map(s => `
       <div class="list-item">
@@ -4250,11 +4268,11 @@ function renderStockList() {
   if (valueEl) valueEl.textContent = fmtMoney(totalValue);
 
   if (state.products.length === 0) {
-    el.innerHTML = '<div class="empty-state">' + t('empty_no_stock') + '</div>';
+    el.innerHTML = emptyStateHTML('box', t('empty_no_stock'));
     return;
   }
   if (filtered.length === 0) {
-    el.innerHTML = '<div class="empty-state">' + t('empty_no_stock_match') + '</div>';
+    el.innerHTML = emptyStateHTML('box', t('empty_no_stock_match'));
     return;
   }
   el.innerHTML = filtered.map(p => {
@@ -4330,7 +4348,7 @@ function renderSalesTab() {
 
   const el = document.getElementById('salesList');
   if (filtered.length === 0) {
-    el.innerHTML = '<div class="empty-state">' + t('empty_no_sales_period') + '</div>';
+    el.innerHTML = emptyStateHTML('receipt', t('empty_no_sales_period'));
     return;
   }
   el.innerHTML = [...filtered].reverse().map(s => {
@@ -4364,11 +4382,11 @@ function renderOrdersList() {
 
   const el = document.getElementById('ordersList');
   if (state.orders.length === 0) {
-    el.innerHTML = '<div class="empty-state">' + t('empty_no_orders') + '</div>';
+    el.innerHTML = emptyStateHTML('clipboard', t('empty_no_orders'));
     return;
   }
   if (filtered.length === 0) {
-    el.innerHTML = '<div class="empty-state">' + t('empty_no_orders_match') + '</div>';
+    el.innerHTML = emptyStateHTML('clipboard', t('empty_no_orders_match'));
     return;
   }
   el.innerHTML = [...filtered].reverse().map(o => `
@@ -4426,7 +4444,7 @@ function renderDebtList() {
 
   const el = document.getElementById('debtList');
   if (debts.length === 0) {
-    el.innerHTML = '<div class="empty-state">' + t('empty_no_debts') + '</div>';
+    el.innerHTML = emptyStateHTML('wallet', t('empty_no_debts'));
     return;
   }
   el.innerHTML = [...debts].reverse().map(d => `
@@ -4754,7 +4772,7 @@ function renderExpensesTab() {
 
   const el = document.getElementById('expensesList');
   if (filtered.length === 0) {
-    el.innerHTML = '<div class="empty-state">' + t('expenses_empty') + '</div>';
+    el.innerHTML = emptyStateHTML('receipt', t('expenses_empty'));
     return;
   }
   el.innerHTML = [...filtered].reverse().map(x => `
@@ -4926,7 +4944,7 @@ function renderDoHome() {
   const recentEl = document.getElementById('doRecentOrdersList');
   const recent = [...orders].reverse().slice(0, 5);
   if (recent.length === 0) {
-    recentEl.innerHTML = '<div class="empty-state">' + t('do_empty_no_orders') + '</div>';
+    recentEl.innerHTML = emptyStateHTML('clipboard', t('do_empty_no_orders'));
   } else {
     recentEl.innerHTML = recent.map(o => {
       const badge = doOrderStageBadge(o);
@@ -4954,11 +4972,11 @@ function renderDoOrdersList() {
 
   const el = document.getElementById('doOrdersList');
   if (orders.length === 0) {
-    el.innerHTML = '<div class="empty-state">' + t('do_empty_no_orders_tap') + '</div>';
+    el.innerHTML = emptyStateHTML('clipboard', t('do_empty_no_orders_tap'));
     return;
   }
   if (filtered.length === 0) {
-    el.innerHTML = '<div class="empty-state">' + t('do_empty_no_orders_match') + '</div>';
+    el.innerHTML = emptyStateHTML('clipboard', t('do_empty_no_orders_match'));
     return;
   }
   el.innerHTML = [...filtered].reverse().map(o => {
@@ -5025,7 +5043,7 @@ function renderDoWholesalerList() {
 
   const el = document.getElementById('doWholesalerList');
   if (items.length === 0) {
-    el.innerHTML = '<div class="empty-state">' + t('do_wholesaler_empty') + '</div>';
+    el.innerHTML = emptyStateHTML('box', t('do_wholesaler_empty'));
     return;
   }
   el.innerHTML = items.map(o => `
@@ -5237,7 +5255,7 @@ function renderDoProfitTab() {
 
   const el = document.getElementById('doProfitList');
   if (known.length === 0) {
-    el.innerHTML = '<div class="empty-state">' + t('do_profit_empty') + '</div>';
+    el.innerHTML = emptyStateHTML('chart', t('do_profit_empty'));
     return;
   }
   el.innerHTML = [...known].reverse().map(o => {
