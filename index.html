@@ -201,6 +201,17 @@
   .stat-card .label { font-size: 12px; color: var(--ink-soft); margin-bottom: 6px; }
   .stat-card .value { font-family: 'Plus Jakarta Sans'; font-size: 20px; font-weight: 600; }
   .stat-card .value.danger { color: var(--danger); }
+  .dashboard-greeting { margin-bottom: 18px; }
+  .dashboard-greeting .greeting-text { font-family: 'Plus Jakarta Sans'; font-weight: 700; font-size: 21px; color: var(--ink); }
+  .dashboard-greeting .greeting-date { font-size: 13px; color: var(--ink-soft); margin-top: 2px; }
+  .value-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .trend-badge {
+    display: inline-flex; align-items: center; gap: 2px; font-size: 11.5px; font-weight: 600;
+    padding: 2px 7px; border-radius: 20px;
+  }
+  .trend-badge.up { background: rgba(46,125,50,0.12); color: #2E7D32; }
+  .trend-badge.down { background: var(--danger-tint); color: var(--danger); }
+  .trend-badge.flat { background: var(--surface-hover); color: var(--ink-faint); }
   .stat-card .sub { font-size: 11px; color: var(--ink-faint); margin-top: 3px; }
 
   .section-title { font-size: 13px; font-weight: 600; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.04em; margin: 22px 0 10px; }
@@ -941,6 +952,10 @@
 
       <div class="content">
         <div id="tab-home" class="tabpanel">
+          <div class="dashboard-greeting">
+            <div class="greeting-text" id="dashboardGreeting">Good morning</div>
+            <div class="greeting-date" id="dashboardDate"></div>
+          </div>
           <div class="stat-row">
             <div class="stat-card">
               <div class="label" id="statLabelOrders">Pending orders</div>
@@ -949,7 +964,10 @@
             </div>
             <div class="stat-card">
               <div class="label" id="statLabelSalesWeek">Sales this week</div>
-              <div class="value" id="statSalesWeek">&#8358;0</div>
+              <div class="value-row">
+                <div class="value" id="statSalesWeek">&#8358;0</div>
+                <span class="trend-badge" id="salesWeekTrend" style="display:none;"></span>
+              </div>
             </div>
           </div>
 
@@ -1056,6 +1074,10 @@
         </div>
 
         <div id="tab-do-home" class="tabpanel" style="display:none;">
+          <div class="dashboard-greeting">
+            <div class="greeting-text" id="doGreeting">Good morning</div>
+            <div class="greeting-date" id="doGreetingDate"></div>
+          </div>
           <div class="stat-row" style="margin-bottom:18px;">
             <div class="stat-card">
               <div class="label" id="doLabelPendingOrders">Pending customer orders</div>
@@ -1074,7 +1096,10 @@
             </div>
             <div class="stat-card">
               <div class="label" id="doLabelProfitWeek">Profit this week</div>
-              <div class="value" id="doStatProfitWeek">&#8358;0</div>
+              <div class="value-row">
+                <div class="value" id="doStatProfitWeek">&#8358;0</div>
+                <span class="trend-badge" id="doProfitWeekTrend" style="display:none;"></span>
+              </div>
             </div>
           </div>
           <div class="quick-actions">
@@ -1924,7 +1949,12 @@ const TRANSLATIONS = {
     catalogue_made_with: 'Made with',
     catalogue_empty_items: 'This store hasn\'t shared any items yet.',
     catalogue_could_not_load: 'Couldn\'t load this catalogue',
-    catalogue_check_connection: 'Check your internet connection and try again.'
+    catalogue_check_connection: 'Check your internet connection and try again.',
+    greeting_morning: 'Good morning',
+    greeting_afternoon: 'Good afternoon',
+    greeting_evening: 'Good evening',
+    trend_no_change: 'no change',
+    trend_vs_last_week: 'vs last week'
   },
   fr: {
     nav_home: 'Accueil',
@@ -2144,7 +2174,12 @@ const TRANSLATIONS = {
     catalogue_made_with: 'Créé avec',
     catalogue_empty_items: 'Cette boutique n\'a encore partagé aucun article.',
     catalogue_could_not_load: 'Impossible de charger ce catalogue',
-    catalogue_check_connection: 'Vérifiez votre connexion internet et réessayez.'
+    catalogue_check_connection: 'Vérifiez votre connexion internet et réessayez.',
+    greeting_morning: 'Bonjour',
+    greeting_afternoon: 'Bon après-midi',
+    greeting_evening: 'Bonsoir',
+    trend_no_change: 'aucun changement',
+    trend_vs_last_week: 'vs semaine dernière'
   },
   es: {
     nav_home: 'Inicio',
@@ -2364,7 +2399,12 @@ const TRANSLATIONS = {
     catalogue_made_with: 'Hecho con',
     catalogue_empty_items: 'Esta tienda aún no ha compartido artículos.',
     catalogue_could_not_load: 'No se pudo cargar este catálogo',
-    catalogue_check_connection: 'Verifica tu conexión a internet e inténtalo de nuevo.'
+    catalogue_check_connection: 'Verifica tu conexión a internet e inténtalo de nuevo.',
+    greeting_morning: 'Buenos días',
+    greeting_afternoon: 'Buenas tardes',
+    greeting_evening: 'Buenas noches',
+    trend_no_change: 'sin cambios',
+    trend_vs_last_week: 'vs semana pasada'
   },
   de: {
     nav_home: 'Start',
@@ -2584,7 +2624,12 @@ const TRANSLATIONS = {
     catalogue_made_with: 'Erstellt mit',
     catalogue_empty_items: 'Dieser Shop hat noch keine Artikel geteilt.',
     catalogue_could_not_load: 'Katalog konnte nicht geladen werden',
-    catalogue_check_connection: 'Überprüfe deine Internetverbindung und versuche es erneut.'
+    catalogue_check_connection: 'Überprüfe deine Internetverbindung und versuche es erneut.',
+    greeting_morning: 'Guten Morgen',
+    greeting_afternoon: 'Guten Tag',
+    greeting_evening: 'Guten Abend',
+    trend_no_change: 'keine Änderung',
+    trend_vs_last_week: 'vs letzte Woche'
   },
   zh: {
     nav_home: '首页',
@@ -2804,7 +2849,12 @@ const TRANSLATIONS = {
     catalogue_made_with: '使用以下工具制作',
     catalogue_empty_items: '该店铺还没有分享任何商品。',
     catalogue_could_not_load: '无法加载此目录',
-    catalogue_check_connection: '请检查您的网络连接并重试。'
+    catalogue_check_connection: '请检查您的网络连接并重试。',
+    greeting_morning: '早上好',
+    greeting_afternoon: '下午好',
+    greeting_evening: '晚上好',
+    trend_no_change: '无变化',
+    trend_vs_last_week: '与上周相比'
   }
 };
 
@@ -4049,7 +4099,47 @@ function periodLabel(period) {
   return t(map[period] || 'doPeriodOptWeek');
 }
 
+function getGreetingText() {
+  const hour = new Date().getHours();
+  if (hour < 12) return t('greeting_morning');
+  if (hour < 17) return t('greeting_afternoon');
+  return t('greeting_evening');
+}
+
+function renderGreeting(greetingElId, dateElId) {
+  const name = (state.profile && (state.profile.name || state.profile.shopName)) || '';
+  const greetingEl = document.getElementById(greetingElId);
+  const dateEl = document.getElementById(dateElId);
+  if (greetingEl) greetingEl.textContent = getGreetingText() + (name ? ', ' + name : '');
+  if (dateEl) {
+    const lang = (state.settings && state.settings.language) || 'en';
+    const opts = { weekday: 'long', month: 'long', day: 'numeric' };
+    dateEl.textContent = new Date().toLocaleDateString(lang, opts);
+  }
+}
+
+function renderTrendBadge(elId, current, previous) {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  if (!previous || previous <= 0) { el.style.display = 'none'; return; }
+  const pctChange = ((current - previous) / previous) * 100;
+  const rounded = Math.round(Math.abs(pctChange));
+  if (rounded === 0) {
+    el.className = 'trend-badge flat';
+    el.textContent = '\u2014 ' + t('trend_no_change');
+  } else if (pctChange > 0) {
+    el.className = 'trend-badge up';
+    el.textContent = '\u2191 ' + rounded + '% ' + t('trend_vs_last_week');
+  } else {
+    el.className = 'trend-badge down';
+    el.textContent = '\u2193 ' + rounded + '% ' + t('trend_vs_last_week');
+  }
+  el.style.display = 'inline-flex';
+}
+
 function renderDashboard() {
+  renderGreeting('dashboardGreeting', 'dashboardDate');
+
   const totalItems = state.products.reduce((s, p) => s + Number(p.qty), 0);
   document.getElementById('statItems').textContent = totalItems;
 
@@ -4058,10 +4148,15 @@ function renderDashboard() {
   document.getElementById('statOrders').textContent = fmtMoney(pendingTotal);
   document.getElementById('statOrdersCount').textContent = pendingOrders.length + ' ' + (pendingOrders.length === 1 ? t('do_order_singular') : t('do_order_plural'));
 
-  const weekStart = periodStartDate('week');
-  const weekSales = state.sales.filter(s => new Date(s.date) >= weekStart);
+  const { start: weekStart, end: weekEnd } = periodRange('week');
+  const weekSales = state.sales.filter(s => { const d = new Date(s.date); return d >= weekStart && d < weekEnd; });
   const weekTotal = weekSales.reduce((s, x) => s + Number(x.total), 0);
   document.getElementById('statSalesWeek').textContent = fmtMoney(weekTotal);
+
+  const { start: lastWeekStart, end: lastWeekEnd } = periodRange('lastweek');
+  const lastWeekSales = state.sales.filter(s => { const d = new Date(s.date); return d >= lastWeekStart && d < lastWeekEnd; });
+  const lastWeekTotal = lastWeekSales.reduce((s, x) => s + Number(x.total), 0);
+  renderTrendBadge('salesWeekTrend', weekTotal, lastWeekTotal);
 
   const lowStock = state.products.filter(p => Number(p.qty) <= 2);
   const lowEl = document.getElementById('lowStockList');
@@ -4750,6 +4845,8 @@ function doOrderStageBadge(order) {
 }
 
 function renderDoHome() {
+  renderGreeting('doGreeting', 'doGreetingDate');
+
   const orders = state.dropshipOrders || [];
   const pending = orders.filter(o => o.stage === 'pending');
   const pendingValue = pending.reduce((s, o) => s + Number(o.sellPrice || 0), 0);
@@ -4762,6 +4859,12 @@ function renderDoHome() {
   const weekOrders = orders.filter(o => new Date(o.date) >= weekStart && o.costPrice != null);
   const weekGrossProfit = weekOrders.reduce((s, o) => s + (Number(o.sellPrice || 0) - Number(o.costPrice || 0)), 0);
   const weekProfit = weekGrossProfit - totalExpensesInRange(weekStart, weekEnd);
+
+  const { start: lastWeekStart, end: lastWeekEnd } = periodRange('lastweek');
+  const lastWeekOrders = orders.filter(o => { const d = new Date(o.date); return d >= lastWeekStart && d < lastWeekEnd && o.costPrice != null; });
+  const lastWeekGrossProfit = lastWeekOrders.reduce((s, o) => s + (Number(o.sellPrice || 0) - Number(o.costPrice || 0)), 0);
+  const lastWeekProfit = lastWeekGrossProfit - totalExpensesInRange(lastWeekStart, lastWeekEnd);
+  renderTrendBadge('doProfitWeekTrend', weekProfit, lastWeekProfit);
 
   document.getElementById('doStatPendingOrders').textContent = fmtMoney(pendingValue);
   document.getElementById('doStatPendingOrdersCount').textContent = pending.length + ' ' + (pending.length === 1 ? t('do_order_singular') : t('do_order_plural'));
