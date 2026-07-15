@@ -296,6 +296,36 @@
   }
   .fab svg { display: block; }
   .fab:active { transform: scale(0.92); }
+
+  .walkthrough-highlight {
+    position: fixed; border-radius: 12px; z-index: 71; pointer-events: none;
+    box-shadow: 0 0 0 4px var(--accent), 0 0 0 9999px rgba(15,20,17,0.6);
+    transition: top 0.3s ease, left 0.3s ease, width 0.3s ease, height 0.3s ease;
+  }
+  .walkthrough-tooltip {
+    position: fixed; z-index: 72; background: var(--surface); border-radius: 16px;
+    padding: 18px 20px; max-width: 270px; width: calc(100% - 24px);
+    box-shadow: 0 24px 60px rgba(20,30,25,0.32), 0 4px 14px rgba(20,30,25,0.14);
+    transition: top 0.3s ease, left 0.3s ease, bottom 0.3s ease;
+  }
+  .walkthrough-tooltip .wt-step {
+    font-size: 11px; font-weight: 700; color: var(--accent); letter-spacing: 0.04em;
+    text-transform: uppercase; margin-bottom: 6px;
+  }
+  .walkthrough-tooltip h3 {
+    font-family: 'Plus Jakarta Sans'; font-weight: 700; font-size: 16px; color: var(--primary);
+    margin: 0 0 6px;
+  }
+  .walkthrough-tooltip p { font-size: 13.5px; color: var(--ink-soft); line-height: 1.5; margin: 0 0 16px; }
+  .walkthrough-tooltip .wt-actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .walkthrough-tooltip .wt-skip {
+    background: none; border: none; font-size: 12.5px; color: var(--ink-faint);
+    text-decoration: underline; cursor: pointer; padding: 4px 0;
+  }
+  .walkthrough-tooltip .wt-next {
+    background: var(--primary); color: #fff; border: none; padding: 9px 18px;
+    border-radius: 9px; font-weight: 600; font-size: 13.5px; cursor: pointer; font-family: 'Inter';
+  }
   @media (min-width: 860px) { .fab { display: none !important; } }
   .navbar .nicon { font-size: 18px; }
 
@@ -1298,6 +1328,9 @@
           <div class="field-group" style="max-width:280px;">
             <button class="btn btn-ghost" onclick="openFaqModal()">&#128172; Help &amp; FAQ</button>
           </div>
+          <div class="field-group" style="max-width:280px;">
+            <button class="btn btn-ghost" onclick="replayWalkthrough()"><span id="wtReplayLabel">&#128064; Take the tour again</span></button>
+          </div>
 
           <div style="margin-top:28px; padding-top:20px; border-top:1px solid var(--border); max-width:280px;">
             <button class="btn btn-danger-ghost" id="settingsLogoutBtn" onclick="switchShop()">Log out</button>
@@ -1339,6 +1372,17 @@
       <line x1="5" y1="12" x2="19" y2="12"/>
     </svg>
   </button>
+
+  <div id="walkthroughHighlight" class="walkthrough-highlight" style="display:none;"></div>
+  <div id="walkthroughTooltip" class="walkthrough-tooltip" style="display:none;">
+    <div class="wt-step" id="wtStepCounter">1 of 5</div>
+    <h3 id="wtTitle">Welcome to Ledger!</h3>
+    <p id="wtText">This is your Home.</p>
+    <div class="wt-actions">
+      <button class="wt-skip" onclick="skipWalkthrough()" id="wtSkipBtn">Skip tour</button>
+      <button class="wt-next" onclick="walkthroughNext()" id="wtNextBtn">Next</button>
+    </div>
+  </div>
 </div>
 
 <div class="modal-overlay" id="stockModal">
@@ -1975,7 +2019,29 @@ const TRANSLATIONS = {
     greeting_afternoon: 'Good afternoon',
     greeting_evening: 'Good evening',
     trend_no_change: 'no change',
-    trend_vs_last_week: 'vs last week'
+    trend_vs_last_week: 'vs last week',
+    wt_home_title: 'Welcome to Ledger!',
+    wt_home_text: 'This is your Home — pending orders, this week\'s sales, and low stock, all at a glance.',
+    wt_stock_title: 'Stock',
+    wt_stock_text: 'Add what you\'re selling here, with a buy price and a sell price for each item.',
+    wt_sales_title: 'Sales',
+    wt_sales_text: 'Log every sale here, and Ledger works out your profit automatically.',
+    wt_orders_title: 'Orders',
+    wt_orders_text: 'Track things customers have asked for but not paid for yet.',
+    wt_debts_title: 'Debts',
+    wt_debts_text: 'Keep track of anyone who owes you money, and tap to mark them paid.',
+    wt_dohome_title: 'Welcome to Ledger!',
+    wt_dohome_text: 'This is your Home — pending orders, unpaid customers, and this week\'s profit, all at a glance.',
+    wt_doorders_title: 'Customer Orders',
+    wt_doorders_text: 'Log what a customer wants here, and add the wholesaler\'s cost once you know it.',
+    wt_dowholesaler_title: 'Wholesaler List',
+    wt_dowholesaler_text: 'Every pending order automatically shows up here, ready to send to your supplier.',
+    wt_doprofit_title: 'Profit',
+    wt_doprofit_text: 'See your real profit here — once wholesaler costs are filled in, and expenses included.',
+    wt_step_of: 'Step {n} of {total}',
+    wt_next: 'Next',
+    wt_finish: 'Got it!',
+    wtReplayLabel: '👁 Take the tour again'
   },
   fr: {
     nav_home: 'Accueil',
@@ -2200,7 +2266,29 @@ const TRANSLATIONS = {
     greeting_afternoon: 'Bon après-midi',
     greeting_evening: 'Bonsoir',
     trend_no_change: 'aucun changement',
-    trend_vs_last_week: 'vs semaine dernière'
+    trend_vs_last_week: 'vs semaine dernière',
+    wt_home_title: 'Bienvenue sur Ledger !',
+    wt_home_text: 'Voici votre Accueil — commandes en attente, ventes de la semaine et stock faible, en un coup d\'œil.',
+    wt_stock_title: 'Stock',
+    wt_stock_text: 'Ajoutez ici ce que vous vendez, avec un prix d\'achat et un prix de vente pour chaque article.',
+    wt_sales_title: 'Ventes',
+    wt_sales_text: 'Enregistrez chaque vente ici, et Ledger calcule automatiquement votre profit.',
+    wt_orders_title: 'Commandes',
+    wt_orders_text: 'Suivez ce que les clients ont demandé mais pas encore payé.',
+    wt_debts_title: 'Dettes',
+    wt_debts_text: 'Gardez une trace de ceux qui vous doivent de l\'argent, et appuyez pour les marquer payés.',
+    wt_dohome_title: 'Bienvenue sur Ledger !',
+    wt_dohome_text: 'Voici votre Accueil — commandes en attente, clients impayés et profit de la semaine, en un coup d\'œil.',
+    wt_doorders_title: 'Commandes clients',
+    wt_doorders_text: 'Enregistrez ici ce qu\'un client veut, et ajoutez le coût du grossiste une fois connu.',
+    wt_dowholesaler_title: 'Liste grossiste',
+    wt_dowholesaler_text: 'Chaque commande en attente apparaît automatiquement ici, prête à envoyer à votre fournisseur.',
+    wt_doprofit_title: 'Profit',
+    wt_doprofit_text: 'Consultez votre vrai profit ici — une fois les coûts grossiste renseignés, dépenses incluses.',
+    wt_step_of: 'Étape {n} sur {total}',
+    wt_next: 'Suivant',
+    wt_finish: 'Compris !',
+    wtReplayLabel: '👁 Refaire la visite'
   },
   es: {
     nav_home: 'Inicio',
@@ -2425,7 +2513,29 @@ const TRANSLATIONS = {
     greeting_afternoon: 'Buenas tardes',
     greeting_evening: 'Buenas noches',
     trend_no_change: 'sin cambios',
-    trend_vs_last_week: 'vs semana pasada'
+    trend_vs_last_week: 'vs semana pasada',
+    wt_home_title: '¡Bienvenido a Ledger!',
+    wt_home_text: 'Este es tu Inicio — pedidos pendientes, ventas de esta semana e inventario bajo, todo de un vistazo.',
+    wt_stock_title: 'Inventario',
+    wt_stock_text: 'Agrega aquí lo que vendes, con un precio de compra y uno de venta para cada artículo.',
+    wt_sales_title: 'Ventas',
+    wt_sales_text: 'Registra cada venta aquí, y Ledger calcula tu ganancia automáticamente.',
+    wt_orders_title: 'Pedidos',
+    wt_orders_text: 'Rastrea lo que los clientes han pedido pero aún no han pagado.',
+    wt_debts_title: 'Deudas',
+    wt_debts_text: 'Lleva el registro de quien te debe dinero, y toca para marcarlo como pagado.',
+    wt_dohome_title: '¡Bienvenido a Ledger!',
+    wt_dohome_text: 'Este es tu Inicio — pedidos pendientes, clientes sin pagar y ganancia de esta semana, todo de un vistazo.',
+    wt_doorders_title: 'Pedidos de clientes',
+    wt_doorders_text: 'Registra aquí lo que un cliente quiere, y agrega el costo del mayorista cuando lo sepas.',
+    wt_dowholesaler_title: 'Lista del mayorista',
+    wt_dowholesaler_text: 'Cada pedido pendiente aparece aquí automáticamente, listo para enviar a tu proveedor.',
+    wt_doprofit_title: 'Ganancia',
+    wt_doprofit_text: 'Mira tu ganancia real aquí — una vez que completes los costos del mayorista, gastos incluidos.',
+    wt_step_of: 'Paso {n} de {total}',
+    wt_next: 'Siguiente',
+    wt_finish: '¡Entendido!',
+    wtReplayLabel: '👁 Repetir el recorrido'
   },
   de: {
     nav_home: 'Start',
@@ -2650,7 +2760,29 @@ const TRANSLATIONS = {
     greeting_afternoon: 'Guten Tag',
     greeting_evening: 'Guten Abend',
     trend_no_change: 'keine Änderung',
-    trend_vs_last_week: 'vs letzte Woche'
+    trend_vs_last_week: 'vs letzte Woche',
+    wt_home_title: 'Willkommen bei Ledger!',
+    wt_home_text: 'Das ist dein Home-Tab — offene Bestellungen, Verkäufe dieser Woche und niedriger Lagerbestand, alles auf einen Blick.',
+    wt_stock_title: 'Lager',
+    wt_stock_text: 'Füge hier hinzu, was du verkaufst, mit Einkaufs- und Verkaufspreis für jeden Artikel.',
+    wt_sales_title: 'Verkäufe',
+    wt_sales_text: 'Erfasse hier jeden Verkauf, und Ledger berechnet deinen Gewinn automatisch.',
+    wt_orders_title: 'Bestellungen',
+    wt_orders_text: 'Behalte im Blick, was Kunden angefragt, aber noch nicht bezahlt haben.',
+    wt_debts_title: 'Schulden',
+    wt_debts_text: 'Behalte den Überblick, wer dir Geld schuldet, und tippe, um als bezahlt zu markieren.',
+    wt_dohome_title: 'Willkommen bei Ledger!',
+    wt_dohome_text: 'Das ist dein Home-Tab — offene Bestellungen, unbezahlte Kunden und Gewinn dieser Woche, alles auf einen Blick.',
+    wt_doorders_title: 'Kundenbestellungen',
+    wt_doorders_text: 'Erfasse hier, was ein Kunde will, und trage die Großhändlerkosten ein, sobald du sie kennst.',
+    wt_dowholesaler_title: 'Großhändlerliste',
+    wt_dowholesaler_text: 'Jede offene Bestellung erscheint hier automatisch, bereit zum Senden an deinen Großhändler.',
+    wt_doprofit_title: 'Gewinn',
+    wt_doprofit_text: 'Sieh hier deinen echten Gewinn — sobald Großhändlerkosten eingetragen sind, Ausgaben inklusive.',
+    wt_step_of: 'Schritt {n} von {total}',
+    wt_next: 'Weiter',
+    wt_finish: 'Verstanden!',
+    wtReplayLabel: '👁 Tour erneut ansehen'
   },
   zh: {
     nav_home: '首页',
@@ -2875,7 +3007,29 @@ const TRANSLATIONS = {
     greeting_afternoon: '下午好',
     greeting_evening: '晚上好',
     trend_no_change: '无变化',
-    trend_vs_last_week: '与上周相比'
+    trend_vs_last_week: '与上周相比',
+    wt_home_title: '欢迎使用 Ledger！',
+    wt_home_text: '这里是您的首页—待处理订单、本周销售和库存不足，一目了然。',
+    wt_stock_title: '库存',
+    wt_stock_text: '在这里添加您要销售的商品，为每件商品设置进价和售价。',
+    wt_sales_title: '销售',
+    wt_sales_text: '在这里记录每笔销售，Ledger 会自动计算您的利润。',
+    wt_orders_title: '订单',
+    wt_orders_text: '追踪客户请求但尚未付款的商品。',
+    wt_debts_title: '欠款',
+    wt_debts_text: '记录谁欠您钱，点击即可标记为已付款。',
+    wt_dohome_title: '欢迎使用 Ledger！',
+    wt_dohome_text: '这里是您的首页—待处理订单、未付款客户和本周利润，一目了然。',
+    wt_doorders_title: '客户订单',
+    wt_doorders_text: '在这里记录客户需要什么，并在知道批发商成本后添加。',
+    wt_dowholesaler_title: '批发商清单',
+    wt_dowholesaler_text: '每个待处理订单会自动显示在这里，准备发送给您的供应商。',
+    wt_doprofit_title: '利润',
+    wt_doprofit_text: '填写批发商成本后，在这里查看您的真实利润（已包含支出）。',
+    wt_step_of: '第 {n} 步，共 {total} 步',
+    wt_next: '下一步',
+    wt_finish: '知道了！',
+    wtReplayLabel: '👁 重新查看引导'
   }
 };
 
@@ -2949,6 +3103,7 @@ function applyTranslations() {
     salesPeriodOptYear: 'doPeriodOptYear', salesPeriodOptLastyear: 'doPeriodOptLastyear',
     salesPeriodOptCustom: 'doPeriodOptCustom', salesFromLabel: 'doProfitFromLabel', salesToLabel: 'doProfitToLabel',
     expensesTabTitle: 'expensesTabTitle',
+    wtReplayLabel: 'wtReplayLabel',
     expPeriodOptToday: 'doPeriodOptToday', expPeriodOptYesterday: 'doPeriodOptYesterday',
     expPeriodOptWeek: 'doPeriodOptWeek', expPeriodOptLastweek: 'doPeriodOptLastweek',
     expPeriodOptMonth: 'doPeriodOptMonth', expPeriodOptLastmonth: 'doPeriodOptLastmonth',
@@ -3703,6 +3858,7 @@ async function saveProfile() {
   renderAll();
   rememberShopOnDevice(shopCode);
 
+  const wasMandatory = profileMandatory;
   if (profileMandatory) {
     profileMandatory = false;
     document.getElementById('profileModalClose').style.display = 'flex';
@@ -3711,6 +3867,10 @@ async function saveProfile() {
 
   closeModal('profileModal');
   toast('Profile saved');
+
+  if (wasMandatory && !(state.settings && state.settings.walkthroughSeen)) {
+    setTimeout(startWalkthrough, 400);
+  }
 }
 
 function getKnownShops() {
@@ -3883,6 +4043,107 @@ function handleFabClick() {
   }
 }
 
+// ===================== GUIDED WALKTHROUGH =====================
+
+let walkthroughSteps = [];
+let walkthroughStepIndex = 0;
+
+function getWalkthroughSteps() {
+  if (isDropshipMode()) {
+    return [
+      { tab: 'do-home', title: t('wt_dohome_title'), text: t('wt_dohome_text') },
+      { tab: 'do-orders', title: t('wt_doorders_title'), text: t('wt_doorders_text') },
+      { tab: 'do-wholesaler', title: t('wt_dowholesaler_title'), text: t('wt_dowholesaler_text') },
+      { tab: 'do-profit', title: t('wt_doprofit_title'), text: t('wt_doprofit_text') },
+      { tab: 'debts', title: t('wt_debts_title'), text: t('wt_debts_text') }
+    ];
+  }
+  return [
+    { tab: 'home', title: t('wt_home_title'), text: t('wt_home_text') },
+    { tab: 'stock', title: t('wt_stock_title'), text: t('wt_stock_text') },
+    { tab: 'sales', title: t('wt_sales_title'), text: t('wt_sales_text') },
+    { tab: 'orders', title: t('wt_orders_title'), text: t('wt_orders_text') },
+    { tab: 'debts', title: t('wt_debts_title'), text: t('wt_debts_text') }
+  ];
+}
+
+function startWalkthrough() {
+  walkthroughSteps = getWalkthroughSteps();
+  walkthroughStepIndex = 0;
+  document.getElementById('walkthroughHighlight').style.display = 'block';
+  document.getElementById('walkthroughTooltip').style.display = 'block';
+  showWalkthroughStep();
+}
+
+function showWalkthroughStep() {
+  const step = walkthroughSteps[walkthroughStepIndex];
+  showTab(step.tab, true);
+
+  const buttons = document.querySelectorAll('.nav-btn[data-tab="' + step.tab + '"]');
+  let target = null;
+  buttons.forEach(b => { if (b.offsetParent !== null) target = b; });
+
+  const highlight = document.getElementById('walkthroughHighlight');
+  const tooltip = document.getElementById('walkthroughTooltip');
+
+  if (target) {
+    const rect = target.getBoundingClientRect();
+    highlight.style.left = (rect.left - 6) + 'px';
+    highlight.style.top = (rect.top - 6) + 'px';
+    highlight.style.width = (rect.width + 12) + 'px';
+    highlight.style.height = (rect.height + 12) + 'px';
+
+    const isBottomHalf = rect.top > window.innerHeight / 2;
+    tooltip.style.transform = 'none';
+    if (isBottomHalf) {
+      tooltip.style.bottom = (window.innerHeight - rect.top + 14) + 'px';
+      tooltip.style.top = 'auto';
+    } else {
+      tooltip.style.top = (rect.bottom + 14) + 'px';
+      tooltip.style.bottom = 'auto';
+    }
+    let left = rect.left + rect.width / 2 - 135;
+    left = Math.max(12, Math.min(left, window.innerWidth - 282));
+    tooltip.style.left = left + 'px';
+  } else {
+    highlight.style.display = 'none';
+    tooltip.style.top = '50%';
+    tooltip.style.left = '50%';
+    tooltip.style.bottom = 'auto';
+    tooltip.style.transform = 'translate(-50%, -50%)';
+  }
+
+  document.getElementById('wtStepCounter').textContent = t('wt_step_of').replace('{n}', walkthroughStepIndex + 1).replace('{total}', walkthroughSteps.length);
+  document.getElementById('wtTitle').textContent = step.title;
+  document.getElementById('wtText').textContent = step.text;
+  document.getElementById('wtNextBtn').textContent = (walkthroughStepIndex === walkthroughSteps.length - 1) ? t('wt_finish') : t('wt_next');
+}
+
+function walkthroughNext() {
+  walkthroughStepIndex++;
+  if (walkthroughStepIndex >= walkthroughSteps.length) {
+    endWalkthrough();
+  } else {
+    showWalkthroughStep();
+  }
+}
+
+async function skipWalkthrough() {
+  await endWalkthrough();
+}
+
+async function endWalkthrough() {
+  document.getElementById('walkthroughHighlight').style.display = 'none';
+  document.getElementById('walkthroughTooltip').style.display = 'none';
+  state.settings = { ...(state.settings || {}), walkthroughSeen: true };
+  await saveState('settings');
+}
+
+function replayWalkthrough() {
+  closeSettingsDrawer();
+  setTimeout(startWalkthrough, 300);
+}
+
 function closeSettingsDrawer() {
   showTab(lastActiveTabBeforeSettings);
 }
@@ -3991,12 +4252,12 @@ function fmtWholesalerMoney(n) {
 }
 
 const EMPTY_STATE_ICONS = {
-  box: '<svg viewBox="0 0 64 64" fill="none" stroke="#C7D0CA" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 24 L32 14 L56 24 L56 46 L32 56 L8 46 Z"/><path d="M8 24 L32 34 L56 24"/><path d="M32 34 L32 56"/><circle cx="46" cy="16" r="3" fill="#E8A33D" stroke="none"/></svg>',
-  receipt: '<svg viewBox="0 0 64 64" fill="none" stroke="#C7D0CA" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8 H48 V52 L44 48 L40 52 L36 48 L32 52 L28 48 L24 52 L20 48 L16 52 Z"/><line x1="22" y1="20" x2="42" y2="20"/><line x1="22" y1="28" x2="42" y2="28"/><line x1="22" y1="36" x2="34" y2="36"/><circle cx="44" cy="14" r="3" fill="#E8A33D" stroke="none"/></svg>',
-  clipboard: '<svg viewBox="0 0 64 64" fill="none" stroke="#C7D0CA" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="14" y="12" width="36" height="44" rx="4"/><rect x="24" y="8" width="16" height="8" rx="2" fill="#FBF8F3"/><line x1="21" y1="28" x2="43" y2="28"/><line x1="21" y1="36" x2="43" y2="36"/><line x1="21" y1="44" x2="35" y2="44"/><circle cx="46" cy="20" r="3" fill="#E8A33D" stroke="none"/></svg>',
-  wallet: '<svg viewBox="0 0 64 64" fill="none" stroke="#C7D0CA" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="18" width="48" height="34" rx="6"/><path d="M8 28 H56"/><circle cx="46" cy="38" r="4"/><circle cx="44" cy="14" r="3" fill="#E8A33D" stroke="none"/></svg>',
-  chart: '<svg viewBox="0 0 64 64" fill="none" stroke="#C7D0CA" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 52 V12"/><path d="M12 52 H52"/><path d="M18 44 L28 44 L36 44 L46 44" stroke-dasharray="1 6"/><circle cx="46" cy="20" r="3" fill="#E8A33D" stroke="none"/></svg>',
-  shop: '<svg viewBox="0 0 64 64" fill="none" stroke="#C7D0CA" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 24 L14 10 H50 L54 24"/><path d="M10 24 V52 H54 V24"/><path d="M10 24 H54"/><rect x="26" y="36" width="12" height="16"/><circle cx="46" cy="16" r="3" fill="#E8A33D" stroke="none"/></svg>'
+  box: '<svg viewBox="0 0 64 64" fill="none" stroke="#C7D0CA" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 24 L32 14 L56 24 L56 46 L32 56 L8 46 Z"/><path d="M8 24 L32 34 L56 24"/><path d="M32 34 L32 56"/></svg>',
+  receipt: '<svg viewBox="0 0 64 64" fill="none" stroke="#C7D0CA" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8 H48 V52 L44 48 L40 52 L36 48 L32 52 L28 48 L24 52 L20 48 L16 52 Z"/><line x1="22" y1="20" x2="42" y2="20"/><line x1="22" y1="28" x2="42" y2="28"/><line x1="22" y1="36" x2="34" y2="36"/></svg>',
+  clipboard: '<svg viewBox="0 0 64 64" fill="none" stroke="#C7D0CA" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="14" y="12" width="36" height="44" rx="4"/><rect x="24" y="8" width="16" height="8" rx="2" fill="#FBF8F3"/><line x1="21" y1="28" x2="43" y2="28"/><line x1="21" y1="36" x2="43" y2="36"/><line x1="21" y1="44" x2="35" y2="44"/></svg>',
+  wallet: '<svg viewBox="0 0 64 64" fill="none" stroke="#C7D0CA" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="18" width="48" height="34" rx="6"/><path d="M8 28 H56"/><circle cx="46" cy="38" r="4"/></svg>',
+  chart: '<svg viewBox="0 0 64 64" fill="none" stroke="#C7D0CA" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 52 V12"/><path d="M12 52 H52"/><path d="M18 44 L28 44 L36 44 L46 44" stroke-dasharray="1 6"/></svg>',
+  shop: '<svg viewBox="0 0 64 64" fill="none" stroke="#C7D0CA" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 24 L14 10 H50 L54 24"/><path d="M10 24 V52 H54 V24"/><path d="M10 24 H54"/><rect x="26" y="36" width="12" height="16"/></svg>'
 };
 
 function emptyStateHTML(iconType, message) {
