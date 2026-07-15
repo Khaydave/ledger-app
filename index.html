@@ -152,6 +152,7 @@
   .btn-primary:active { transform: scale(0.98); }
   .btn-ghost { background: transparent; color: var(--primary); border: 1.5px solid var(--primary-tint); }
   .btn-ghost:hover { background: var(--primary-tint); }
+  .btn svg { width: 15px; height: 15px; vertical-align: -2px; margin-right: 3px; }
   .btn-danger-ghost { background: transparent; color: var(--danger); border: 1.5px solid var(--danger-tint); }
   .btn-danger-ghost:hover { background: var(--danger-tint); }
   .hint { font-size: 12px; color: var(--ink-faint); margin-top: 18px; line-height: 1.6; max-width: 280px; }
@@ -193,6 +194,9 @@
   }
   .icon-btn:hover { background: var(--surface-hover); color: var(--ink); }
   .icon-btn.small { width: 30px; height: 30px; font-size: 13px; }
+  .icon-btn svg { width: 17px; height: 17px; }
+  .icon-btn.small svg { width: 15px; height: 15px; }
+  .search-icon svg { width: 15px; height: 15px; position: relative; top: 2px; }
 
   /* DASHBOARD */
   .stat-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px; }
@@ -1040,7 +1044,7 @@
             <div style="display:flex; gap:8px;">
               <button class="icon-btn" onclick="openRestockModal()" title="Order from wholesaler">&#128722;</button>
               <button class="icon-btn" onclick="openCatalogueModal()" title="Build catalogue">&#128196;</button>
-              <button class="icon-btn" onclick="openModal('stockModal')">&#43;</button>
+              <button class="icon-btn" onclick="openModal('stockModal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
             </div>
           </div>
           <div class="stat-row" style="margin-bottom:14px;">
@@ -1054,7 +1058,7 @@
             </div>
           </div>
           <div class="search-box">
-            <span class="search-icon">&#128269;</span>
+            <span class="search-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
             <input id="stockSearchInput" placeholder="Search stock..." oninput="renderStockList()">
           </div>
           <div id="stockList"></div>
@@ -1063,7 +1067,7 @@
         <div id="tab-sales" class="tabpanel" style="display:none;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin: 6px 0 14px;">
             <h2 style="font-size:18px;" id="salesTabTitle">Sales</h2>
-            <button class="icon-btn" onclick="openModal('saleModal')">&#43;</button>
+            <button class="icon-btn" onclick="openModal('saleModal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
           </div>
           <div class="field-group" style="max-width:220px;">
             <select id="salesPeriodSelect" onchange="setSalesPeriod(this.value)">
@@ -1088,7 +1092,7 @@
                 <label style="font-size:11px;" id="salesToLabel">To</label>
                 <input type="date" id="salesCustomEnd">
               </div>
-              <button class="icon-btn" onclick="applyCustomSalesRange()" title="Apply">&#10003;</button>
+              <button class="icon-btn" onclick="applyCustomSalesRange()" title="Apply"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>
             </div>
           </div>
           <div class="stat-row" style="margin-bottom:16px;">
@@ -1108,7 +1112,7 @@
         <div id="tab-orders" class="tabpanel" style="display:none;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin: 6px 0 14px;">
             <h2 style="font-size:18px;" id="ordersTabTitle">Orders</h2>
-            <button class="icon-btn" onclick="openModal('orderModal')">&#43;</button>
+            <button class="icon-btn" onclick="openModal('orderModal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
           </div>
           <div class="stat-card" style="margin-bottom:16px;">
             <div class="label" id="statLabelOrdersTotal">Pending order value</div>
@@ -1116,7 +1120,7 @@
             <div class="sub" id="statOrdersTotalCount">0 pending orders</div>
           </div>
           <div class="search-box">
-            <span class="search-icon">&#128269;</span>
+            <span class="search-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
             <input id="orderSearchInput" placeholder="Search orders by customer..." oninput="renderOrdersList()">
           </div>
           <div id="ordersList"></div>
@@ -1162,10 +1166,10 @@
         <div id="tab-do-orders" class="tabpanel" style="display:none;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin: 6px 0 14px;">
             <h2 style="font-size:18px;" id="doOrdersTabTitle">Customer orders</h2>
-            <button class="icon-btn" onclick="openModal('doOrderModal')">&#43;</button>
+            <button class="icon-btn" onclick="openModal('doOrderModal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
           </div>
           <div class="search-box">
-            <span class="search-icon">&#128269;</span>
+            <span class="search-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
             <input id="doOrderSearchInput" placeholder="Search by customer..." oninput="renderDoOrdersList()">
           </div>
           <div id="doOrdersList"></div>
@@ -1187,9 +1191,9 @@
           </div>
           <div class="field-group"><label>Note (optional)</label><input id="doWholesalerNote" placeholder="e.g. Please deliver by Friday"></div>
           <div class="modal-actions" style="margin-bottom:10px;">
-            <button class="btn btn-ghost" onclick="exportDoWholesalerImage()">&#128247; JPEG</button>
-            <button class="btn btn-ghost" onclick="exportDoWholesalerPDF()">&#128196; PDF</button>
-            <button class="btn btn-ghost" onclick="exportDoWholesalerExcel()">&#128202; Excel</button>
+            <button class="btn btn-ghost" onclick="exportDoWholesalerImage()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg> JPEG</button>
+            <button class="btn btn-ghost" onclick="exportDoWholesalerPDF()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> PDF</button>
+            <button class="btn btn-ghost" onclick="exportDoWholesalerExcel()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg> Excel</button>
           </div>
           <button class="btn btn-ghost" style="margin-bottom:16px;" onclick="copyDoWholesalerText()"><span id="doBtnCopyText">Copy as text</span></button>
           <div id="doWholesalerList"></div>
@@ -1223,7 +1227,7 @@
                 <label style="font-size:11px;" id="doProfitToLabel">To</label>
                 <input type="date" id="doProfitCustomEnd">
               </div>
-              <button class="icon-btn" onclick="applyDoProfitCustomRange()" title="Apply">&#10003;</button>
+              <button class="icon-btn" onclick="applyDoProfitCustomRange()" title="Apply"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>
             </div>
           </div>
           <div class="stat-row" style="margin-bottom:16px;">
@@ -1243,7 +1247,7 @@
         <div id="tab-debts" class="tabpanel" style="display:none;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin: 6px 0 14px;">
             <h2 style="font-size:18px;" id="debtsTabTitle">Customer debts</h2>
-            <button class="icon-btn" onclick="openModal('debtModal')">&#43;</button>
+            <button class="icon-btn" onclick="openModal('debtModal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
           </div>
           <div class="stat-card" style="margin-bottom:16px;">
             <div class="label" id="statLabelOwed">Owed to you</div>
@@ -1255,7 +1259,7 @@
         <div id="tab-expenses" class="tabpanel" style="display:none;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin: 6px 0 14px;">
             <h2 style="font-size:18px;" id="expensesTabTitle">Expenses</h2>
-            <button class="icon-btn" onclick="openModal('expenseModal')">&#43;</button>
+            <button class="icon-btn" onclick="openModal('expenseModal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
           </div>
           <div class="field-group" style="max-width:220px;">
             <select id="expensesPeriodSelect" onchange="setExpensesPeriod(this.value)">
@@ -1280,7 +1284,7 @@
                 <label style="font-size:11px;" id="expToLabel">To</label>
                 <input type="date" id="expensesCustomEnd">
               </div>
-              <button class="icon-btn" onclick="applyExpensesCustomRange()" title="Apply">&#10003;</button>
+              <button class="icon-btn" onclick="applyExpensesCustomRange()" title="Apply"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>
             </div>
           </div>
           <div class="stat-card" style="margin-bottom:16px;">
@@ -1416,7 +1420,7 @@
     <div class="field-group">
       <label id="saleItemLabel">Item</label>
       <div class="search-box">
-        <span class="search-icon">&#128269;</span>
+        <span class="search-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
         <input id="saleSearchInput" placeholder="Search item to sell..." oninput="renderSaleProductPicker()" onfocus="renderSaleProductPicker()">
       </div>
       <div class="product-pick-list" id="saleProductPicker"></div>
@@ -4663,7 +4667,7 @@ function renderOrdersList() {
       <div class="li-right">
         <div class="li-tag ${o.fulfilled ? 'ok' : 'pending'}">${o.fulfilled ? t('label_fulfilled') : fmtMoney(o.amount)}</div>
         <div class="li-actions">
-          <div class="icon-btn small" onclick="event.stopPropagation(); deleteOrder('${o.id}')">&#128465;</div>
+          <div class="icon-btn small" onclick="event.stopPropagation(); deleteOrder('${o.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></div>
         </div>
       </div>
     </div>`).join('');
@@ -4721,7 +4725,7 @@ function renderDebtList() {
       <div class="li-right">
         <div class="li-tag ${d.paid ? 'paid' : 'owe'}">${d.paid ? t('label_paid') : fmtMoney(d.amount)}</div>
         <div class="li-actions">
-          <div class="icon-btn small" onclick="event.stopPropagation(); deleteDebt('${d.id}')">&#128465;</div>
+          <div class="icon-btn small" onclick="event.stopPropagation(); deleteDebt('${d.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></div>
         </div>
       </div>
     </div>`).join('');
@@ -5794,7 +5798,7 @@ function renderRestockCustomList() {
         <div class="li-title">${escapeHtml(item.name)}</div>
         <div class="li-sub">${t('label_qty')}: ${item.qty}</div>
       </div>
-      <div class="icon-btn small" onclick="removeRestockCustomItem(${i})">&#128465;</div>
+      <div class="icon-btn small" onclick="removeRestockCustomItem(${i})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></div>
     </div>`).join('');
 }
 
