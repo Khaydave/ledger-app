@@ -384,7 +384,7 @@
     .sidebar .brand-name { font-family: 'Plus Jakarta Sans'; font-weight: 600; font-size: 16px; }
     .sidebar button {
       display: flex; align-items: center; gap: 12px; background: none; border: none;
-      padding: 11px 12px; border-radius: 10px; font-family: 'Inter'; font-size: 14px; font-weight: 500;
+      width: 100%; padding: 11px 12px; border-radius: 10px; font-family: 'Inter'; font-size: 14px; font-weight: 500;
       color: var(--ink-soft); cursor: pointer; text-align: left; margin-bottom: 2px;
     }
     .sidebar button:hover { background: var(--surface-hover); color: var(--ink); }
@@ -674,9 +674,9 @@
       <div id="publicCatNote" style="display:none;" class="public-cat-note"></div>
       <div id="publicCatList"></div>
       <a id="publicCatWhatsapp" class="whatsapp-cta" style="display:none;" href="#" target="_blank" rel="noopener">
-        <span>&#128172;</span><span>Message on WhatsApp</span>
+        <span>&#128172;</span><span id="publicCatWhatsappText">Message on WhatsApp</span>
       </a>
-      <div class="public-cat-footer">Made with <a href="?" onclick="event.preventDefault(); location.href = location.pathname;">Ledger</a></div>
+      <div class="public-cat-footer"><span id="publicCatMadeWith">Made with</span> <a href="?" onclick="event.preventDefault(); location.href = location.pathname;">Ledger</a></div>
     </div>
   </div>
 
@@ -1283,7 +1283,7 @@
         </div>
         <div id="navDropshipMobile" style="display:none; flex:1;">
           <button class="nav-btn active" data-tab="do-home" onclick="showTab('do-home')"><span class="nicon">&#8962;</span>Home</button>
-          <button class="nav-btn" data-tab="do-orders" onclick="showTab('do-orders')"><span class="nicon">&#128203;</span>Orders</button>
+          <button class="nav-btn" data-tab="do-orders" onclick="showTab('do-orders')"><span class="nicon">&#128203;</span>Customer</button>
           <button class="nav-btn" data-tab="do-wholesaler" onclick="showTab('do-wholesaler')"><span class="nicon">&#128230;</span>Wholesaler</button>
           <button class="nav-btn" data-tab="do-profit" onclick="showTab('do-profit')"><span class="nicon">&#128200;</span>Profit</button>
           <button class="nav-btn" data-tab="debts" onclick="showTab('debts')"><span class="nicon">&#128179;</span>Debts</button>
@@ -1708,8 +1708,10 @@ const TRANSLATIONS = {
     nav_debts: 'Debts',
     nav_expenses: 'Expenses',
     'nav_do-home': 'Home',
-    'nav_do-orders': 'Customer Orders',
-    'nav_do-wholesaler': 'Wholesaler List',
+    'nav_do-orders': 'Customer',
+    'nav_do-wholesaler': 'Wholesaler',
+    'nav_do-orders_full': 'Customer Orders',
+    'nav_do-wholesaler_full': 'Wholesaler List',
     'nav_do-profit': 'Profit',
     tab_stock: 'Your stock',
     tab_sales: 'Sales',
@@ -1915,7 +1917,14 @@ const TRANSLATIONS = {
     expenses_total_prefix: 'Total expenses',
     expense_singular: 'expense',
     expense_plural: 'expenses',
-    expenses_empty: 'No expenses logged for this period yet.'
+    expenses_empty: 'No expenses logged for this period yet.',
+    catalogue_store_not_found: 'Store not found',
+    catalogue_check_link: 'Double check the link and try again.',
+    catalogue_message_whatsapp: 'Message on WhatsApp',
+    catalogue_made_with: 'Made with',
+    catalogue_empty_items: 'This store hasn\'t shared any items yet.',
+    catalogue_could_not_load: 'Couldn\'t load this catalogue',
+    catalogue_check_connection: 'Check your internet connection and try again.'
   },
   fr: {
     nav_home: 'Accueil',
@@ -2128,7 +2137,14 @@ const TRANSLATIONS = {
     expenses_total_prefix: 'Dépenses totales',
     expense_singular: 'dépense',
     expense_plural: 'dépenses',
-    expenses_empty: 'Aucune dépense enregistrée pour cette période.'
+    expenses_empty: 'Aucune dépense enregistrée pour cette période.',
+    catalogue_store_not_found: 'Boutique introuvable',
+    catalogue_check_link: 'Vérifiez le lien et réessayez.',
+    catalogue_message_whatsapp: 'Envoyer un message sur WhatsApp',
+    catalogue_made_with: 'Créé avec',
+    catalogue_empty_items: 'Cette boutique n\'a encore partagé aucun article.',
+    catalogue_could_not_load: 'Impossible de charger ce catalogue',
+    catalogue_check_connection: 'Vérifiez votre connexion internet et réessayez.'
   },
   es: {
     nav_home: 'Inicio',
@@ -2341,7 +2357,14 @@ const TRANSLATIONS = {
     expenses_total_prefix: 'Gastos totales',
     expense_singular: 'gasto',
     expense_plural: 'gastos',
-    expenses_empty: 'Aún no hay gastos registrados en este período.'
+    expenses_empty: 'Aún no hay gastos registrados en este período.',
+    catalogue_store_not_found: 'Tienda no encontrada',
+    catalogue_check_link: 'Verifica el enlace e inténtalo de nuevo.',
+    catalogue_message_whatsapp: 'Enviar mensaje por WhatsApp',
+    catalogue_made_with: 'Hecho con',
+    catalogue_empty_items: 'Esta tienda aún no ha compartido artículos.',
+    catalogue_could_not_load: 'No se pudo cargar este catálogo',
+    catalogue_check_connection: 'Verifica tu conexión a internet e inténtalo de nuevo.'
   },
   de: {
     nav_home: 'Start',
@@ -2554,7 +2577,14 @@ const TRANSLATIONS = {
     expenses_total_prefix: 'Gesamtausgaben',
     expense_singular: 'Ausgabe',
     expense_plural: 'Ausgaben',
-    expenses_empty: 'Noch keine Ausgaben für diesen Zeitraum erfasst.'
+    expenses_empty: 'Noch keine Ausgaben für diesen Zeitraum erfasst.',
+    catalogue_store_not_found: 'Shop nicht gefunden',
+    catalogue_check_link: 'Überprüfe den Link und versuche es erneut.',
+    catalogue_message_whatsapp: 'Auf WhatsApp schreiben',
+    catalogue_made_with: 'Erstellt mit',
+    catalogue_empty_items: 'Dieser Shop hat noch keine Artikel geteilt.',
+    catalogue_could_not_load: 'Katalog konnte nicht geladen werden',
+    catalogue_check_connection: 'Überprüfe deine Internetverbindung und versuche es erneut.'
   },
   zh: {
     nav_home: '首页',
@@ -2767,7 +2797,14 @@ const TRANSLATIONS = {
     expenses_total_prefix: '总支出',
     expense_singular: '笔支出',
     expense_plural: '笔支出',
-    expenses_empty: '此时段内还没有支出记录。'
+    expenses_empty: '此时段内还没有支出记录。',
+    catalogue_store_not_found: '未找到店铺',
+    catalogue_check_link: '请检查链接并重试。',
+    catalogue_message_whatsapp: '通过 WhatsApp 发消息',
+    catalogue_made_with: '使用以下工具制作',
+    catalogue_empty_items: '该店铺还没有分享任何商品。',
+    catalogue_could_not_load: '无法加载此目录',
+    catalogue_check_connection: '请检查您的网络连接并重试。'
   }
 };
 
@@ -2780,7 +2817,10 @@ function applyTranslations() {
   document.querySelectorAll('.nav-btn').forEach(b => {
     const tab = b.dataset.tab;
     const icon = b.querySelector('.nicon');
-    if (icon && tab) b.innerHTML = icon.outerHTML + t('nav_' + tab);
+    if (!icon || !tab) return;
+    const isMobileNav = !!b.closest('.navbar');
+    const key = (!isMobileNav && (tab === 'do-orders' || tab === 'do-wholesaler')) ? 'nav_' + tab + '_full' : 'nav_' + tab;
+    b.innerHTML = icon.outerHTML + t(key);
   });
   const idMap = {
     stockTabTitle: 'tab_stock', salesTabTitle: 'tab_sales', ordersTabTitle: 'tab_orders',
@@ -3339,8 +3379,8 @@ async function showPublicCatalogue(code) {
     const snap = await getDoc(ref);
 
     if (!snap.exists()) {
-      shopNameEl.textContent = "Store not found";
-      locationEl.textContent = "Double check the link and try again.";
+      shopNameEl.textContent = t('catalogue_store_not_found');
+      locationEl.textContent = t('catalogue_check_link');
       return;
     }
 
@@ -3350,6 +3390,9 @@ async function showPublicCatalogue(code) {
     const products = data.products || [];
     const includedIds = catalogue.includedIds || [];
     const items = products.filter(p => includedIds.includes(p.id));
+
+    // Use the shop's own saved language and currency so the page reflects the seller's settings, not the viewer's
+    state.settings = data.settings || { currency: 'NGN' };
 
     const displayName = profile.shopName || code;
     shopNameEl.textContent = displayName;
@@ -3366,14 +3409,15 @@ async function showPublicCatalogue(code) {
       noteEl.style.display = 'block';
     }
 
-    // Use the shop's own saved currency setting to format prices consistently for viewers
-    state.settings = data.settings || { currency: 'NGN' };
+    document.getElementById('publicCatWhatsappText').textContent = t('catalogue_message_whatsapp');
+    document.getElementById('publicCatMadeWith').textContent = t('catalogue_made_with');
+
     if (state.settings.currency !== 'NGN') {
       await ensureExchangeRates();
     }
 
     if (items.length === 0) {
-      listEl.innerHTML = '<div class="empty-state">This store hasn\'t shared any items yet.</div>';
+      listEl.innerHTML = '<div class="empty-state">' + t('catalogue_empty_items') + '</div>';
     } else {
       listEl.innerHTML = items.map(p => `
         <div class="public-cat-item">
@@ -3391,8 +3435,8 @@ async function showPublicCatalogue(code) {
       waEl.style.display = 'flex';
     }
   } catch (e) {
-    shopNameEl.textContent = "Couldn't load this catalogue";
-    locationEl.textContent = "Check your internet connection and try again.";
+    shopNameEl.textContent = t('catalogue_could_not_load');
+    locationEl.textContent = t('catalogue_check_connection');
   }
 }
 
@@ -4864,7 +4908,7 @@ function renderDoWholesalerTarget() {
           <span style="font-size:14.5px; color:#1F2A24;">${escapeHtml(o.description)} <span style="color:#9AA69C;">&times; ${o.qty || 1}</span></span>
           <span style="font-family:'Plus Jakarta Sans',sans-serif; font-weight:600; font-size:14.5px; color:#1F4B43;">${o.costPrice != null ? fmtWholesalerMoney(o.costPrice) : 'TBD'}</span>
         </div>`).join('')}
-      <div style="text-align:center; font-size:11px; color:#9AA69C; margin-top:18px;">Made with Ledger</div>
+      <div style="text-align:center; font-size:11px; color:#9AA69C; margin-top:18px;">${t('catalogue_made_with')} Ledger</div>
     </div>`;
   return target;
 }
@@ -5202,7 +5246,7 @@ function renderCatalogueTarget() {
           <span style="font-size:14.5px; color:#1F2A24;">${escapeHtml(p.name)}</span>
           <span style="font-family:'Plus Jakarta Sans',sans-serif; font-weight:600; font-size:14.5px; color:#1F4B43;">${fmtMoney(p.price)}</span>
         </div>`).join('')}
-      <div style="text-align:center; font-size:11px; color:#9AA69C; margin-top:18px;">Made with Ledger</div>
+      <div style="text-align:center; font-size:11px; color:#9AA69C; margin-top:18px;">${t('catalogue_made_with')} Ledger</div>
     </div>`;
   return target;
 }
@@ -5442,7 +5486,7 @@ function renderRestockTarget() {
           <span style="font-size:14.5px; color:#1F2A24;">${escapeHtml(p.name)}</span>
           <span style="font-family:'Plus Jakarta Sans',sans-serif; font-weight:600; font-size:14.5px; color:#1F4B43;">Qty: ${p.qty}</span>
         </div>`).join('')}
-      <div style="text-align:center; font-size:11px; color:#9AA69C; margin-top:18px;">Made with Ledger</div>
+      <div style="text-align:center; font-size:11px; color:#9AA69C; margin-top:18px;">${t('catalogue_made_with')} Ledger</div>
     </div>`;
   return target;
 }
