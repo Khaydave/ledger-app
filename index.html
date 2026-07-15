@@ -218,6 +218,10 @@
   .trend-badge.up { background: rgba(46,125,50,0.12); color: #2E7D32; }
   .trend-badge.down { background: var(--danger-tint); color: var(--danger); }
   .trend-badge.flat { background: var(--surface-hover); color: var(--ink-faint); }
+  .sparkline { margin-top: 8px; line-height: 0; }
+  .sparkline svg { display: block; }
+  .trend-card-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 16px; }
+  .trend-card-row .trend-card-label { font-size: 12px; color: var(--ink-soft); }
   .stat-card .sub { font-size: 11px; color: var(--ink-faint); margin-top: 3px; }
 
   .section-title { font-size: 13px; font-weight: 600; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.04em; margin: 22px 0 10px; }
@@ -1026,6 +1030,7 @@
                 <div class="value" id="statSalesWeek">&#8358;0</div>
                 <span class="trend-badge" id="salesWeekTrend" style="display:none;"></span>
               </div>
+              <div class="sparkline" id="salesWeekChart"></div>
             </div>
           </div>
 
@@ -1111,6 +1116,10 @@
               <div class="value" id="statSalesProfit">&#8358;0</div>
             </div>
           </div>
+          <div class="stat-card trend-card-row" style="margin-bottom:16px;">
+            <span class="trend-card-label" id="salesTrend7dLabel">Last 7 days</span>
+            <div class="sparkline" id="salesTab7dChart"></div>
+          </div>
           <div id="salesList"></div>
         </div>
 
@@ -1158,6 +1167,7 @@
                 <div class="value" id="doStatProfitWeek">&#8358;0</div>
                 <span class="trend-badge" id="doProfitWeekTrend" style="display:none;"></span>
               </div>
+              <div class="sparkline" id="doProfitWeekChart"></div>
             </div>
           </div>
           <div class="quick-actions">
@@ -1245,6 +1255,10 @@
               <div class="label" id="doProfitLabel">Profit &mdash; this week</div>
               <div class="value" id="doStatProfit">&#8358;0</div>
             </div>
+          </div>
+          <div class="stat-card trend-card-row" style="margin-bottom:16px;">
+            <span class="trend-card-label" id="doProfitTrend7dLabel">Last 7 days</span>
+            <div class="sparkline" id="doProfitTab7dChart"></div>
           </div>
           <div id="doProfitList"></div>
         </div>
@@ -2054,7 +2068,8 @@ const TRANSLATIONS = {
     wt_step_of: 'Step {n} of {total}',
     wt_next: 'Next',
     wt_finish: 'Got it!',
-    wtReplayLabel: 'Take the tour again'
+    wtReplayLabel: 'Take the tour again',
+    label_last_7_days: 'Last 7 days'
   },
   fr: {
     nav_home: 'Accueil',
@@ -2301,7 +2316,8 @@ const TRANSLATIONS = {
     wt_step_of: 'Étape {n} sur {total}',
     wt_next: 'Suivant',
     wt_finish: 'Compris !',
-    wtReplayLabel: 'Refaire la visite'
+    wtReplayLabel: 'Refaire la visite',
+    label_last_7_days: '7 derniers jours'
   },
   es: {
     nav_home: 'Inicio',
@@ -2548,7 +2564,8 @@ const TRANSLATIONS = {
     wt_step_of: 'Paso {n} de {total}',
     wt_next: 'Siguiente',
     wt_finish: '¡Entendido!',
-    wtReplayLabel: 'Repetir el recorrido'
+    wtReplayLabel: 'Repetir el recorrido',
+    label_last_7_days: 'Últimos 7 días'
   },
   de: {
     nav_home: 'Start',
@@ -2795,7 +2812,8 @@ const TRANSLATIONS = {
     wt_step_of: 'Schritt {n} von {total}',
     wt_next: 'Weiter',
     wt_finish: 'Verstanden!',
-    wtReplayLabel: 'Tour erneut ansehen'
+    wtReplayLabel: 'Tour erneut ansehen',
+    label_last_7_days: 'Letzte 7 Tage'
   },
   zh: {
     nav_home: '首页',
@@ -3042,7 +3060,8 @@ const TRANSLATIONS = {
     wt_step_of: '第 {n} 步，共 {total} 步',
     wt_next: '下一步',
     wt_finish: '知道了！',
-    wtReplayLabel: '重新查看引导'
+    wtReplayLabel: '重新查看引导',
+    label_last_7_days: '过去7天'
   }
 };
 
@@ -3117,6 +3136,7 @@ function applyTranslations() {
     salesPeriodOptCustom: 'doPeriodOptCustom', salesFromLabel: 'doProfitFromLabel', salesToLabel: 'doProfitToLabel',
     expensesTabTitle: 'expensesTabTitle',
     wtReplayLabel: 'wtReplayLabel',
+    salesTrend7dLabel: 'label_last_7_days', doProfitTrend7dLabel: 'label_last_7_days',
     expPeriodOptToday: 'doPeriodOptToday', expPeriodOptYesterday: 'doPeriodOptYesterday',
     expPeriodOptWeek: 'doPeriodOptWeek', expPeriodOptLastweek: 'doPeriodOptLastweek',
     expPeriodOptMonth: 'doPeriodOptMonth', expPeriodOptLastmonth: 'doPeriodOptLastmonth',
@@ -4459,6 +4479,63 @@ function renderGreeting(greetingElId, dateElId) {
   }
 }
 
+function buildSparklineSVG(values, color) {
+  const width = 64, height = 22;
+  const safeValues = values.length ? values : [0];
+  const max = Math.max(...safeValues, 0);
+  const min = Math.min(...safeValues, 0);
+  const range = (max - min) || 1;
+  const stepX = safeValues.length > 1 ? width / (safeValues.length - 1) : width;
+  const pts = safeValues.map((v, i) => {
+    const x = safeValues.length > 1 ? i * stepX : width / 2;
+    const y = height - 3 - ((v - min) / range) * (height - 6);
+    return x.toFixed(1) + ',' + y.toFixed(1);
+  });
+  const linePath = 'M' + pts.join(' L');
+  const areaPath = linePath + ` L${width},${height} L0,${height} Z`;
+  return `<svg viewBox="0 0 ${width} ${height}" width="${width}" height="${height}" preserveAspectRatio="none">` +
+    `<path d="${areaPath}" fill="${color}" fill-opacity="0.12" stroke="none"/>` +
+    `<path d="${linePath}" fill="none" stroke="${color}" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>` +
+    `</svg>`;
+}
+
+function getDailyRangeTotal(filterFn, dayStart, dayEnd) {
+  return filterFn(dayStart, dayEnd);
+}
+
+function lastNDayRanges(days) {
+  const ranges = [];
+  for (let i = days - 1; i >= 0; i--) {
+    const dayStart = new Date(); dayStart.setHours(0, 0, 0, 0); dayStart.setDate(dayStart.getDate() - i);
+    const dayEnd = new Date(dayStart); dayEnd.setDate(dayEnd.getDate() + 1);
+    ranges.push({ dayStart, dayEnd });
+  }
+  return ranges;
+}
+
+function getDailySalesTotals(days) {
+  return lastNDayRanges(days).map(({ dayStart, dayEnd }) =>
+    state.sales.filter(s => { const d = new Date(s.date); return d >= dayStart && d < dayEnd; })
+      .reduce((s, x) => s + Number(x.total), 0)
+  );
+}
+
+function getDailyProfitTotals(days) {
+  return lastNDayRanges(days).map(({ dayStart, dayEnd }) => {
+    const grossProfit = state.sales.filter(s => { const d = new Date(s.date); return d >= dayStart && d < dayEnd; })
+      .reduce((s, x) => s + Number(x.profit || 0), 0);
+    return grossProfit - totalExpensesInRange(dayStart, dayEnd);
+  });
+}
+
+function getDailyDoProfitTotals(days) {
+  return lastNDayRanges(days).map(({ dayStart, dayEnd }) => {
+    const orders = (state.dropshipOrders || []).filter(o => { const d = new Date(o.date); return d >= dayStart && d < dayEnd && o.costPrice != null; });
+    const grossProfit = orders.reduce((s, o) => s + (Number(o.sellPrice || 0) - Number(o.costPrice || 0)), 0);
+    return grossProfit - totalExpensesInRange(dayStart, dayEnd);
+  });
+}
+
 function renderTrendBadge(elId, current, previous) {
   const el = document.getElementById(elId);
   if (!el) return;
@@ -4498,6 +4575,7 @@ function renderDashboard() {
   const lastWeekSales = state.sales.filter(s => { const d = new Date(s.date); return d >= lastWeekStart && d < lastWeekEnd; });
   const lastWeekTotal = lastWeekSales.reduce((s, x) => s + Number(x.total), 0);
   renderTrendBadge('salesWeekTrend', weekTotal, lastWeekTotal);
+  document.getElementById('salesWeekChart').innerHTML = buildSparklineSVG(getDailySalesTotals(7), '#1F4B43');
 
   const lowStock = state.products.filter(p => Number(p.qty) <= 2);
   const lowEl = document.getElementById('lowStockList');
@@ -4617,6 +4695,8 @@ function renderSalesTab() {
     profitEl.textContent = (totalProfit < 0 ? '- ' : '') + fmtMoney(Math.abs(totalProfit));
     profitEl.className = 'value ' + (totalProfit < 0 ? 'is-loss-value' : 'is-profit-value');
   }
+
+  document.getElementById('salesTab7dChart').innerHTML = buildSparklineSVG(getDailySalesTotals(7), '#1F4B43');
 
   const el = document.getElementById('salesList');
   if (filtered.length === 0) {
@@ -5206,6 +5286,7 @@ function renderDoHome() {
   const lastWeekGrossProfit = lastWeekOrders.reduce((s, o) => s + (Number(o.sellPrice || 0) - Number(o.costPrice || 0)), 0);
   const lastWeekProfit = lastWeekGrossProfit - totalExpensesInRange(lastWeekStart, lastWeekEnd);
   renderTrendBadge('doProfitWeekTrend', weekProfit, lastWeekProfit);
+  document.getElementById('doProfitWeekChart').innerHTML = buildSparklineSVG(getDailyDoProfitTotals(7), '#1F4B43');
 
   document.getElementById('doStatPendingOrders').textContent = fmtMoney(pendingValue);
   document.getElementById('doStatPendingOrdersCount').textContent = pending.length + ' ' + (pending.length === 1 ? t('do_order_singular') : t('do_order_plural'));
@@ -5524,6 +5605,8 @@ function renderDoProfitTab() {
   const profitEl = document.getElementById('doStatProfit');
   profitEl.textContent = (profit < 0 ? '- ' : '') + fmtMoney(Math.abs(profit));
   profitEl.className = 'value ' + (profit < 0 ? 'is-loss-value' : 'is-profit-value');
+
+  document.getElementById('doProfitTab7dChart').innerHTML = buildSparklineSVG(getDailyDoProfitTotals(7), '#1F4B43');
 
   const el = document.getElementById('doProfitList');
   if (known.length === 0) {
