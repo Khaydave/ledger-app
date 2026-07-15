@@ -282,6 +282,16 @@
     color: var(--ink-faint); font-family: 'Inter'; font-size: 10.5px; font-weight: 500;
   }
   .navbar button.active { color: var(--primary); }
+  .fab {
+    position: fixed; right: 18px; bottom: calc(78px + env(safe-area-inset-bottom));
+    width: 56px; height: 56px; border-radius: 50%; border: none;
+    background: var(--primary); color: #fff; font-size: 26px; line-height: 1;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 10px 24px rgba(31,75,67,0.32), 0 3px 8px rgba(31,75,67,0.18);
+    cursor: pointer; z-index: 35; transition: transform 0.15s;
+  }
+  .fab:active { transform: scale(0.92); }
+  @media (min-width: 860px) { .fab { display: none !important; } }
   .navbar .nicon { font-size: 18px; }
 
   /* SIDEBAR (desktop) */
@@ -1318,6 +1328,7 @@
     </div>
   </div>
 
+  <button id="fabButton" class="fab" style="display:none;" onclick="handleFabClick()">&#43;</button>
 </div>
 
 <div class="modal-overlay" id="stockModal">
@@ -3825,8 +3836,40 @@ function showTab(name, skipHistory) {
   if (name === 'do-wholesaler') renderDoWholesalerList();
   if (name === 'do-profit') renderDoProfitTab();
 
+  updateFab(name);
+
   if (!skipHistory && shopCode) {
     history.pushState({ tab: name }, '', '#' + name);
+  }
+}
+
+const FAB_ACTIONS = {
+  'home': () => openModal('saleModal'),
+  'stock': () => openModal('stockModal'),
+  'sales': () => openModal('saleModal'),
+  'orders': () => openModal('orderModal'),
+  'debts': () => openModal('debtModal'),
+  'expenses': () => openModal('expenseModal'),
+  'do-home': () => openModal('doOrderModal'),
+  'do-orders': () => openModal('doOrderModal')
+};
+let currentFabTab = null;
+
+function updateFab(name) {
+  const fab = document.getElementById('fabButton');
+  if (!fab) return;
+  if (FAB_ACTIONS[name]) {
+    fab.style.display = 'flex';
+    currentFabTab = name;
+  } else {
+    fab.style.display = 'none';
+    currentFabTab = null;
+  }
+}
+
+function handleFabClick() {
+  if (currentFabTab && FAB_ACTIONS[currentFabTab]) {
+    FAB_ACTIONS[currentFabTab]();
   }
 }
 
@@ -4107,7 +4150,9 @@ function getGreetingText() {
 }
 
 function renderGreeting(greetingElId, dateElId) {
-  const name = (state.profile && (state.profile.name || state.profile.shopName)) || '';
+  const personalName = (state.profile && state.profile.name) || '';
+  const firstName = personalName.trim().split(/\s+/)[0] || '';
+  const name = firstName || (state.profile && state.profile.shopName) || '';
   const greetingEl = document.getElementById(greetingElId);
   const dateEl = document.getElementById(dateElId);
   if (greetingEl) greetingEl.textContent = getGreetingText() + (name ? ', ' + name : '');
