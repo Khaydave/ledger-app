@@ -147,9 +147,10 @@
     width: 100%;
     transition: background 0.15s, transform 0.1s;
   }
+  .btn:active { transform: scale(0.97); }
   .btn-primary { background: var(--primary); color: #fff; }
   .btn-primary:hover { background: var(--primary-dark); }
-  .btn-primary:active { transform: scale(0.98); }
+  .btn-primary:active { transform: scale(0.97); }
   .btn-ghost { background: transparent; color: var(--primary); border: 1.5px solid var(--primary-tint); }
   .btn-ghost:hover { background: var(--primary-tint); }
   .btn svg { width: 15px; height: 15px; vertical-align: -2px; margin-right: 3px; }
@@ -192,9 +193,10 @@
     width: 34px; height: 34px; border-radius: 9px;
     display: flex; align-items: center; justify-content: center;
     font-size: 15px; color: var(--ink-soft); cursor: pointer;
-    transition: background 0.15s;
+    transition: background 0.15s, transform 0.1s;
   }
   .icon-btn:hover { background: var(--surface-hover); color: var(--ink); }
+  .icon-btn:active { transform: scale(0.92); }
   .icon-btn.small { width: 30px; height: 30px; font-size: 13px; }
   .icon-btn svg { width: 17px; height: 17px; }
   .icon-btn.small svg { width: 15px; height: 15px; }
@@ -218,10 +220,6 @@
   .trend-badge.up { background: rgba(46,125,50,0.12); color: #2E7D32; }
   .trend-badge.down { background: var(--danger-tint); color: var(--danger); }
   .trend-badge.flat { background: var(--surface-hover); color: var(--ink-faint); }
-  .sparkline { margin-top: 8px; line-height: 0; }
-  .sparkline svg { display: block; }
-  .trend-card-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 16px; }
-  .trend-card-row .trend-card-label { font-size: 12px; color: var(--ink-soft); }
   .stat-card .sub { font-size: 11px; color: var(--ink-faint); margin-top: 3px; }
 
   .section-title { font-size: 13px; font-weight: 600; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.04em; margin: 22px 0 10px; }
@@ -260,9 +258,10 @@
   .list-item {
     background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
     padding: 13px 15px; margin-bottom: 9px; display: flex; align-items: center; justify-content: space-between;
-    transition: box-shadow 0.15s;
+    transition: box-shadow 0.15s, transform 0.1s;
   }
   .list-item:hover { box-shadow: 0 2px 10px rgba(31,42,36,0.06); }
+  .list-item[onclick]:active { transform: scale(0.985); background: var(--surface-hover); }
   .list-item .li-main { flex: 1; min-width: 0; }
   .list-item .li-title { font-size: 15px; font-weight: 500; margin-bottom: 3px; }
   .list-item .li-sub { font-size: 12.5px; color: var(--ink-soft); }
@@ -299,7 +298,9 @@
     flex: 1; background: none; border: none; display: flex; flex-direction: column;
     align-items: center; gap: 3px; padding: 8px 2px; cursor: pointer;
     color: var(--ink-faint); font-family: 'Inter'; font-size: 10.5px; font-weight: 500;
+    transition: transform 0.1s, opacity 0.1s;
   }
+  .navbar button:active { transform: scale(0.92); opacity: 0.7; }
   .navbar button.active { color: var(--primary); }
   .fab {
     position: fixed; right: 18px; bottom: calc(78px + env(safe-area-inset-bottom));
@@ -352,7 +353,13 @@
     display: none; position: fixed; inset: 0; background: rgba(20,20,15,0.42);
     align-items: flex-end; justify-content: center; z-index: 50;
   }
-  .modal-overlay.active { display: flex; }
+  .modal-overlay.active { display: flex; animation: modalBackdropFade 0.18s ease; }
+  @keyframes modalBackdropFade { from { opacity: 0; } to { opacity: 1; } }
+  .modal-overlay.active .modal-sheet { animation: modalSheetSlideUp 0.28s cubic-bezier(0.16,1,0.3,1); }
+  @keyframes modalSheetSlideUp {
+    from { transform: translateY(28px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
   .modal-sheet {
     background: var(--bg); width: 100%; max-width: 460px; border-radius: 20px 20px 0 0;
     padding: 22px 20px calc(22px + env(safe-area-inset-bottom)); max-height: 86vh; overflow-y: auto;
@@ -370,11 +377,12 @@
   .product-pick-item .ppi-sub { color: var(--ink-faint); font-size: 12px; }
 
   .toast {
-    position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
+    position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(8px) scale(0.96);
     background: var(--ink); color: #fff; font-size: 13px; padding: 10px 18px;
-    border-radius: 20px; z-index: 60; opacity: 0; transition: opacity 0.25s; pointer-events: none;
+    border-radius: 20px; z-index: 60; opacity: 0; pointer-events: none;
+    transition: opacity 0.25s cubic-bezier(0.16,1,0.3,1), transform 0.25s cubic-bezier(0.16,1,0.3,1);
   }
-  .toast.show { opacity: 1; }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
 
   /* PUBLIC CATALOGUE PAGE */
   .public-cat-wrap { max-width: 480px; margin: 0 auto; padding: 32px 20px 60px; min-height: 100vh; }
@@ -457,8 +465,10 @@
       display: flex; align-items: center; gap: 12px; background: none; border: none;
       width: 100%; padding: 11px 12px; border-radius: 10px; font-family: 'Inter'; font-size: 14px; font-weight: 500;
       color: var(--ink-soft); cursor: pointer; text-align: left; margin-bottom: 2px;
+      transition: background 0.15s, color 0.15s;
     }
     .sidebar button:hover { background: var(--surface-hover); color: var(--ink); }
+    .sidebar button:active { background: var(--primary-tint); }
     .sidebar button.active { background: var(--primary-tint); color: var(--primary); }
     .sidebar .nicon { font-size: 17px; width: 20px; text-align: center; }
     .navbar { display: none; }
@@ -637,6 +647,7 @@
     transition: color 0.15s, transform 0.15s;
   }
   .social-icon:hover { color: var(--primary); transform: translateY(-1px); }
+  .social-icon:active { transform: scale(0.88); }
   .landing-footer .legal-link:hover { color: var(--primary); text-decoration: underline; }
 
   @media (min-width: 860px) {
@@ -1030,7 +1041,6 @@
                 <div class="value" id="statSalesWeek">&#8358;0</div>
                 <span class="trend-badge" id="salesWeekTrend" style="display:none;"></span>
               </div>
-              <div class="sparkline" id="salesWeekChart"></div>
             </div>
           </div>
 
@@ -1116,10 +1126,6 @@
               <div class="value" id="statSalesProfit">&#8358;0</div>
             </div>
           </div>
-          <div class="stat-card trend-card-row" style="margin-bottom:16px;">
-            <span class="trend-card-label" id="salesTrend7dLabel">Last 7 days</span>
-            <div class="sparkline" id="salesTab7dChart"></div>
-          </div>
           <div id="salesList"></div>
         </div>
 
@@ -1167,7 +1173,6 @@
                 <div class="value" id="doStatProfitWeek">&#8358;0</div>
                 <span class="trend-badge" id="doProfitWeekTrend" style="display:none;"></span>
               </div>
-              <div class="sparkline" id="doProfitWeekChart"></div>
             </div>
           </div>
           <div class="quick-actions">
@@ -1255,10 +1260,6 @@
               <div class="label" id="doProfitLabel">Profit &mdash; this week</div>
               <div class="value" id="doStatProfit">&#8358;0</div>
             </div>
-          </div>
-          <div class="stat-card trend-card-row" style="margin-bottom:16px;">
-            <span class="trend-card-label" id="doProfitTrend7dLabel">Last 7 days</span>
-            <div class="sparkline" id="doProfitTab7dChart"></div>
           </div>
           <div id="doProfitList"></div>
         </div>
@@ -3136,7 +3137,6 @@ function applyTranslations() {
     salesPeriodOptCustom: 'doPeriodOptCustom', salesFromLabel: 'doProfitFromLabel', salesToLabel: 'doProfitToLabel',
     expensesTabTitle: 'expensesTabTitle',
     wtReplayLabel: 'wtReplayLabel',
-    salesTrend7dLabel: 'label_last_7_days', doProfitTrend7dLabel: 'label_last_7_days',
     expPeriodOptToday: 'doPeriodOptToday', expPeriodOptYesterday: 'doPeriodOptYesterday',
     expPeriodOptWeek: 'doPeriodOptWeek', expPeriodOptLastweek: 'doPeriodOptLastweek',
     expPeriodOptMonth: 'doPeriodOptMonth', expPeriodOptLastmonth: 'doPeriodOptLastmonth',
@@ -4479,63 +4479,6 @@ function renderGreeting(greetingElId, dateElId) {
   }
 }
 
-function buildSparklineSVG(values, color) {
-  const width = 64, height = 22;
-  const safeValues = values.length ? values : [0];
-  const max = Math.max(...safeValues, 0);
-  const min = Math.min(...safeValues, 0);
-  const range = (max - min) || 1;
-  const stepX = safeValues.length > 1 ? width / (safeValues.length - 1) : width;
-  const pts = safeValues.map((v, i) => {
-    const x = safeValues.length > 1 ? i * stepX : width / 2;
-    const y = height - 3 - ((v - min) / range) * (height - 6);
-    return x.toFixed(1) + ',' + y.toFixed(1);
-  });
-  const linePath = 'M' + pts.join(' L');
-  const areaPath = linePath + ` L${width},${height} L0,${height} Z`;
-  return `<svg viewBox="0 0 ${width} ${height}" width="${width}" height="${height}" preserveAspectRatio="none">` +
-    `<path d="${areaPath}" fill="${color}" fill-opacity="0.12" stroke="none"/>` +
-    `<path d="${linePath}" fill="none" stroke="${color}" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>` +
-    `</svg>`;
-}
-
-function getDailyRangeTotal(filterFn, dayStart, dayEnd) {
-  return filterFn(dayStart, dayEnd);
-}
-
-function lastNDayRanges(days) {
-  const ranges = [];
-  for (let i = days - 1; i >= 0; i--) {
-    const dayStart = new Date(); dayStart.setHours(0, 0, 0, 0); dayStart.setDate(dayStart.getDate() - i);
-    const dayEnd = new Date(dayStart); dayEnd.setDate(dayEnd.getDate() + 1);
-    ranges.push({ dayStart, dayEnd });
-  }
-  return ranges;
-}
-
-function getDailySalesTotals(days) {
-  return lastNDayRanges(days).map(({ dayStart, dayEnd }) =>
-    state.sales.filter(s => { const d = new Date(s.date); return d >= dayStart && d < dayEnd; })
-      .reduce((s, x) => s + Number(x.total), 0)
-  );
-}
-
-function getDailyProfitTotals(days) {
-  return lastNDayRanges(days).map(({ dayStart, dayEnd }) => {
-    const grossProfit = state.sales.filter(s => { const d = new Date(s.date); return d >= dayStart && d < dayEnd; })
-      .reduce((s, x) => s + Number(x.profit || 0), 0);
-    return grossProfit - totalExpensesInRange(dayStart, dayEnd);
-  });
-}
-
-function getDailyDoProfitTotals(days) {
-  return lastNDayRanges(days).map(({ dayStart, dayEnd }) => {
-    const orders = (state.dropshipOrders || []).filter(o => { const d = new Date(o.date); return d >= dayStart && d < dayEnd && o.costPrice != null; });
-    const grossProfit = orders.reduce((s, o) => s + (Number(o.sellPrice || 0) - Number(o.costPrice || 0)), 0);
-    return grossProfit - totalExpensesInRange(dayStart, dayEnd);
-  });
-}
-
 function renderTrendBadge(elId, current, previous) {
   const el = document.getElementById(elId);
   if (!el) return;
@@ -4575,7 +4518,6 @@ function renderDashboard() {
   const lastWeekSales = state.sales.filter(s => { const d = new Date(s.date); return d >= lastWeekStart && d < lastWeekEnd; });
   const lastWeekTotal = lastWeekSales.reduce((s, x) => s + Number(x.total), 0);
   renderTrendBadge('salesWeekTrend', weekTotal, lastWeekTotal);
-  document.getElementById('salesWeekChart').innerHTML = buildSparklineSVG(getDailySalesTotals(7), '#1F4B43');
 
   const lowStock = state.products.filter(p => Number(p.qty) <= 2);
   const lowEl = document.getElementById('lowStockList');
@@ -4696,7 +4638,6 @@ function renderSalesTab() {
     profitEl.className = 'value ' + (totalProfit < 0 ? 'is-loss-value' : 'is-profit-value');
   }
 
-  document.getElementById('salesTab7dChart').innerHTML = buildSparklineSVG(getDailySalesTotals(7), '#1F4B43');
 
   const el = document.getElementById('salesList');
   if (filtered.length === 0) {
@@ -5286,7 +5227,6 @@ function renderDoHome() {
   const lastWeekGrossProfit = lastWeekOrders.reduce((s, o) => s + (Number(o.sellPrice || 0) - Number(o.costPrice || 0)), 0);
   const lastWeekProfit = lastWeekGrossProfit - totalExpensesInRange(lastWeekStart, lastWeekEnd);
   renderTrendBadge('doProfitWeekTrend', weekProfit, lastWeekProfit);
-  document.getElementById('doProfitWeekChart').innerHTML = buildSparklineSVG(getDailyDoProfitTotals(7), '#1F4B43');
 
   document.getElementById('doStatPendingOrders').textContent = fmtMoney(pendingValue);
   document.getElementById('doStatPendingOrdersCount').textContent = pending.length + ' ' + (pending.length === 1 ? t('do_order_singular') : t('do_order_plural'));
@@ -5606,7 +5546,6 @@ function renderDoProfitTab() {
   profitEl.textContent = (profit < 0 ? '- ' : '') + fmtMoney(Math.abs(profit));
   profitEl.className = 'value ' + (profit < 0 ? 'is-loss-value' : 'is-profit-value');
 
-  document.getElementById('doProfitTab7dChart').innerHTML = buildSparklineSVG(getDailyDoProfitTotals(7), '#1F4B43');
 
   const el = document.getElementById('doProfitList');
   if (known.length === 0) {
