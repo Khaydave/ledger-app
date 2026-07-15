@@ -212,8 +212,8 @@
   .dashboard-greeting .greeting-date { font-size: 13px; color: var(--ink-soft); margin-top: 2px; }
   .value-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
   .trend-badge {
-    display: inline-flex; align-items: center; gap: 2px; font-size: 11.5px; font-weight: 600;
-    padding: 2px 7px; border-radius: 20px;
+    display: inline-flex; align-items: center; gap: 2px; font-size: 10px; font-weight: 600;
+    padding: 1px 6px; border-radius: 20px; line-height: 1.6;
   }
   .trend-badge.up { background: rgba(46,125,50,0.12); color: #2E7D32; }
   .trend-badge.down { background: var(--danger-tint); color: var(--danger); }
@@ -4027,13 +4027,11 @@ function showTab(name, skipHistory) {
 }
 
 const FAB_ACTIONS = {
-  'home': () => openModal('saleModal'),
   'stock': () => openModal('stockModal'),
   'sales': () => openModal('saleModal'),
   'orders': () => openModal('orderModal'),
   'debts': () => openModal('debtModal'),
   'expenses': () => openModal('expenseModal'),
-  'do-home': () => openModal('doOrderModal'),
   'do-orders': () => openModal('doOrderModal')
 };
 let currentFabTab = null;
