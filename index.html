@@ -313,6 +313,9 @@
   .fab svg { display: block; }
   .fab:active { transform: scale(0.92); }
 
+  .walkthrough-blocker { position: fixed; inset: 0; z-index: 70; background: transparent; }
+  body.walkthrough-active { overflow: hidden; height: 100vh; }
+
   .walkthrough-highlight {
     position: fixed; border-radius: 12px; z-index: 71; pointer-events: none;
     box-shadow: 0 0 0 4px var(--accent), 0 0 0 9999px rgba(15,20,17,0.6);
@@ -1447,6 +1450,7 @@
     </svg>
   </button>
 
+  <div id="walkthroughBlocker" class="walkthrough-blocker" style="display:none;"></div>
   <div id="walkthroughHighlight" class="walkthrough-highlight" style="display:none;"></div>
   <div id="walkthroughTooltip" class="walkthrough-tooltip" style="display:none;">
     <div class="wt-step" id="wtStepCounter">1 of 5</div>
@@ -4157,8 +4161,10 @@ function getWalkthroughSteps() {
 function startWalkthrough() {
   walkthroughSteps = getWalkthroughSteps();
   walkthroughStepIndex = 0;
+  document.getElementById('walkthroughBlocker').style.display = 'block';
   document.getElementById('walkthroughHighlight').style.display = 'block';
   document.getElementById('walkthroughTooltip').style.display = 'block';
+  document.body.classList.add('walkthrough-active');
   showWalkthroughStep();
 }
 
@@ -4220,8 +4226,10 @@ async function skipWalkthrough() {
 }
 
 async function endWalkthrough() {
+  document.getElementById('walkthroughBlocker').style.display = 'none';
   document.getElementById('walkthroughHighlight').style.display = 'none';
   document.getElementById('walkthroughTooltip').style.display = 'none';
+  document.body.classList.remove('walkthrough-active');
   state.settings = { ...(state.settings || {}), walkthroughSeen: true };
   await saveState('settings');
 }
