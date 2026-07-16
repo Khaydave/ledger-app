@@ -376,6 +376,17 @@
   .product-pick-item:hover, .product-pick-item.selected { background: var(--primary-tint); }
   .product-pick-item .ppi-sub { color: var(--ink-faint); font-size: 12px; }
 
+  .skeleton {
+    background: linear-gradient(90deg, var(--border) 25%, var(--surface-hover) 37%, var(--border) 63%);
+    background-size: 400% 100%;
+    animation: skeletonShimmer 1.4s ease infinite;
+    border-radius: 8px;
+  }
+  @keyframes skeletonShimmer {
+    0% { background-position: 100% 50%; }
+    100% { background-position: 0 50%; }
+  }
+
   .toast {
     position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(8px) scale(0.96);
     background: var(--ink); color: #fff; font-size: 13px; padding: 10px 18px;
@@ -750,19 +761,54 @@
 
   <div id="publicCatalogueScreen" class="screen">
     <div class="public-cat-wrap" id="publicCatWrap">
-      <div class="public-cat-header">
-        <div class="avatar-circle" id="publicCatAvatar" style="margin:0 auto 14px;"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></span></div>
-        <h1 id="publicCatShopName">Loading...</h1>
-        <div class="loc" id="publicCatLocation"></div>
+      <div id="publicCatSkeleton">
+        <div class="skeleton" style="width:64px; height:64px; border-radius:50%; margin:0 auto 14px;"></div>
+        <div class="skeleton" style="width:50%; height:18px; margin:0 auto 8px;"></div>
+        <div class="skeleton" style="width:35%; height:12px; margin:0 auto 28px;"></div>
+        <div class="skeleton" style="height:52px; border-radius:12px; margin-bottom:10px;"></div>
+        <div class="skeleton" style="height:52px; border-radius:12px; margin-bottom:10px;"></div>
+        <div class="skeleton" style="height:52px; border-radius:12px;"></div>
       </div>
-      <div id="publicCatNote" style="display:none;" class="public-cat-note"></div>
-      <div id="publicCatList"></div>
-      <a id="publicCatWhatsapp" class="whatsapp-cta" style="display:none;" href="#" target="_blank" rel="noopener">
-        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></span><span id="publicCatWhatsappText">Message on WhatsApp</span>
-      </a>
-      <div class="public-cat-footer"><span id="publicCatMadeWith">Made with</span> <a href="?" onclick="event.preventDefault(); location.href = location.pathname;">Ledger</a></div>
+      <div id="publicCatRealContent" style="display:none;">
+        <div class="public-cat-header">
+          <div class="avatar-circle" id="publicCatAvatar" style="margin:0 auto 14px;"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></span></div>
+          <h1 id="publicCatShopName">Loading...</h1>
+          <div class="loc" id="publicCatLocation"></div>
+        </div>
+        <div id="publicCatNote" style="display:none;" class="public-cat-note"></div>
+        <div id="publicCatList"></div>
+        <a id="publicCatWhatsapp" class="whatsapp-cta" style="display:none;" href="#" target="_blank" rel="noopener">
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></span><span id="publicCatWhatsappText">Message on WhatsApp</span>
+        </a>
+        <div class="public-cat-footer"><span id="publicCatMadeWith">Made with</span> <a href="?" onclick="event.preventDefault(); location.href = location.pathname;">Ledger</a></div>
+      </div>
     </div>
   </div>
+
+  <div id="loadingScreen" class="screen" style="background:var(--bg);">
+    <div style="max-width:400px; margin:0 auto; padding:60px 24px; width:100%;">
+      <div class="skeleton" style="width:48px; height:48px; border-radius:12px; margin:0 auto 28px;"></div>
+      <div class="skeleton" style="width:60%; height:13px; margin:0 auto 32px;"></div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px;">
+        <div class="skeleton" style="height:74px; border-radius:14px;"></div>
+        <div class="skeleton" style="height:74px; border-radius:14px;"></div>
+      </div>
+      <div class="skeleton" style="height:58px; border-radius:14px; margin-bottom:10px;"></div>
+      <div class="skeleton" style="height:58px; border-radius:14px; margin-bottom:10px;"></div>
+      <div class="skeleton" style="height:58px; border-radius:14px;"></div>
+    </div>
+  </div>
+  <script>
+    (function() {
+      try {
+        var session = JSON.parse(localStorage.getItem('ledger_session') || 'null');
+        if (session && session.code) {
+          document.getElementById('landingScreen').classList.remove('active');
+          document.getElementById('loadingScreen').classList.add('active');
+        }
+      } catch (e) { /* if this fails, the landing page just shows normally */ }
+    })();
+  </script>
 
   <div id="landingScreen" class="screen active">
     <nav class="landing-nav">
@@ -3349,6 +3395,7 @@ function goToLogin() {
 
 function enterMainScreen() {
   document.getElementById('landingScreen').classList.remove('active');
+  document.getElementById('loadingScreen').classList.remove('active');
   document.getElementById('onboarding').classList.remove('active');
   document.getElementById('mainScreen').classList.add('active');
   document.getElementById('shopPasswordInput').value = '';
@@ -3407,6 +3454,11 @@ function clearSession() {
   try { localStorage.removeItem(SESSION_KEY); } catch (e) { /* ignore */ }
 }
 
+function showLandingFallback() {
+  document.getElementById('loadingScreen').classList.remove('active');
+  document.getElementById('landingScreen').classList.add('active');
+}
+
 async function tryAutoLogin() {
   let session;
   try {
@@ -3419,9 +3471,9 @@ async function tryAutoLogin() {
     const { db, doc, getDoc } = window.__firestore;
     const ref = doc(db, 'shops', session.code);
     const snap = await getDoc(ref);
-    if (!snap.exists()) { clearSession(); return; }
+    if (!snap.exists()) { clearSession(); showLandingFallback(); return; }
     const data = snap.data();
-    if (data.passwordHash !== session.passwordHash) { clearSession(); return; }
+    if (data.passwordHash !== session.passwordHash) { clearSession(); showLandingFallback(); return; }
 
     state = {
       products: data.products || [],
@@ -3441,7 +3493,8 @@ async function tryAutoLogin() {
     shopDocRef = ref;
     enterMainScreen();
   } catch (e) {
-    /* couldn't reach Firebase; just leave them on the login screen to try manually */
+    /* couldn't reach Firebase; fall back to the landing page so they can try logging in manually */
+    showLandingFallback();
   }
 }
 
@@ -3696,6 +3749,9 @@ async function showPublicCatalogue(code) {
   } catch (e) {
     shopNameEl.textContent = t('catalogue_could_not_load');
     locationEl.textContent = t('catalogue_check_connection');
+  } finally {
+    document.getElementById('publicCatSkeleton').style.display = 'none';
+    document.getElementById('publicCatRealContent').style.display = 'block';
   }
 }
 
