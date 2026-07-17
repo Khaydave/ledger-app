@@ -1535,6 +1535,15 @@
     <h2 id="doOrderModalTitle">Log customer order</h2>
     <div class="modal-sub" id="doOrderModalSub">Track what a customer wants, and what it'll cost you to source it.</div>
     <input type="hidden" id="doOrderEditId" value="">
+    <div style="text-align:center; margin-bottom:16px;">
+      <div class="avatar-circle" id="doOrderPhotoPreview" onclick="document.getElementById('doOrderPhotoInput').click()"
+        style="width:84px; height:84px; margin:0 auto; cursor:pointer; overflow:hidden; border-radius:16px;">
+        <span style="font-size:24px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></span>
+      </div>
+      <input type="file" id="doOrderPhotoInput" accept="image/*" style="display:none;" onchange="handleDoOrderPhotoUpload(event)">
+      <p class="hint" style="margin-top:8px;" id="doOrderPhotoHint">Tap to add a photo (optional)</p>
+      <p class="hint" style="text-decoration:underline; cursor:pointer;" id="doOrderRemovePhotoLabel" onclick="removeDoOrderPhoto()">Remove photo</p>
+    </div>
     <div class="field-group"><label id="doOrderCustomerLabel">Customer name</label><input id="doOrderCustomer" placeholder="e.g. Blessing"></div>
     <div class="field-group"><label id="doOrderDescLabel">What did they order?</label><input id="doOrderDescription" placeholder="e.g. Blue ankara dress, size M"></div>
     <div class="field-group"><label id="doOrderQtyLabel">Quantity</label><input id="doOrderQty" type="number" inputmode="numeric" placeholder="e.g. 1" value="1"></div>
@@ -4300,6 +4309,10 @@ function openModal(id) {
     document.getElementById('doOrderModalTitle').textContent = t('doOrderModalTitleAdd');
     document.getElementById('doOrderSaveBtn').textContent = t('doOrderSaveBtnAdd');
     document.getElementById('doOrderDeleteBtn').style.display = 'none';
+    const doPreview = document.getElementById('doOrderPhotoPreview');
+    doPreview.innerHTML = '<span style="font-size:24px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></span>';
+    delete doPreview.dataset.pending;
+    delete doPreview.dataset.removed;
   }
   if (id === 'expenseModal') {
     document.getElementById('expenseEditId').value = '';
@@ -5299,6 +5312,58 @@ async function deleteExpense() {
 
 // ===================== DROPSHIPPER MODE =====================
 
+function handleDoOrderPhotoUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const img = new Image();
+    img.onload = () => {
+      const maxDim = 640;
+      let w = img.width, h = img.height;
+      if (w > h && w > maxDim) { h = h * (maxDim / w); w = maxDim; }
+      else if (h > maxDim) { w = w * (maxDim / h); h = maxDim; }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, w, h);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.75);
+      const preview = document.getElementById('doOrderPhotoPreview');
+      preview.innerHTML = `<img src="${dataUrl}" style="width:100%;height:100%;object-fit:cover;">`;
+      preview.dataset.pending = dataUrl;
+      delete preview.dataset.removed;
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeDoOrderPhoto() {
+  const preview = document.getElementById('doOrderPhotoPreview');
+  preview.innerHTML = '<span style="font-size:24px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></span>';
+  preview.dataset.removed = 'true';
+  delete preview.dataset.pending;
+}
+
+async function uploadDoOrderPhotoToR2(orderId, dataUrl) {
+  const key = `shops/${shopCode}/dropship-orders/${orderId}.jpg`;
+  const res = await fetch(R2_WORKER_URL + '/upload', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ key, dataUrl })
+  });
+  if (!res.ok) throw new Error('Upload failed');
+  const data = await res.json();
+  return data.url;
+}
+
+async function deleteDoOrderPhotoFromR2(orderId) {
+  const key = `shops/${shopCode}/dropship-orders/${orderId}.jpg`;
+  try {
+    await fetch(R2_WORKER_URL + '/delete/' + encodeURIComponent(key), { method: 'DELETE' });
+  } catch (e) { /* best-effort cleanup */ }
+}
+
 async function submitDoOrder() {
   const editId = document.getElementById('doOrderEditId').value;
   const customer = document.getElementById('doOrderCustomer').value.trim();
@@ -5314,30 +5379,51 @@ async function submitDoOrder() {
     return;
   }
 
-  if (editId) {
-    const order = state.dropshipOrders.find(o => o.id === editId);
-    if (order) {
-      order.customer = customer;
-      order.description = description;
-      order.qty = qty;
-      order.sellPrice = sellPrice;
-      order.costPrice = costPrice;
-      order.stage = stage;
-      // customerPaid is intentionally left untouched here - it's only changed via the tap-to-toggle action
-    }
-  } else {
-    state.dropshipOrders.push({
-      id: crypto.randomUUID(),
-      customer, description, qty, sellPrice, costPrice, stage,
-      customerPaid: false,
-      date: new Date().toISOString()
-    });
-  }
+  const preview = document.getElementById('doOrderPhotoPreview');
+  const pendingPhoto = preview.dataset.pending;
+  const photoRemoved = preview.dataset.removed === 'true';
+  const saveBtn = document.getElementById('doOrderSaveBtn');
+  const originalBtnText = saveBtn.textContent;
+  saveBtn.disabled = true;
+  if (pendingPhoto) saveBtn.textContent = 'Saving photo...';
 
-  await saveState('dropshipOrders');
-  closeModal('doOrderModal');
-  renderAll();
-  toast(editId ? 'Order updated' : 'Order saved');
+  try {
+    if (editId) {
+      const order = state.dropshipOrders.find(o => o.id === editId);
+      if (order) {
+        order.customer = customer;
+        order.description = description;
+        order.qty = qty;
+        order.sellPrice = sellPrice;
+        order.costPrice = costPrice;
+        order.stage = stage;
+        // customerPaid is intentionally left untouched here - it's only changed via the tap-to-toggle action
+        if (photoRemoved) { order.photoURL = null; await deleteDoOrderPhotoFromR2(editId); }
+        if (pendingPhoto) order.photoURL = await uploadDoOrderPhotoToR2(editId, pendingPhoto);
+      }
+    } else {
+      const newId = crypto.randomUUID();
+      const newOrder = {
+        id: newId,
+        customer, description, qty, sellPrice, costPrice, stage,
+        customerPaid: false,
+        photoURL: null,
+        date: new Date().toISOString()
+      };
+      if (pendingPhoto) newOrder.photoURL = await uploadDoOrderPhotoToR2(newId, pendingPhoto);
+      state.dropshipOrders.push(newOrder);
+    }
+
+    await saveState('dropshipOrders');
+    closeModal('doOrderModal');
+    renderAll();
+    toast(editId ? 'Order updated' : 'Order saved');
+  } catch (e) {
+    toast("Couldn't save the photo. Check your connection and try again.");
+  } finally {
+    saveBtn.disabled = false;
+    saveBtn.textContent = originalBtnText;
+  }
 }
 
 function editDoOrder(id) {
@@ -5354,6 +5440,13 @@ function editDoOrder(id) {
   document.getElementById('doOrderModalTitle').textContent = t('doOrderModalTitleEdit');
   document.getElementById('doOrderSaveBtn').textContent = t('doOrderSaveBtnEdit');
   document.getElementById('doOrderDeleteBtn').style.display = 'block';
+
+  const preview = document.getElementById('doOrderPhotoPreview');
+  delete preview.dataset.pending;
+  delete preview.dataset.removed;
+  preview.innerHTML = order.photoURL
+    ? `<img src="${order.photoURL}" style="width:100%;height:100%;object-fit:cover;">`
+    : '<span style="font-size:24px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></span>';
 }
 
 async function toggleDoOrderPaid(id) {
@@ -5368,8 +5461,10 @@ async function toggleDoOrderPaid(id) {
 async function deleteDoOrder() {
   const editId = document.getElementById('doOrderEditId').value;
   if (!editId) return;
+  const order = state.dropshipOrders.find(o => o.id === editId);
   state.dropshipOrders = state.dropshipOrders.filter(o => o.id !== editId);
   await saveState('dropshipOrders');
+  if (order && order.photoURL) await deleteDoOrderPhotoFromR2(editId);
   closeModal('doOrderModal');
   renderAll();
   toast('Order deleted');
@@ -5416,11 +5511,17 @@ function renderDoHome() {
   } else {
     recentEl.innerHTML = recent.map(o => {
       const badge = doOrderStageBadge(o);
+      const thumb = o.photoURL
+        ? `<img src="${o.photoURL}" style="width:40px; height:40px; border-radius:9px; object-fit:cover; margin-right:12px; flex-shrink:0;">`
+        : '';
       return `
         <div class="list-item" onclick="editDoOrder('${o.id}')" style="cursor:pointer;">
-          <div class="li-main">
-            <div class="li-title">${escapeHtml(o.customer)}</div>
-            <div class="li-sub">${o.qty || 1} &times; ${escapeHtml(o.description)}</div>
+          <div style="display:flex; align-items:center; flex:1; min-width:0;">
+            ${thumb}
+            <div class="li-main">
+              <div class="li-title">${escapeHtml(o.customer)}</div>
+              <div class="li-sub">${o.qty || 1} &times; ${escapeHtml(o.description)}</div>
+            </div>
           </div>
           <div class="li-right">
             <div class="li-tag ${badge.cls}">${badge.label}</div>
@@ -5449,11 +5550,17 @@ function renderDoOrdersList() {
   }
   el.innerHTML = [...filtered].reverse().map(o => {
     const badge = doOrderStageBadge(o);
+    const thumb = o.photoURL
+      ? `<img src="${o.photoURL}" style="width:40px; height:40px; border-radius:9px; object-fit:cover; margin-right:12px; flex-shrink:0;">`
+      : '';
     return `
       <div class="list-item" onclick="editDoOrder('${o.id}')" style="cursor:pointer;">
-        <div class="li-main">
-          <div class="li-title">${escapeHtml(o.customer)}</div>
-          <div class="li-sub">${o.qty || 1} &times; ${escapeHtml(o.description)}</div>
+        <div style="display:flex; align-items:center; flex:1; min-width:0;">
+          ${thumb}
+          <div class="li-main">
+            <div class="li-title">${escapeHtml(o.customer)}</div>
+            <div class="li-sub">${o.qty || 1} &times; ${escapeHtml(o.description)}</div>
+          </div>
         </div>
         <div class="li-right">
           <div class="li-tag ${badge.cls}">${badge.label}</div>
@@ -5516,9 +5623,12 @@ function renderDoWholesalerList() {
   }
   el.innerHTML = items.map(o => `
     <div class="list-item">
-      <div class="li-main">
-        <div class="li-title">${escapeHtml(o.description)}</div>
-        <div class="li-sub">${t('label_qty')}: ${o.qty || 1} &middot; ${t('label_for_customer')} ${escapeHtml(o.customer)}</div>
+      <div style="display:flex; align-items:center; flex:1; min-width:0;">
+        ${o.photoURL ? `<img src="${o.photoURL}" style="width:40px; height:40px; border-radius:9px; object-fit:cover; margin-right:12px; flex-shrink:0;">` : ''}
+        <div class="li-main">
+          <div class="li-title">${escapeHtml(o.description)}</div>
+          <div class="li-sub">${t('label_qty')}: ${o.qty || 1} &middot; ${t('label_for_customer')} ${escapeHtml(o.customer)}</div>
+        </div>
       </div>
       <div class="li-tag ok">${o.costPrice != null ? fmtWholesalerMoney(o.costPrice) : t('label_cost_tbd')}</div>
     </div>`).join('');
@@ -5544,8 +5654,11 @@ function renderDoWholesalerTarget() {
       <div style="font-size:13px; color:#5B6B62; margin:2px 0 18px;">Wholesaler order &mdash; customer pre-orders</div>
       ${note ? `<div style="font-size:13px; color:#5B6B62; margin-bottom:14px;">${escapeHtml(note)}</div>` : ''}
       ${items.map(o => `
-        <div style="display:flex; justify-content:space-between; padding:12px 0; border-bottom:1px solid #E7E0D2;">
-          <span style="font-size:14.5px; color:#1F2A24;">${escapeHtml(o.description)} <span style="color:#9AA69C;">&times; ${o.qty || 1}</span></span>
+        <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 0; border-bottom:1px solid #E7E0D2;">
+          <div style="display:flex; align-items:center; gap:10px;">
+            ${o.photoURL ? `<img src="${o.photoURL}" crossorigin="anonymous" style="width:36px;height:36px;border-radius:8px;object-fit:cover;">` : ''}
+            <span style="font-size:14.5px; color:#1F2A24;">${escapeHtml(o.description)} <span style="color:#9AA69C;">&times; ${o.qty || 1}</span></span>
+          </div>
           <span style="font-family:'Plus Jakarta Sans',sans-serif; font-weight:600; font-size:14.5px; color:#1F4B43;">${o.costPrice != null ? fmtWholesalerMoney(o.costPrice) : 'TBD'}</span>
         </div>`).join('')}
       <div style="text-align:center; font-size:11px; color:#9AA69C; margin-top:18px;">${t('catalogue_made_with')} Ledger</div>
@@ -5558,7 +5671,7 @@ async function exportDoWholesalerImage() {
   if (!target) return;
   await saveDoWholesalerNote();
   try {
-    const canvas = await html2canvas(target.firstElementChild, { scale: 2, backgroundColor: '#FBF8F3' });
+    const canvas = await html2canvas(target.firstElementChild, { scale: 2, backgroundColor: '#FBF8F3', useCORS: true });
     const link = document.createElement('a');
     link.download = (shopCode || 'shop') + '-wholesaler-order.jpg';
     link.href = canvas.toDataURL('image/jpeg', 0.92);
@@ -5576,7 +5689,7 @@ async function exportDoWholesalerPDF() {
   if (!target) return;
   await saveDoWholesalerNote();
   try {
-    const canvas = await html2canvas(target.firstElementChild, { scale: 2, backgroundColor: '#FFFFFF' });
+    const canvas = await html2canvas(target.firstElementChild, { scale: 2, backgroundColor: '#FFFFFF', useCORS: true });
     const imgData = canvas.toDataURL('image/png');
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'a4' });
