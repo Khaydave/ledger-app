@@ -732,27 +732,38 @@
           <div class="loc" id="adminLoggedInAs"></div>
         </div>
 
-        <div class="stat-row" style="margin-bottom:14px;">
-          <div class="stat-card">
-            <div class="label">Accounts created</div>
-            <div class="value" id="statTotalAccounts">&mdash;</div>
-          </div>
-          <div class="stat-card">
-            <div class="label">Total logins</div>
-            <div class="value" id="statTotalLogins">&mdash;</div>
-          </div>
-        </div>
-        <div class="stat-card" style="margin-bottom:20px;">
-          <div class="label">Total sign-ups</div>
-          <div class="value" id="statTotalSignups">&mdash;</div>
+        <div class="period-toggle" style="margin-bottom:20px;">
+          <button id="adminTabBtnOverview" class="active" onclick="setAdminDashTab('overview')">Overview</button>
+          <button id="adminTabBtnAnnounce" onclick="setAdminDashTab('announce')">Announcements</button>
+          <button id="adminTabBtnAdmins" onclick="setAdminDashTab('admins')">Admins</button>
         </div>
 
-        <div class="section-title">Recent activity</div>
-        <div id="adminActivityList" style="margin-bottom:24px;"></div>
+        <div id="adminTab-overview">
+          <div class="stat-row" style="margin-bottom:14px;">
+            <div class="stat-card">
+              <div class="label">Accounts created</div>
+              <div class="value" id="statTotalAccounts">&mdash;</div>
+            </div>
+            <div class="stat-card">
+              <div class="label">Total logins</div>
+              <div class="value" id="statTotalLogins">&mdash;</div>
+            </div>
+          </div>
+          <div class="stat-card" style="margin-bottom:20px;">
+            <div class="label">Total sign-ups</div>
+            <div class="value" id="statTotalSignups">&mdash;</div>
+          </div>
 
-        <div style="border-top:1px solid var(--border); padding-top:20px; margin-bottom:20px;">
-          <div class="section-title" style="margin-top:0;">Email shop owners</div>
-          <p class="hint" style="margin-bottom:14px;">Sends to every shop that has an email address saved in their profile. <span id="adminEmailRecipientCount"></span></p>
+          <div class="section-title">Recent activity</div>
+          <div id="adminActivityList"></div>
+        </div>
+
+        <div id="adminTab-announce" style="display:none;">
+          <div class="stat-card" style="margin-bottom:18px;">
+            <div class="label">Shop owners reachable by email</div>
+            <div class="value" id="adminEmailRecipientCountValue">&mdash;</div>
+          </div>
+          <p class="hint" style="margin-bottom:14px;">Sends to every shop that has an email address saved in their profile.</p>
           <div class="field-group"><label>Subject</label><input id="adminEmailSubject" placeholder="e.g. New feature: Expense tracking"></div>
           <div class="field-group">
             <label>Message</label>
@@ -762,14 +773,16 @@
           <div id="adminEmailResult" style="margin-top:10px; font-size:13px; color:var(--ink-soft);"></div>
         </div>
 
-        <div style="border-top:1px solid var(--border); padding-top:20px; margin-bottom:20px;">
+        <div id="adminTab-admins" style="display:none;">
           <div class="section-title" style="margin-top:0;">Add another admin</div>
           <div class="field-group"><label>Their email</label><input id="newAdminEmail" type="email" placeholder="teammate@example.com"></div>
           <div class="field-group"><label>Set their password</label><input id="newAdminPassword" type="password" placeholder="At least 4 characters"></div>
-          <button class="btn btn-ghost" onclick="addNewAdmin()">Add admin</button>
-        </div>
+          <button class="btn btn-ghost" style="margin-bottom:24px;" onclick="addNewAdmin()">Add admin</button>
 
-        <button class="btn btn-danger-ghost" onclick="adminLogout()">Log out</button>
+          <div style="border-top:1px solid var(--border); padding-top:20px;">
+            <button class="btn btn-danger-ghost" onclick="adminLogout()">Log out</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -3639,6 +3652,16 @@ async function showAdminDashboard() {
   await loadAdminStats();
 }
 
+function setAdminDashTab(tab) {
+  const tabs = ['overview', 'announce', 'admins'];
+  tabs.forEach(t => {
+    document.getElementById('adminTab-' + t).style.display = t === tab ? 'block' : 'none';
+  });
+  document.getElementById('adminTabBtnOverview').classList.toggle('active', tab === 'overview');
+  document.getElementById('adminTabBtnAnnounce').classList.toggle('active', tab === 'announce');
+  document.getElementById('adminTabBtnAdmins').classList.toggle('active', tab === 'admins');
+}
+
 async function loadAdminStats() {
   try {
     await waitForFirebase();
@@ -3681,8 +3704,8 @@ async function loadAdminStats() {
 
   try {
     const emails = await getAllShopOwnerEmails();
-    const countEl = document.getElementById('adminEmailRecipientCount');
-    if (countEl) countEl.textContent = `(${emails.length} shop${emails.length === 1 ? '' : 's'} currently have an email on file)`;
+    const countEl = document.getElementById('adminEmailRecipientCountValue');
+    if (countEl) countEl.textContent = emails.length;
   } catch (e) { /* non-critical; the count is just a helpful preview */ }
 }
 
