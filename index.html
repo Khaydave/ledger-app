@@ -1408,6 +1408,12 @@
           <div class="field-group" style="max-width:280px;">
             <button class="btn btn-ghost" onclick="replayWalkthrough()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><span id="wtReplayLabel">Take the tour again</span></button>
           </div>
+          <div class="field-group" style="max-width:280px;">
+            <a class="btn btn-ghost" style="display:block; text-align:center; text-decoration:none;" id="contactUsBtn"
+              href="mailto:ledgerstockapp@gmail.com?subject=Ledger%20Support&body=Hi%2C%0A%0AShop%20code%3A%20">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M22 6l-10 7L2 6"/></svg> <span id="contactUsLabel">Contact Us</span>
+            </a>
+          </div>
 
           <div style="margin-top:28px; padding-top:20px; border-top:1px solid var(--border); max-width:280px;">
             <button class="btn btn-danger-ghost" id="settingsLogoutBtn" onclick="switchShop()">Log out</button>
@@ -2138,7 +2144,8 @@ const TRANSLATIONS = {
     wt_next: 'Next',
     wt_finish: 'Got it!',
     wtReplayLabel: 'Take the tour again',
-    label_last_7_days: 'Last 7 days'
+    label_last_7_days: 'Last 7 days',
+    contactUsLabel: 'Contact Us'
   },
   fr: {
     nav_home: 'Accueil',
@@ -2386,7 +2393,8 @@ const TRANSLATIONS = {
     wt_next: 'Suivant',
     wt_finish: 'Compris !',
     wtReplayLabel: 'Refaire la visite',
-    label_last_7_days: '7 derniers jours'
+    label_last_7_days: '7 derniers jours',
+    contactUsLabel: 'Nous contacter'
   },
   es: {
     nav_home: 'Inicio',
@@ -2634,7 +2642,8 @@ const TRANSLATIONS = {
     wt_next: 'Siguiente',
     wt_finish: '¡Entendido!',
     wtReplayLabel: 'Repetir el recorrido',
-    label_last_7_days: 'Últimos 7 días'
+    label_last_7_days: 'Últimos 7 días',
+    contactUsLabel: 'Contáctanos'
   },
   de: {
     nav_home: 'Start',
@@ -2882,7 +2891,8 @@ const TRANSLATIONS = {
     wt_next: 'Weiter',
     wt_finish: 'Verstanden!',
     wtReplayLabel: 'Tour erneut ansehen',
-    label_last_7_days: 'Letzte 7 Tage'
+    label_last_7_days: 'Letzte 7 Tage',
+    contactUsLabel: 'Kontakt'
   },
   zh: {
     nav_home: '首页',
@@ -3130,7 +3140,8 @@ const TRANSLATIONS = {
     wt_next: '下一步',
     wt_finish: '知道了！',
     wtReplayLabel: '重新查看引导',
-    label_last_7_days: '过去7天'
+    label_last_7_days: '过去7天',
+    contactUsLabel: '联系我们'
   }
 };
 
@@ -3205,6 +3216,7 @@ function applyTranslations() {
     salesPeriodOptCustom: 'doPeriodOptCustom', salesFromLabel: 'doProfitFromLabel', salesToLabel: 'doProfitToLabel',
     expensesTabTitle: 'expensesTabTitle',
     wtReplayLabel: 'wtReplayLabel',
+    contactUsLabel: 'contactUsLabel',
     expPeriodOptToday: 'doPeriodOptToday', expPeriodOptYesterday: 'doPeriodOptYesterday',
     expPeriodOptWeek: 'doPeriodOptWeek', expPeriodOptLastweek: 'doPeriodOptLastweek',
     expPeriodOptMonth: 'doPeriodOptMonth', expPeriodOptLastmonth: 'doPeriodOptLastmonth',
@@ -3865,6 +3877,12 @@ function renderSettingsTab() {
   populateCurrencySelect('settingsCurrencySelect', (state.settings && state.settings.currency) || 'NGN');
   document.getElementById('settingsLanguageSelect').value = (state.settings && state.settings.language) || 'en';
   applyModeUI();
+
+  const contactBtn = document.getElementById('contactUsBtn');
+  if (contactBtn) {
+    const body = encodeURIComponent('Hi,\n\nShop code: ' + (shopCode || '') + '\n\n');
+    contactBtn.href = 'mailto:ledgerstockapp@gmail.com?subject=Ledger%20Support&body=' + body;
+  }
 }
 
 async function setTheme(mode) {
