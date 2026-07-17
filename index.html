@@ -751,6 +751,18 @@
         <div id="adminActivityList" style="margin-bottom:24px;"></div>
 
         <div style="border-top:1px solid var(--border); padding-top:20px; margin-bottom:20px;">
+          <div class="section-title" style="margin-top:0;">Email shop owners</div>
+          <p class="hint" style="margin-bottom:14px;">Sends to every shop that has an email address saved in their profile. <span id="adminEmailRecipientCount"></span></p>
+          <div class="field-group"><label>Subject</label><input id="adminEmailSubject" placeholder="e.g. New feature: Expense tracking"></div>
+          <div class="field-group">
+            <label>Message</label>
+            <textarea id="adminEmailMessage" rows="6" style="width:100%; padding:12px 14px; border:1.5px solid var(--border); border-radius:10px; font-family:'Inter'; font-size:14px; resize:vertical;" placeholder="Write your update here..."></textarea>
+          </div>
+          <button class="btn btn-primary" onclick="sendAdminAnnouncement()">Send to shop owners</button>
+          <div id="adminEmailResult" style="margin-top:10px; font-size:13px; color:var(--ink-soft);"></div>
+        </div>
+
+        <div style="border-top:1px solid var(--border); padding-top:20px; margin-bottom:20px;">
           <div class="section-title" style="margin-top:0;">Add another admin</div>
           <div class="field-group"><label>Their email</label><input id="newAdminEmail" type="email" placeholder="teammate@example.com"></div>
           <div class="field-group"><label>Set their password</label><input id="newAdminPassword" type="password" placeholder="At least 4 characters"></div>
@@ -3665,6 +3677,73 @@ async function loadAdminStats() {
     }
   } catch (e) {
     toast("Couldn't load stats. Check your connection.");
+  }
+
+  try {
+    const emails = await getAllShopOwnerEmails();
+    const countEl = document.getElementById('adminEmailRecipientCount');
+    if (countEl) countEl.textContent = `(${emails.length} shop${emails.length === 1 ? '' : 's'} currently have an email on file)`;
+  } catch (e) { /* non-critical; the count is just a helpful preview */ }
+}
+
+// IMPORTANT: replace this with your actual deployed email Worker URL once it's set up.
+const EMAIL_WORKER_URL = 'https://ledgeremailworkerjs.ifedav-olowogoke.workers.dev';
+
+async function getAllShopOwnerEmails() {
+  await waitForFirebase();
+  const { db, collection, getDocs } = window.__firestore;
+  const snap = await getDocs(collection(db, 'shops'));
+  const emails = [];
+  snap.forEach(docSnap => {
+    const data = docSnap.data();
+    const email = data.profile && data.profile.email && data.profile.email.trim();
+    if (email && email.includes('@')) emails.push(email);
+  });
+  return emails;
+}
+
+async function sendAdminAnnouncement() {
+  const subject = document.getElementById('adminEmailSubject').value.trim();
+  const message = document.getElementById('adminEmailMessage').value.trim();
+  const resultEl = document.getElementById('adminEmailResult');
+
+  if (!subject || !message) {
+    resultEl.textContent = 'Fill in both a subject and a message first.';
+    return;
+  }
+
+  resultEl.textContent = 'Looking up shop owners with an email on file...';
+  let emails;
+  try {
+    emails = await getAllShopOwnerEmails();
+  } catch (e) {
+    resultEl.textContent = "Couldn't load shop emails. Check your connection and try again.";
+    return;
+  }
+
+  if (emails.length === 0) {
+    resultEl.textContent = 'No shop owners have an email address on file yet.';
+    return;
+  }
+
+  const confirmed = confirm(`This will send this email to ${emails.length} shop owner${emails.length === 1 ? '' : 's'}. Send it now?`);
+  if (!confirmed) { resultEl.textContent = ''; return; }
+
+  resultEl.textContent = `Sending to ${emails.length} shop owner${emails.length === 1 ? '' : 's'}...`;
+  try {
+    const res = await fetch(EMAIL_WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ subject, message, recipients: emails })
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      resultEl.textContent = 'Something went wrong: ' + (data.error || 'unknown error.');
+      return;
+    }
+    resultEl.textContent = `Done — sent to ${data.sent} of ${data.totalRequested}.` + (data.failed > 0 ? ` ${data.failed} failed to send.` : '');
+  } catch (e) {
+    resultEl.textContent = "Couldn't reach the email service. Check your connection and try again.";
   }
 }
 
