@@ -1469,6 +1469,15 @@
     <h2 id="stockModalTitle">Add stock</h2>
     <div class="modal-sub" id="stockModalSub">Add a new item, or add more of one you already have.</div>
     <input type="hidden" id="stockEditId" value="">
+    <div style="text-align:center; margin-bottom:16px;">
+      <div class="avatar-circle" id="stockPhotoPreview" onclick="document.getElementById('stockPhotoInput').click()"
+        style="width:84px; height:84px; margin:0 auto; cursor:pointer; overflow:hidden; border-radius:16px;">
+        <span style="font-size:24px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></span>
+      </div>
+      <input type="file" id="stockPhotoInput" accept="image/*" style="display:none;" onchange="handleStockPhotoUpload(event)">
+      <p class="hint" style="margin-top:8px;">Tap to add a photo (optional)</p>
+      <p class="hint" style="text-decoration:underline; cursor:pointer;" onclick="removeStockPhoto()">Remove photo</p>
+    </div>
     <div class="field-group"><label id="stockNameLabel">Item name</label><input id="stockName" placeholder="e.g. Blue ankara dress"></div>
     <div class="field-group"><label id="stockQtyLabel">Quantity</label><input id="stockQty" type="number" inputmode="numeric" placeholder="e.g. 10"></div>
     <div class="field-group"><label id="stockCostPriceLabel">Buy price (cost, per item)</label><input id="stockCostPrice" type="number" inputmode="numeric" placeholder="e.g. 5000"></div>
@@ -3737,7 +3746,10 @@ async function showPublicCatalogue(code) {
     } else {
       listEl.innerHTML = items.map(p => `
         <div class="public-cat-item">
-          <span class="name">${escapeHtml(p.name)}</span>
+          <div style="display:flex; align-items:center; gap:10px;">
+            ${p.photoURL ? `<img src="${p.photoURL}" style="width:44px; height:44px; border-radius:9px; object-fit:cover;">` : ''}
+            <span class="name">${escapeHtml(p.name)}</span>
+          </div>
           <span class="price">${fmtMoney(p.price)}</span>
         </div>`).join('');
     }
@@ -4272,6 +4284,10 @@ function openModal(id) {
     document.getElementById('stockModalSub').textContent = t('stock_modal_sub_add');
     document.getElementById('stockSaveBtn').textContent = t('btn_save_item');
     document.getElementById('stockDeleteBtn').style.display = 'none';
+    const preview = document.getElementById('stockPhotoPreview');
+    preview.innerHTML = '<span style="font-size:24px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></span>';
+    delete preview.dataset.pending;
+    delete preview.dataset.removed;
   }
   if (id === 'doOrderModal') {
     document.getElementById('doOrderEditId').value = '';
@@ -4633,11 +4649,17 @@ function renderStockList() {
   }
   el.innerHTML = filtered.map(p => {
     const low = Number(p.qty) <= 2;
+    const thumb = p.photoURL
+      ? `<img src="${p.photoURL}" style="width:44px; height:44px; border-radius:9px; object-fit:cover; margin-right:12px; flex-shrink:0;">`
+      : '';
     return `
       <div class="list-item" onclick="editStock('${p.id}')" style="cursor:pointer;">
-        <div class="li-main">
-          <div class="li-title">${escapeHtml(p.name)}</div>
-          <div class="li-sub">${fmtMoney(p.price)} ${t('label_each')}</div>
+        <div style="display:flex; align-items:center; flex:1; min-width:0;">
+          ${thumb}
+          <div class="li-main">
+            <div class="li-title">${escapeHtml(p.name)}</div>
+            <div class="li-sub">${fmtMoney(p.price)} ${t('label_each')}</div>
+          </div>
         </div>
         <div class="li-right">
           <div class="li-tag ${low ? 'low' : 'ok'}">${p.qty} ${t('label_in_stock')}</div>
@@ -4849,6 +4871,62 @@ function selectSaleProduct(id) {
   document.getElementById('saleQty').focus();
 }
 
+// ===================== PHOTO STORAGE (Cloudflare R2 via Worker) =====================
+// IMPORTANT: replace this with your actual deployed Worker URL after setup (see deployment notes).
+const R2_WORKER_URL = 'https://ledger-photos-worker.ifedav-olowogoke.workers.dev';
+
+function handleStockPhotoUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const img = new Image();
+    img.onload = () => {
+      const maxDim = 640;
+      let w = img.width, h = img.height;
+      if (w > h && w > maxDim) { h = h * (maxDim / w); w = maxDim; }
+      else if (h > maxDim) { w = w * (maxDim / h); h = maxDim; }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, w, h);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.75);
+      const preview = document.getElementById('stockPhotoPreview');
+      preview.innerHTML = `<img src="${dataUrl}" style="width:100%;height:100%;object-fit:cover;">`;
+      preview.dataset.pending = dataUrl;
+      delete preview.dataset.removed;
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeStockPhoto() {
+  const preview = document.getElementById('stockPhotoPreview');
+  preview.innerHTML = '<span style="font-size:24px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></span>';
+  preview.dataset.removed = 'true';
+  delete preview.dataset.pending;
+}
+
+async function uploadStockPhotoToR2(productId, dataUrl) {
+  const key = `shops/${shopCode}/products/${productId}.jpg`;
+  const res = await fetch(R2_WORKER_URL + '/upload', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ key, dataUrl })
+  });
+  if (!res.ok) throw new Error('Upload failed');
+  const data = await res.json();
+  return data.url;
+}
+
+async function deleteStockPhotoFromR2(productId) {
+  const key = `shops/${shopCode}/products/${productId}.jpg`;
+  try {
+    await fetch(R2_WORKER_URL + '/delete/' + encodeURIComponent(key), { method: 'DELETE' });
+  } catch (e) { /* best-effort cleanup; a missing/undeleted file isn't worth blocking on */ }
+}
+
 async function submitStock() {
   const editId = document.getElementById('stockEditId').value;
   const name = document.getElementById('stockName').value.trim();
@@ -4857,23 +4935,47 @@ async function submitStock() {
   const price = Number(document.getElementById('stockPrice').value);
   if (!name || qty === '' || isNaN(qty) || qty < 0) { toast('Fill in the item name and quantity'); return; }
 
-  if (editId) {
-    const item = state.products.find(p => p.id === editId);
-    if (item) { item.name = name; item.qty = qty; item.costPrice = costPrice || 0; item.price = price || 0; }
-  } else {
-    const existing = state.products.find(p => p.name.toLowerCase() === name.toLowerCase());
-    if (existing) {
-      existing.qty = Number(existing.qty) + qty;
-      if (costPrice) existing.costPrice = costPrice;
-      if (price) existing.price = price;
+  const preview = document.getElementById('stockPhotoPreview');
+  const pendingPhoto = preview.dataset.pending;
+  const photoRemoved = preview.dataset.removed === 'true';
+  const saveBtn = document.getElementById('stockSaveBtn');
+  const originalBtnText = saveBtn.textContent;
+  saveBtn.disabled = true;
+  if (pendingPhoto) saveBtn.textContent = 'Saving photo...';
+
+  try {
+    if (editId) {
+      const item = state.products.find(p => p.id === editId);
+      if (item) {
+        item.name = name; item.qty = qty; item.costPrice = costPrice || 0; item.price = price || 0;
+        if (photoRemoved) { item.photoURL = null; await deleteStockPhotoFromR2(editId); }
+        if (pendingPhoto) item.photoURL = await uploadStockPhotoToR2(editId, pendingPhoto);
+      }
     } else {
-      state.products.push({ id: crypto.randomUUID(), name, qty, costPrice: costPrice || 0, price: price || 0 });
+      const existing = state.products.find(p => p.name.toLowerCase() === name.toLowerCase());
+      if (existing) {
+        existing.qty = Number(existing.qty) + qty;
+        if (costPrice) existing.costPrice = costPrice;
+        if (price) existing.price = price;
+        if (photoRemoved) { existing.photoURL = null; await deleteStockPhotoFromR2(existing.id); }
+        if (pendingPhoto) existing.photoURL = await uploadStockPhotoToR2(existing.id, pendingPhoto);
+      } else {
+        const newId = crypto.randomUUID();
+        const newItem = { id: newId, name, qty, costPrice: costPrice || 0, price: price || 0, photoURL: null };
+        if (pendingPhoto) newItem.photoURL = await uploadStockPhotoToR2(newId, pendingPhoto);
+        state.products.push(newItem);
+      }
     }
+    await saveState('products');
+    closeModal('stockModal');
+    renderAll();
+    toast('Stock saved');
+  } catch (e) {
+    toast("Couldn't save the photo. Check your connection and try again.");
+  } finally {
+    saveBtn.disabled = false;
+    saveBtn.textContent = originalBtnText;
   }
-  await saveState('products');
-  closeModal('stockModal');
-  renderAll();
-  toast('Stock saved');
 }
 
 function editStock(id) {
@@ -4889,13 +4991,22 @@ function editStock(id) {
   document.getElementById('stockModalSub').textContent = t('stock_modal_sub_edit');
   document.getElementById('stockSaveBtn').textContent = t('btn_save_changes');
   document.getElementById('stockDeleteBtn').style.display = 'block';
+
+  const preview = document.getElementById('stockPhotoPreview');
+  delete preview.dataset.pending;
+  delete preview.dataset.removed;
+  preview.innerHTML = p.photoURL
+    ? `<img src="${p.photoURL}" style="width:100%;height:100%;object-fit:cover;">`
+    : '<span style="font-size:24px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></span>';
 }
 
 async function deleteStock() {
   const editId = document.getElementById('stockEditId').value;
   if (!editId) return;
+  const item = state.products.find(p => p.id === editId);
   state.products = state.products.filter(p => p.id !== editId);
   await saveState('products');
+  if (item && item.photoURL) await deleteStockPhotoFromR2(editId);
   closeModal('stockModal');
   renderAll();
   toast('Item deleted');
@@ -5663,7 +5774,11 @@ function renderCataloguePicker(includedIds) {
   }
   el.innerHTML = state.products.map(p => `
     <label class="product-pick-item" style="cursor:pointer;">
-      <span><input type="checkbox" class="catalogue-check" value="${p.id}" ${includedIds.includes(p.id) ? 'checked' : ''} style="width:auto; margin-right:8px;">${escapeHtml(p.name)}</span>
+      <span style="display:flex; align-items:center;">
+        <input type="checkbox" class="catalogue-check" value="${p.id}" ${includedIds.includes(p.id) ? 'checked' : ''} style="width:auto; margin-right:8px;">
+        ${p.photoURL ? `<img src="${p.photoURL}" style="width:26px; height:26px; border-radius:6px; object-fit:cover; margin-right:8px;">` : ''}
+        ${escapeHtml(p.name)}
+      </span>
       <span class="ppi-sub">${fmtMoney(p.price)}</span>
     </label>`).join('');
 }
@@ -5722,7 +5837,10 @@ function showCatalogueReview() {
   reviewEl.innerHTML = (note ? `<p class="hint" style="margin-bottom:12px;"><b>${t('label_caption')}:</b> ${escapeHtml(note)}</p>` : '') +
     items.map(p => `
       <div class="list-item">
-        <div class="li-main"><div class="li-title">${escapeHtml(p.name)}</div></div>
+        <div class="li-main" style="display:flex; align-items:center; gap:10px;">
+          ${p.photoURL ? `<img src="${p.photoURL}" style="width:36px; height:36px; border-radius:8px; object-fit:cover;">` : ''}
+          <div class="li-title">${escapeHtml(p.name)}</div>
+        </div>
         <div class="li-tag ok">${fmtMoney(p.price)}</div>
       </div>`).join('');
 
@@ -5772,8 +5890,11 @@ function renderCatalogueTarget() {
       </div>
       ${note ? `<div style="font-size:13px; color:#5B6B62; margin:6px 0 18px;">${escapeHtml(note)}</div>` : '<div style="margin-bottom:14px;"></div>'}
       ${items.map(p => `
-        <div style="display:flex; justify-content:space-between; padding:12px 0; border-bottom:1px solid #E7E0D2;">
-          <span style="font-size:14.5px; color:#1F2A24;">${escapeHtml(p.name)}</span>
+        <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 0; border-bottom:1px solid #E7E0D2;">
+          <div style="display:flex; align-items:center; gap:10px;">
+            ${p.photoURL ? `<img src="${p.photoURL}" crossorigin="anonymous" style="width:40px;height:40px;border-radius:8px;object-fit:cover;">` : ''}
+            <span style="font-size:14.5px; color:#1F2A24;">${escapeHtml(p.name)}</span>
+          </div>
           <span style="font-family:'Plus Jakarta Sans',sans-serif; font-weight:600; font-size:14.5px; color:#1F4B43;">${fmtMoney(p.price)}</span>
         </div>`).join('')}
       <div style="text-align:center; font-size:11px; color:#9AA69C; margin-top:18px;">${t('catalogue_made_with')} Ledger</div>
@@ -5787,7 +5908,7 @@ async function exportCatalogueImage() {
   await saveCatalogue();
 
   try {
-    const canvas = await html2canvas(target.firstElementChild, { scale: 2, backgroundColor: '#FBF8F3' });
+    const canvas = await html2canvas(target.firstElementChild, { scale: 2, backgroundColor: '#FBF8F3', useCORS: true });
     const link = document.createElement('a');
     link.download = (shopCode || 'catalogue') + '-catalogue.jpg';
     link.href = canvas.toDataURL('image/jpeg', 0.92);
@@ -5806,7 +5927,7 @@ async function exportCataloguePDF() {
   await saveCatalogue();
 
   try {
-    const canvas = await html2canvas(target.firstElementChild, { scale: 2, backgroundColor: '#FFFFFF' });
+    const canvas = await html2canvas(target.firstElementChild, { scale: 2, backgroundColor: '#FFFFFF', useCORS: true });
     const imgData = canvas.toDataURL('image/png');
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'a4' });
