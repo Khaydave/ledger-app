@@ -691,6 +691,159 @@
     .phone-mock.back { transform: rotate(-9deg) translate(-70px, 6px); }
     .phone-mock.front { transform: rotate(6deg) translate(64px, -10px); }
   }
+
+  /* Refined Ledger experience — presentation only; app state and services stay unchanged. */
+  :root { --radius: 16px; }
+  html { scroll-behavior: smooth; }
+  button, input, select { -webkit-tap-highlight-color: transparent; }
+  button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible {
+    outline: 3px solid var(--accent); outline-offset: 3px;
+  }
+
+  /* Public landing page */
+  .landing-nav { padding: 13px clamp(20px, 5vw, 72px); background: rgba(251,248,243,.94); }
+  .landing-nav .brand-lockup .mark { width: 36px; height: 36px; }
+  .landing-nav .brand-lockup span { font-size: 18px; letter-spacing: -.03em; }
+  .landing-btn { border-radius: 12px; padding: 11px 20px; }
+  .landing-hero {
+    max-width: 1320px; min-height: 520px; margin: 28px auto 0; padding: 64px clamp(26px, 6vw, 84px);
+    border: 1px solid var(--border); border-radius: 32px;
+    background: radial-gradient(ellipse at 83% 15%, var(--primary-tint), transparent 42%), var(--surface);
+    box-shadow: 0 20px 60px rgba(31,42,36,.06);
+  }
+  .landing-hero h1 { font-size: clamp(38px, 4.2vw, 58px); line-height: 1.08; letter-spacing: -.045em; }
+  .landing-hero p.sub { max-width: 510px; font-size: 16px; line-height: 1.75; }
+  .landing-hero .eyebrow { border: 1px solid var(--border); }
+  .landing-hero-actions .ghost-link { padding: 12px 2px; }
+  .mockup-stack { min-height: 380px; }
+  .phone-mock { box-shadow: 0 28px 58px rgba(20,30,25,.2), 0 6px 18px rgba(20,30,25,.1); }
+  .landing-section { max-width: 1320px; padding: 74px clamp(24px, 5vw, 68px); }
+  .landing-section.tinted { max-width: 1240px; border: 1px solid var(--border); }
+  .section-heading { font-size: clamp(28px, 3vw, 36px); letter-spacing: -.035em; }
+  .section-sub { line-height: 1.75; }
+  .feature-grid { gap: 18px; }
+  .feature-card { border-radius: 18px; padding: 24px; box-shadow: 0 10px 30px rgba(31,42,36,.045); }
+  .feature-card .ficon { border-radius: 13px; }
+  .feature-card h3 { font-size: 16px; }
+  .feature-card p { font-size: 13.5px; line-height: 1.7; }
+  .step-card, .faq-item { border-radius: 16px; box-shadow: 0 8px 24px rgba(31,42,36,.04); }
+  .landing-cta-band { max-width: 1240px; margin: 20px auto 48px; padding: 64px 32px; }
+  .landing-cta-band h2 { font-size: clamp(28px, 3vw, 38px); letter-spacing: -.03em; }
+  .landing-footer { max-width: 1320px; padding-right: clamp(24px, 5vw, 68px); padding-left: clamp(24px, 5vw, 68px); }
+
+  /* Sign-in and shop setup */
+  #onboarding {
+    width: min(100% - 32px, 480px); min-height: 0; margin: auto; padding: 40px 38px;
+    border: 1px solid var(--border); border-radius: 24px; background: var(--surface);
+    box-shadow: 0 24px 70px rgba(31,42,36,.09);
+  }
+  #onboarding .mark { width: 52px; height: 52px; margin-bottom: 18px; }
+  #onboarding h1 { font-size: 28px; letter-spacing: -.04em; }
+  #onboarding p { max-width: 350px; }
+  #onboarding .field-group, #onboarding #signupFields { max-width: 100% !important; }
+  #onboarding .auth-toggle { max-width: 100%; }
+  #onboarding input, #onboarding select { min-height: 48px; border-radius: 12px; }
+  #onboarding .btn { max-width: 100%; min-height: 50px; border-radius: 12px; }
+  .auth-toggle { border-radius: 12px; }
+  .auth-toggle button { border-radius: 9px; }
+
+  /* App workspace */
+  #mainScreen.active { min-height: 100vh; background: var(--bg); }
+  .sidebar {
+    border-right: 1px solid var(--border); box-shadow: 8px 0 28px rgba(31,42,36,.025);
+  }
+  .sidebar .brand { padding: 4px 9px 30px; }
+  .sidebar .brand-name { font-size: 17px; letter-spacing: -.03em; }
+  .sidebar button { min-height: 44px; border-radius: 12px; font-size: 13.5px; }
+  .sidebar button.active { font-weight: 600; box-shadow: inset 3px 0 0 var(--primary); }
+  .topbar { padding-top: 25px; }
+  .topbar .shopname { display: flex; align-items: center; gap: 11px; font-size: 14px; }
+  .topbar .shopname img { width: 32px; height: 32px; border-radius: 9px; object-fit: cover; }
+  .topbar-actions { gap: 10px; }
+  .icon-btn { width: 40px; height: 40px; border-radius: 12px; }
+  .content { width: 100%; max-width: 1180px; padding: 34px 52px 56px; }
+  .tabpanel { animation-duration: .2s; }
+  .tabpanel h2 { font-size: 24px !important; font-weight: 700; letter-spacing: -.035em; }
+  .dashboard-greeting { margin-bottom: 24px; }
+  .dashboard-greeting .greeting-text { font-size: 28px; letter-spacing: -.04em; }
+  .dashboard-greeting .greeting-date { margin-top: 5px; font-size: 13px; }
+  .stat-row { gap: 14px; margin-bottom: 22px; }
+  .stat-card {
+    border-color: color-mix(in srgb, var(--border) 80%, transparent);
+    border-radius: 18px; padding: 19px 20px;
+    box-shadow: 0 8px 24px rgba(31,42,36,.035);
+  }
+  .stat-card .label { font-size: 12px; font-weight: 600; letter-spacing: .01em; }
+  .stat-card .value { font-size: clamp(22px, 2.2vw, 28px); letter-spacing: -.035em; }
+  .stat-card .sub { font-size: 12px; margin-top: 6px; }
+  .quick-actions { gap: 12px; margin: 20px 0 30px; }
+  .quick-btn {
+    min-height: 112px; align-items: flex-start; justify-content: center; padding: 18px 20px;
+    border: 1px solid transparent; border-radius: 18px; font-size: 13.5px;
+    box-shadow: 0 10px 24px rgba(31,75,67,.12);
+  }
+  .quick-btn .qicon { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 11px; background: rgba(255,255,255,.16); }
+  .quick-btn.secondary { border-color: var(--border); box-shadow: 0 8px 20px rgba(31,42,36,.035); }
+  .quick-btn.secondary .qicon { background: rgba(31,75,67,.08); }
+  .section-title { margin: 30px 0 13px; color: var(--ink); font-size: 14px; font-weight: 700; text-transform: none; letter-spacing: -.01em; }
+  .list-item, .empty-state { border-radius: 15px; }
+  .list-item { min-height: 68px; padding: 14px 16px; margin-bottom: 10px; box-shadow: 0 5px 16px rgba(31,42,36,.025); }
+  .list-item:hover { box-shadow: 0 10px 24px rgba(31,42,36,.07); }
+  .li-title { letter-spacing: -.01em; }
+  .li-tag { padding: 5px 10px; border-radius: 8px; }
+  .search-box input, input, select { border-radius: 12px; }
+  .search-box input { min-height: 46px; }
+  .period-toggle { border-radius: 13px; }
+  .modal-overlay { backdrop-filter: blur(4px); }
+
+  @media (min-width: 860px) {
+    #app { max-width: 1600px; }
+    .sidebar { width: 248px; padding: 24px 16px; }
+    .content { max-width: 1180px; padding: 36px 52px 60px; }
+    .topbar { max-width: 1284px; width: 100%; margin: 0 auto; padding: 26px 52px 0; }
+    .stat-row { gap: 16px; }
+    .quick-actions { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .landing-hero { grid-template-columns: minmax(0, 1.05fr) minmax(390px, .95fr); gap: 48px; }
+    .steps-wrap { max-width: 760px; }
+  }
+  @media (max-width: 859px) {
+    #onboarding { width: min(100% - 28px, 480px); padding: 32px 24px; border-radius: 22px; }
+    .content { padding: 22px 18px 112px; }
+    .topbar { padding: 16px 18px 8px; }
+    .dashboard-greeting .greeting-text { font-size: 24px; }
+    .stat-card { padding: 15px 14px; }
+    .stat-card .value { font-size: 20px; }
+    .quick-btn { min-height: 92px; padding: 14px; }
+    .navbar {
+      position: fixed; z-index: 40; bottom: 0; left: 0; right: 0;
+      border-top: 1px solid var(--border); box-shadow: 0 -8px 24px rgba(31,42,36,.07);
+      padding-top: 7px; background: color-mix(in srgb, var(--surface) 95%, transparent); backdrop-filter: blur(14px);
+    }
+    .navbar button { min-height: 48px; }
+    .landing-nav { padding: 12px 18px; }
+    .landing-hero {
+      margin: 14px 14px 0; padding: 38px 23px 28px; gap: 24px; border-radius: 26px;
+      min-height: 0; background: radial-gradient(ellipse at 88% 10%, var(--primary-tint), transparent 45%), var(--surface);
+    }
+    .landing-hero h1 { font-size: clamp(34px, 8vw, 46px); }
+    .landing-hero p.sub { font-size: 15px; }
+    .mockup-stack { height: 275px; min-height: 275px; }
+    .landing-section { padding: 48px 22px; }
+    .landing-section.tinted { margin: 0 14px; max-width: none; border-radius: 22px; }
+    .landing-cta-band { margin: 12px 14px 34px; padding: 44px 22px; border-radius: 22px; }
+    .landing-footer { padding: 20px 20px 34px; }
+  }
+  @media (max-width: 420px) {
+    .stat-row { gap: 9px; }
+    .stat-card { padding: 13px 11px; }
+    .stat-card .label { font-size: 11px; }
+    .stat-card .value { font-size: 18px; }
+    .quick-actions { gap: 9px; }
+    .quick-btn { min-height: 86px; font-size: 12px; }
+    .content { padding-right: 14px; padding-left: 14px; }
+    .landing-hero-actions { gap: 12px; }
+    .landing-btn.large { padding: 14px 20px; }
+  }
 </style>
 </head>
 <body>
