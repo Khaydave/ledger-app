@@ -3,10 +3,9 @@
     <linearGradient id="barFront" x1="34" y1="66" x2="53" y2="101" gradientUnits="userSpaceOnUse"><stop stop-color="#6EB89A"/><stop offset="1" stop-color="#27684F"/></linearGradient>
     <linearGradient id="barSide" x1="53" y1="70" x2="63" y2="98" gradientUnits="userSpaceOnUse"><stop stop-color="#328368"/><stop offset="1" stop-color="#194A3A"/></linearGradient>
     <linearGradient id="gold" x1="70" y1="22" x2="99" y2="52" gradientUnits="userSpaceOnUse"><stop stop-color="#FFE7A8"/><stop offset="1" stop-color="#E6A83D"/></linearGradient>
-    <filter id="shadow" x="12" y="10" width="106" height="108" color-interpolation-filters="sRGB"><feDropShadow dx="0" dy="7" stdDeviation="5" flood-color="#173B31" flood-opacity=".2"/></filter>
   </defs>
   <ellipse cx="63" cy="105" rx="35" ry="7" fill="#244C3D" opacity=".13"/>
-  <g filter="url(#shadow)">
+  <g>
     <path d="M25 89 78 59l24 14-53 31-24-15Z" fill="#DCECE3"/>
     <path d="m35 77 18-10v28L35 105V77Z" fill="url(#barFront)"/><path d="m53 67 10 6v28l-10-6V67Z" fill="url(#barSide)"/>
     <path d="m59 62 18-10v31L59 93V62Z" fill="#55A382"/><path d="m77 52 10 6v31l-10-6V52Z" fill="#286A52"/>
