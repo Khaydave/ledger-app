@@ -935,6 +935,108 @@
     *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
     [data-reveal] { opacity: 1; transform: none; }
   }
+  /* Four-step explainer carousel */
+  .steps-carousel { max-width: 1120px; margin-top: 8px; }
+  #landingSteps {
+    position: relative; max-width: 1240px; margin: 28px auto; overflow: hidden;
+    border: 0; border-radius: 30px; color: #F6FBF8;
+    background: radial-gradient(ellipse at 92% 8%, rgba(95,158,140,.24), transparent 34%), linear-gradient(140deg, #153D34, #1F4B43 55%, #173F37);
+    box-shadow: 0 24px 64px rgba(20,52,44,.16);
+  }
+  #landingSteps .section-label { color: #B9DED0; }
+  #landingSteps .section-heading { color: #fff; }
+  #landingSteps .section-sub { color: rgba(246,251,248,.76); }
+  .steps-carousel-window {
+    position: relative; overflow: hidden; min-height: 336px; padding: 0;
+    border: 1px solid rgba(224,246,236,.16); border-radius: 24px;
+    background: rgba(7,35,29,.14);
+  }
+  .step-slide {
+    display: none; grid-template-columns: minmax(0, 1.05fr) minmax(270px, .85fr); align-items: center;
+    gap: clamp(20px, 4vw, 56px); min-height: 310px; padding: clamp(20px, 4vw, 44px);
+    border-radius: 18px; background: transparent;
+  }
+  .step-slide.is-active { display: grid; animation: stepSlideIn .44s cubic-bezier(.2,.7,.2,1) both; }
+  .steps-carousel[data-direction="prev"] .step-slide.is-active { animation-name: stepSlideInFromLeft; }
+  @keyframes stepSlideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+  @keyframes stepSlideInFromLeft { from { opacity: 0; transform: translateX(-30px); } to { opacity: 1; transform: translateX(0); } }
+  .step-illustration {
+    display: grid; place-items: center; min-width: 0; min-height: 240px; overflow: hidden;
+    position: relative; border-radius: 20px; background: radial-gradient(ellipse at 50% 85%, rgba(63,136,125,.13), transparent 67%), #E8F2ED;
+  }
+  .step-illustration svg { display: block; }
+  .app-preview {
+    position: relative; width: min(84%, 390px); min-height: 250px; padding: 18px 20px;
+    border: 1px solid #E1EAE5; border-radius: 20px; background: #fff;
+    box-shadow: 0 18px 42px rgba(20,52,44,.16); color: #1D332B;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+  }
+  .preview-top { display:flex; justify-content:space-between; align-items:center; gap:10px; padding-bottom:13px; border-bottom:1px solid #EDF1EE; color:#214B40; font-size:11px; font-weight:800; }
+  .preview-brand { display:flex; align-items:center; gap:7px; }
+  .preview-brand-mark { display:grid; place-items:center; width:22px; height:22px; border-radius:7px; background:#E3F1EB; color:#1F6A57; }
+  .preview-brand-mark svg { width:13px; height:13px; }
+  .preview-tag { padding:5px 8px; border-radius:999px; background:#F1F6F3; color:#71857B; font-size:8px; font-weight:800; letter-spacing:.08em; }
+  .preview-title { margin:15px 0 4px; color:#20382F; font-size:15px; font-weight:800; letter-spacing:-.03em; }
+  .preview-sub { margin:0 0 13px; color:#829188; font-size:9px; }
+  .preview-label { display:block; margin:9px 0 4px; color:#52665D; font-size:8px; font-weight:800; }
+  .preview-input { display:flex; align-items:center; min-height:28px; padding:0 9px; border:1px solid #E3EAE6; border-radius:8px; color:#92A098; font-size:9px; }
+  .preview-input.select::after { content:'⌄'; margin-left:auto; color:#70877C; font-size:14px; }
+  .preview-button { display:flex; justify-content:center; align-items:center; gap:6px; width:100%; min-height:31px; margin-top:12px; border-radius:9px; background:#1F4B43; color:#fff; font-size:9px; font-weight:800; }
+  .preview-button svg { width:13px; height:13px; }
+  .preview-callout { position:absolute; right:-12px; bottom:20px; display:grid; place-items:center; width:46px; height:46px; border:5px solid #E8F2ED; border-radius:16px; background:#DDF1EA; color:#1C6654; box-shadow:0 8px 18px rgba(20,52,44,.14); }
+  .preview-callout svg { width:20px; height:20px; stroke:currentColor; fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+  .preview-row { display:flex; align-items:center; gap:9px; margin-top:7px; padding:8px; border-radius:10px; background:#F6F8F7; }
+  .preview-thumb { display:grid; place-items:center; width:34px; height:34px; border-radius:9px; background:#E2F0E9; color:#387663; }
+  .preview-thumb svg { width:19px; height:19px; stroke:currentColor; fill:none; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
+  .preview-row-copy { min-width:0; flex:1; color:#43584F; font-size:9px; font-weight:700; }
+  .preview-row-copy small { display:block; margin-top:3px; color:#87968E; font-size:8px; font-weight:500; }
+  .preview-pill { padding:4px 6px; border-radius:6px; background:#E7F3ED; color:#286D58; font-size:8px; font-weight:800; }
+  .preview-stats { display:grid; grid-template-columns:1fr 1fr; gap:7px; margin:11px 0 9px; }
+  .preview-stat { padding:8px; border-radius:9px; background:#F4F7F5; }
+  .preview-stat small { display:block; color:#7A8A82; font-size:7px; }
+  .preview-stat b { display:block; margin-top:3px; color:#25483B; font-size:11px; }
+  .step-copy { padding: 10px clamp(4px, 2vw, 16px) 10px 0; }
+  .step-kicker { display: inline-flex; align-items: center; gap: 9px; color: #B9DED0; font: 700 11px 'Plus Jakarta Sans', sans-serif; letter-spacing: .1em; }
+  .step-kicker i { width: 22px; height: 1px; background: #B9DED0; opacity: .7; }
+  .step-copy h3 { margin: 17px 0 11px; font-size: clamp(23px, 3vw, 32px); font-weight: 700; letter-spacing: -.04em; color: #fff; }
+  .step-copy p { max-width: 390px; margin: 0; color: rgba(246,251,248,.8); font-size: 14px; line-height: 1.8; }
+  .step-tip { display: flex; align-items: center; gap: 11px; margin-top: 25px; color: rgba(246,251,248,.82); font-size: 12px; font-weight: 600; }
+  .step-tip span:first-child { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 10px; color: #16493B; background: #C7E7D9; font: 700 11px 'Plus Jakarta Sans', sans-serif; }
+  .steps-carousel-controls { display: flex; justify-content: center; align-items: center; gap: 18px; padding: 18px 8px 2px; }
+  .step-arrow, .step-autoplay {
+    display: inline-flex; align-items: center; justify-content: center; border: 1px solid var(--border);
+    background: rgba(255,255,255,.94); color: var(--primary); cursor: pointer; transition: background .18s ease, transform .18s ease, border-color .18s ease;
+  }
+  .step-arrow { width: 42px; height: 42px; border-radius: 50%; }
+  .step-arrow:hover, .step-autoplay:hover { background: var(--teal-tint); border-color: var(--teal); transform: translateY(-1px); }
+  .step-arrow svg, .step-autoplay svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .step-dots { display: flex; align-items: center; gap: 8px; }
+  .step-dot { width: 8px; height: 8px; padding: 0; border: 0; border-radius: 10px; background: color-mix(in srgb, var(--teal) 25%, var(--border)); cursor: pointer; transition: width .22s ease, background .22s ease; }
+  .step-dot.is-active { width: 25px; background: var(--teal); }
+  .step-autoplay { gap: 7px; min-height: 38px; padding: 0 12px; border-radius: 12px; font: 600 11px 'Plus Jakarta Sans', sans-serif; }
+  @media (max-width: 700px) {
+    #landingSteps { margin: 22px 14px; border-radius:24px; }
+    .steps-carousel-window { min-height: 0; padding: 8px; border-radius: 20px; }
+    .step-slide { grid-template-columns: 1fr; gap: 18px; min-height: 0; padding: 12px 12px 20px; }
+    .step-illustration { min-height: 200px; border-radius: 16px; }
+    .app-preview { width: min(84%, 360px); min-height: 225px; padding: 14px 16px; }
+    .step-illustration svg { max-height: 220px; }
+    .step-copy { padding: 3px 8px 5px; }
+    .step-copy h3 { margin: 11px 0 7px; font-size: 24px; }
+    .step-copy p { font-size: 13px; line-height: 1.7; }
+    .step-tip { margin-top: 15px; }
+    .steps-carousel-controls { gap: 12px; padding-top: 14px; }
+    .step-arrow { width: 42px; height: 42px; }
+    .step-autoplay { margin-left: 5px; }
+  }
+  @media (max-width: 390px) {
+    .step-autoplay { width: 40px; padding: 0; }
+    .step-autoplay span { display: none; }
+    .steps-carousel-controls { gap: 10px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .step-slide.is-active { animation: none; }
+  }
 </style>
 </head>
 <body>
@@ -1148,22 +1250,66 @@
       <div class="section-label">Getting started</div>
       <h2 class="section-heading">Get your ledger running in 4 steps</h2>
       <p class="section-sub">From nothing to fully set up, in about a minute.</p>
-      <div class="steps-wrap">
-        <div class="step-row">
-          <div class="step-num-col"><div class="step-num">1</div><div class="step-line"></div></div>
-          <div class="step-card"><h3>Create your shop</h3><p>Pick a shop code and password &mdash; your ledger is ready instantly, no forms to fill.</p></div>
+      <div class="steps-carousel" id="stepsCarousel" role="region" aria-roledescription="carousel" aria-label="Getting started in four steps">
+        <div class="steps-carousel-window" aria-live="off">
+          <article class="step-slide is-active" data-step-slide aria-roledescription="slide" aria-label="1 of 4">
+            <div class="step-illustration" role="img" aria-label="Ledger shop setup screen preview showing shop code and password fields">
+              <div class="app-preview"><div class="preview-top"><span class="preview-brand"><span class="preview-brand-mark"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4v16h14M8 8h8M8 12h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>Ledger</span><span class="preview-tag">NEW SHOP</span></div>
+                <div class="preview-title">Create your shop</div><p class="preview-sub">Your private business ledger starts here.</p>
+                <label class="preview-label">Shop code</label><div class="preview-input">e.g. ada-thrift-01</div>
+                <label class="preview-label">Password</label><div class="preview-input">••••••••</div>
+                <div class="preview-button">Create shop <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              </div><span class="preview-callout" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3v18M3 12h18"/></svg></span>
+            </div>
+            <div class="step-copy"><span class="step-kicker">STEP 01 <i></i> GET STARTED</span><h3>Create your shop</h3><p>Choose a shop code and password. Your private ledger is ready in moments, with no long sign-up form.</p><div class="step-tip"><span>01</span><span>Pick a name you’ll remember</span></div></div>
+          </article>
+          <article class="step-slide" data-step-slide aria-roledescription="slide" aria-label="2 of 4" aria-hidden="true">
+            <div class="step-illustration" role="img" aria-label="Ledger profile screen preview showing shop name, location, and phone number fields">
+              <div class="app-preview"><div class="preview-top"><span class="preview-brand"><span class="preview-brand-mark"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5 20c.8-4 3.1-6 7-6s6.2 2 7 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>Ledger</span><span class="preview-tag">YOUR PROFILE</span></div>
+                <div class="preview-title">Your profile</div><p class="preview-sub">Keep your shop details up to date.</p>
+                <label class="preview-label">Shop name</label><div class="preview-input">Ada's Thrift Corner</div>
+                <label class="preview-label">Location</label><div class="preview-input">Yaba, Lagos</div>
+                <label class="preview-label">Phone number</label><div class="preview-input">+234 803 123 4567</div>
+                <div class="preview-button">Save profile</div>
+              </div><span class="preview-callout" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg></span>
+            </div>
+            <div class="step-copy"><span class="step-kicker">STEP 02 <i></i> MAKE IT YOURS</span><h3>Set up your profile</h3><p>Add your shop name, location, and preferred currency so your workspace feels familiar and fits your business.</p><div class="step-tip"><span>02</span><span>Your details can be updated later</span></div></div>
+          </article>
+          <article class="step-slide" data-step-slide aria-roledescription="slide" aria-label="3 of 4" aria-hidden="true">
+            <div class="step-illustration" role="img" aria-label="Ledger add stock screen preview showing item name, quantity, buy price, and sell price">
+              <div class="app-preview"><div class="preview-top"><span class="preview-brand"><span class="preview-brand-mark"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 8 9-5 9 5-9 5-9-5ZM3 8v8l9 5 9-5V8M12 13v8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></span>Ledger</span><span class="preview-tag">YOUR STOCK</span></div>
+                <div class="preview-title">Add stock</div><p class="preview-sub">Add a new item to your shop.</p>
+                <label class="preview-label">Item name</label><div class="preview-input">Blue ankara dress</div>
+                <div class="preview-stats"><div class="preview-stat"><small>QUANTITY</small><b>10</b></div><div class="preview-stat"><small>BUY PRICE</small><b>₦5,000</b></div></div>
+                <label class="preview-label">Sell price (per item)</label><div class="preview-input">₦8,500</div>
+                <div class="preview-button">Save item</div>
+              </div><span class="preview-callout" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m3 7 9-4 9 4-9 5-9-5ZM3 7v10l9 4 9-4V7M12 12v9"/></svg></span>
+            </div>
+            <div class="step-copy"><span class="step-kicker">STEP 03 <i></i> BUILD YOUR LIST</span><h3>Add your stock</h3><p>List what you sell with its quantity and price. You can add products one at a time and update them whenever stock changes.</p><div class="step-tip"><span>03</span><span>Start with your best sellers</span></div></div>
+          </article>
+          <article class="step-slide" data-step-slide aria-roledescription="slide" aria-label="4 of 4" aria-hidden="true">
+            <div class="step-illustration" role="img" aria-label="Ledger log a sale screen preview showing item search, quantity sold, and the log sale button">
+              <div class="app-preview"><div class="preview-top"><span class="preview-brand"><span class="preview-brand-mark"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 18V6m0 12h16M7 14l4-4 3 2 5-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Ledger</span><span class="preview-tag">RECORD A SALE</span></div>
+                <div class="preview-title">Log a sale</div><p class="preview-sub">Stock updates automatically when you log it.</p>
+                <label class="preview-label">Item</label><div class="preview-input">Search item to sell...</div>
+                <div class="preview-row"><span class="preview-thumb"><svg viewBox="0 0 24 24"><path d="M4 8h16l-1 12H5L4 8Zm3 0 2-4h6l2 4M9 12v4m6-4v4"/></svg></span><span class="preview-row-copy">Blue ankara dress<small>In stock: 10</small></span><span class="preview-pill">Select</span></div>
+                <div class="preview-stats"><div class="preview-stat"><small>QUANTITY SOLD</small><b>1</b></div><div class="preview-stat"><small>PRICE / ITEM</small><b>₦8,500</b></div></div>
+                <div class="preview-button">Log sale</div>
+              </div><span class="preview-callout" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg></span>
+            </div>
+            <div class="step-copy"><span class="step-kicker">STEP 04 <i></i> KEEP IT CURRENT</span><h3>Start logging</h3><p>Record sales, orders, and debts as they happen. Your ledger helps you see what’s moving and what still needs attention.</p><div class="step-tip"><span>04</span><span>A quick habit that keeps you in control</span></div></div>
+          </article>
         </div>
-        <div class="step-row">
-          <div class="step-num-col"><div class="step-num">2</div><div class="step-line"></div></div>
-          <div class="step-card"><h3>Set up your profile</h3><p>Add your shop name, location, and preferred currency so everything feels like yours.</p></div>
-        </div>
-        <div class="step-row">
-          <div class="step-num-col"><div class="step-num">3</div><div class="step-line"></div></div>
-          <div class="step-card"><h3>Add your stock</h3><p>List what you sell, with quantity and price &mdash; takes a few minutes for a whole shop.</p></div>
-        </div>
-        <div class="step-row">
-          <div class="step-num-col"><div class="step-num">4</div></div>
-          <div class="step-card"><h3>Start logging</h3><p>Record sales, orders, and debts as they happen. That's the whole job from here.</p></div>
+        <div class="steps-carousel-controls">
+          <button class="step-arrow" type="button" data-step-prev aria-label="Previous step"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
+          <div class="step-dots" role="group" aria-label="Choose a step">
+            <button type="button" class="step-dot is-active" data-step-dot="0" aria-label="Show step 1" aria-current="step"></button>
+            <button type="button" class="step-dot" data-step-dot="1" aria-label="Show step 2"></button>
+            <button type="button" class="step-dot" data-step-dot="2" aria-label="Show step 3"></button>
+            <button type="button" class="step-dot" data-step-dot="3" aria-label="Show step 4"></button>
+          </div>
+          <button class="step-arrow" type="button" data-step-next aria-label="Next step"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button>
+          <button class="step-autoplay" type="button" data-step-pause aria-label="Pause automatic steps" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6v12M15 6v12"/></svg><span>Pause</span></button>
         </div>
       </div>
     </section>
@@ -6926,10 +7072,10 @@ bindEnter(['deleteAccountConfirmInput'], confirmDeleteAccount);
 bindEnter(['expenseDescription', 'expenseAmount'], submitExpense);
 
 function setupLandingMotion() {
-  const revealItems = document.querySelectorAll('.feature-card, .step-card, .landing-cta-band, #faq');
+  const revealItems = document.querySelectorAll('.feature-card, .landing-cta-band, #landingSteps, #faq');
   revealItems.forEach((item, index) => {
     item.dataset.reveal = 'true';
-    if (item.classList.contains('feature-card') || item.classList.contains('step-card')) item.style.setProperty('--reveal-delay', `${(index % 4) * 70}ms`);
+    if (item.classList.contains('feature-card')) item.style.setProperty('--reveal-delay', `${(index % 4) * 70}ms`);
   });
   if (!('IntersectionObserver' in window) || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     revealItems.forEach(item => item.classList.add('is-visible'));
@@ -6941,8 +7087,108 @@ function setupLandingMotion() {
   revealItems.forEach(item => observer.observe(item));
 }
 
+function setupStepsCarousel() {
+  const carousel = document.getElementById('stepsCarousel');
+  if (!carousel) return;
+  const slides = Array.from(carousel.querySelectorAll('[data-step-slide]'));
+  const dots = Array.from(carousel.querySelectorAll('[data-step-dot]'));
+  const pauseButton = carousel.querySelector('[data-step-pause]');
+  if (!slides.length) return;
+
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  let current = 0;
+  let timer = null;
+  let userPaused = false;
+  let hovered = false;
+  let focused = false;
+  let inView = !('IntersectionObserver' in window);
+  const delay = 2000;
+
+  function updatePauseButton() {
+    if (!pauseButton) return;
+    const paused = userPaused || reducedMotion.matches;
+    pauseButton.disabled = reducedMotion.matches;
+    pauseButton.setAttribute('aria-pressed', paused ? 'true' : 'false');
+    pauseButton.setAttribute('aria-label', reducedMotion.matches ? 'Automatic steps are off because reduced motion is enabled' : paused ? 'Play automatic steps' : 'Pause automatic steps');
+    pauseButton.innerHTML = reducedMotion.matches
+      ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6v12M15 6v12"/></svg><span>Paused</span>'
+      : paused
+      ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 5 11 7-11 7z"/></svg><span>Play</span>'
+      : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6v12M15 6v12"/></svg><span>Pause</span>';
+  }
+
+  function stopTimer() {
+    if (timer) window.clearTimeout(timer);
+    timer = null;
+  }
+
+  function scheduleNext() {
+    stopTimer();
+    if (userPaused || hovered || focused || !inView || document.hidden || reducedMotion.matches) return;
+    timer = window.setTimeout(() => {
+      showSlide(current + 1, 'next');
+      scheduleNext();
+    }, delay);
+  }
+
+  function showSlide(nextIndex, direction = 'next') {
+    slides[current].classList.remove('is-active');
+    slides[current].setAttribute('aria-hidden', 'true');
+    current = (nextIndex + slides.length) % slides.length;
+    carousel.dataset.direction = direction;
+    slides[current].classList.add('is-active');
+    slides[current].setAttribute('aria-hidden', 'false');
+    dots.forEach((dot, index) => {
+      const active = index === current;
+      dot.classList.toggle('is-active', active);
+      if (active) dot.setAttribute('aria-current', 'step');
+      else dot.removeAttribute('aria-current');
+    });
+  }
+
+  carousel.querySelector('[data-step-prev]')?.addEventListener('click', () => { showSlide(current - 1, 'prev'); scheduleNext(); });
+  carousel.querySelector('[data-step-next]')?.addEventListener('click', () => { showSlide(current + 1, 'next'); scheduleNext(); });
+  dots.forEach(dot => dot.addEventListener('click', () => {
+    const next = Number(dot.dataset.stepDot);
+    showSlide(next, next < current ? 'prev' : 'next');
+    scheduleNext();
+  }));
+  pauseButton?.addEventListener('click', () => {
+    userPaused = !userPaused;
+    updatePauseButton();
+    scheduleNext();
+  });
+  carousel.addEventListener('keydown', event => {
+    if (event.key === 'ArrowLeft') { event.preventDefault(); showSlide(current - 1, 'prev'); scheduleNext(); }
+    if (event.key === 'ArrowRight') { event.preventDefault(); showSlide(current + 1, 'next'); scheduleNext(); }
+  });
+  carousel.addEventListener('pointerenter', () => { hovered = true; stopTimer(); });
+  carousel.addEventListener('pointerleave', () => { hovered = false; scheduleNext(); });
+  carousel.addEventListener('focusin', () => { focused = true; stopTimer(); });
+  carousel.addEventListener('focusout', event => {
+    if (!carousel.contains(event.relatedTarget)) { focused = false; scheduleNext(); }
+  });
+  document.addEventListener('visibilitychange', scheduleNext);
+  if ('IntersectionObserver' in window) {
+    const visibilityObserver = new IntersectionObserver(entries => {
+      inView = entries[0].isIntersecting;
+      scheduleNext();
+    }, { threshold: 0.2 });
+    visibilityObserver.observe(carousel);
+  }
+  reducedMotion.addEventListener?.('change', () => {
+    if (reducedMotion.matches) userPaused = true;
+    updatePauseButton();
+    scheduleNext();
+  });
+
+  updatePauseButton();
+  scheduleNext();
+}
+
 renderFAQList('landingFaqList');
 setupLandingMotion();
+setupStepsCarousel();
 
 const publicStoreCode = new URLSearchParams(location.search).get('store');
 const isAdminRoute = new URLSearchParams(location.search).get('admin') === '1';
