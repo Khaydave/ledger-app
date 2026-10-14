@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ledger</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -551,7 +551,7 @@
     display: flex; align-items: center; gap: 6px;
   }
 
-  /* Phone mockup stack */
+  /* Hero portrait */
   .mockup-stack {
     position: relative; height: 300px; display: flex; align-items: center; justify-content: center;
     max-width: 100%; overflow: visible;
@@ -882,6 +882,59 @@
     .landing-nav .brand-lockup { margin-right: auto; }
     .faq-question { padding: 15px 16px; }
   }
+
+  /* Fresh landing visual: photo-led, calm movement, and compact sign-in. */
+  .landing-hero { overflow: hidden; }
+  .hero-photo-stage {
+    isolation: isolate; position: relative; min-width: 0; min-height: 300px; height: 100%;
+    display: flex; align-items: center; justify-content: center; padding: 12px 0 24px;
+  }
+  .hero-photo-glow {
+    position: absolute; z-index: -1; width: 78%; aspect-ratio: 1; border-radius: 50%;
+    right: 4%; top: 9%; background: radial-gradient(circle, color-mix(in srgb, var(--teal) 28%, transparent), transparent 70%);
+    filter: blur(10px); animation: glowBreathe 7s ease-in-out infinite;
+  }
+  .hero-photo {
+    display: block; width: min(100%, 620px); max-height: 440px; aspect-ratio: 1.38 / 1;
+    object-fit: cover; object-position: 58% 48%; border-radius: 32px 32px 100px 32px;
+    box-shadow: 0 28px 70px rgba(20, 52, 44, .2); animation: portraitFloat 7s ease-in-out infinite;
+    -webkit-mask-image: linear-gradient(180deg, #000 82%, transparent 100%);
+    mask-image: linear-gradient(180deg, #000 82%, transparent 100%);
+  }
+  .hero-photo-note {
+    position: absolute; bottom: 20px; left: clamp(4px, 6%, 34px); display: flex; align-items: center; gap: 10px;
+    padding: 12px 16px; border: 1px solid color-mix(in srgb, var(--border) 74%, transparent);
+    border-radius: 14px; background: color-mix(in srgb, var(--surface) 91%, transparent); color: var(--ink);
+    box-shadow: 0 14px 36px rgba(19, 48, 40, .12); backdrop-filter: blur(12px);
+    font: 600 12px 'Plus Jakarta Sans', sans-serif; animation: noteFloat 6s ease-in-out infinite;
+  }
+  .hero-photo-note .note-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--teal); box-shadow: 0 0 0 4px var(--teal-tint); }
+  @keyframes portraitFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+  @keyframes noteFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+  @keyframes glowBreathe { 0%, 100% { opacity: .55; transform: scale(.96); } 50% { opacity: .9; transform: scale(1.04); } }
+  [data-reveal] { opacity: 0; transform: translateY(18px); transition: opacity .55s ease, transform .55s cubic-bezier(.2,.7,.2,1); }
+  [data-reveal].is-visible { opacity: 1; transform: none; }
+  .feature-card[data-reveal], .step-card[data-reveal] { transition-delay: var(--reveal-delay, 0ms); }
+
+  #onboarding {
+    align-self: center; width: min(calc(100% - 36px), 480px); height: max-content;
+    max-height: calc(100vh - 40px); overflow-y: auto; overscroll-behavior: contain;
+    margin: auto; padding: 34px 38px; border-radius: 24px;
+  }
+  @media (min-width: 860px) {
+    .hero-photo-stage { min-height: 440px; }
+    .hero-photo { max-height: 500px; }
+  }
+  @media (max-width: 859px) {
+    .hero-photo-stage { min-height: 230px; height: auto; padding: 0 0 18px; }
+    .hero-photo { width: 100%; max-height: 290px; aspect-ratio: 1.45 / 1; border-radius: 25px 25px 76px 25px; }
+    .hero-photo-note { bottom: 11px; left: 5px; padding: 10px 12px; font-size: 11px; }
+    #onboarding { width: min(calc(100% - 28px), 480px); max-height: calc(100dvh - 32px); padding: 28px 24px; border-radius: 22px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    [data-reveal] { opacity: 1; transform: none; }
+  }
 </style>
 </head>
 <body>
@@ -1056,24 +1109,10 @@
         </div>
       </div>
 
-      <div class="mockup-stack">
-        <div class="phone-mock back">
-          <div class="mock-title">Your stock</div>
-          <div class="mock-row"><span>Blue ankara dress</span><span class="mtag">12 left</span></div>
-          <div class="mock-row"><span>Skincare set</span><span class="mtag">3 left</span></div>
-          <div class="mock-row"><span>Beaded sandals</span><span class="mtag">7 left</span></div>
-          <div class="mock-row"><span>Silk scarf</span><span class="mtag">20 left</span></div>
-        </div>
-        <div class="phone-mock front">
-          <div class="mock-stat-row">
-            <div class="mock-stat"><div class="ml">Pending orders</div><div class="mv">&#8358;24,000</div></div>
-            <div class="mock-stat"><div class="ml">Sales this week</div><div class="mv">&#8358;86,500</div></div>
-          </div>
-          <div class="mock-title">Recent sales</div>
-          <div class="mock-row"><span>Skincare set</span><span class="mtag">&#8358;8,500</span></div>
-          <div class="mock-row"><span>Silk scarf</span><span class="mtag">&#8358;4,200</span></div>
-          <div class="mock-row"><span>Beaded sandals</span><span class="mtag">&#8358;6,000</span></div>
-        </div>
+      <div class="hero-photo-stage" aria-label="A Nigerian small business owner using Ledger on her phone">
+        <div class="hero-photo-glow"></div>
+        <img class="hero-photo" src="assets/ledger-hero.webp" alt="A young Nigerian shop owner smiling as she uses her phone in her workspace" fetchpriority="high">
+        <div class="hero-photo-note"><span class="note-dot"></span><span>More time for your customers</span></div>
       </div>
     </section>
 
@@ -6886,7 +6925,24 @@ bindEnter(['doOrderCustomer', 'doOrderDescription', 'doOrderSellPrice', 'doOrder
 bindEnter(['deleteAccountConfirmInput'], confirmDeleteAccount);
 bindEnter(['expenseDescription', 'expenseAmount'], submitExpense);
 
+function setupLandingMotion() {
+  const revealItems = document.querySelectorAll('.feature-card, .step-card, .landing-cta-band, #faq');
+  revealItems.forEach((item, index) => {
+    item.dataset.reveal = 'true';
+    if (item.classList.contains('feature-card') || item.classList.contains('step-card')) item.style.setProperty('--reveal-delay', `${(index % 4) * 70}ms`);
+  });
+  if (!('IntersectionObserver' in window) || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    revealItems.forEach(item => item.classList.add('is-visible'));
+    return;
+  }
+  const observer = new IntersectionObserver(entries => entries.forEach(entry => {
+    if (entry.isIntersecting) { entry.target.classList.add('is-visible'); observer.unobserve(entry.target); }
+  }), { threshold: 0.12, rootMargin: '0px 0px -30px 0px' });
+  revealItems.forEach(item => observer.observe(item));
+}
+
 renderFAQList('landingFaqList');
+setupLandingMotion();
 
 const publicStoreCode = new URLSearchParams(location.search).get('store');
 const isAdminRoute = new URLSearchParams(location.search).get('admin') === '1';
