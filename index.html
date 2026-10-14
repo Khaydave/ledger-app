@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ledger</title>
+<link rel="icon" type="image/png" sizes="64x64" href="assets/ledger-favicon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/ledger-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <script type="module">
@@ -871,7 +873,7 @@
   .faq-item.open { border-color: color-mix(in srgb, var(--teal) 45%, var(--border)); }
   .faq-item:focus-within { border-color: var(--teal); }
   .faq-item.open .faq-icon { background: var(--teal-tint); color: var(--teal); }
-  /* Landing FAQ: shorter, grouped, and warmed with Ledger's gold accent. */
+  /* Landing FAQ: clear card separation with Ledger's gold accent. */
   #faq {
     max-width: 1240px; margin: 28px auto; border: 1px solid color-mix(in srgb, var(--accent) 40%, var(--border));
     border-radius: 28px; background: color-mix(in srgb, var(--surface) 88%, var(--accent-tint));
@@ -879,23 +881,23 @@
   #faq .section-label { color: color-mix(in srgb, var(--accent) 68%, var(--ink)); }
   #faq .section-label::before { content: ''; display: inline-block; width: 7px; height: 7px; margin: 0 8px 1px 0; border-radius: 50%; background: var(--accent); }
   #faq .faq-list { max-width: none; }
-  #landingFaqList .faq-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 14px; }
-  #landingFaqList .faq-grid[hidden] { display: none; }
-  #landingFaqList .faq-item { margin: 0; border-color: color-mix(in srgb, var(--accent) 18%, var(--border)); box-shadow: 0 5px 16px rgba(81,60,21,.045); }
+  #landingFaqList .faq-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  #landingFaqList.is-compact .faq-item-extra { display: none; }
+  #landingFaqList .faq-item { margin: 0; border: 1px solid color-mix(in srgb, var(--accent) 22%, var(--border)); border-radius: 14px; background: var(--surface); box-shadow: 0 5px 16px rgba(81,60,21,.055); }
   #landingFaqList .faq-item.open { border-color: color-mix(in srgb, var(--accent) 68%, var(--border)); box-shadow: 0 8px 22px rgba(129,91,25,.09); }
   #landingFaqList .faq-question { min-height: 56px; padding: 13px 15px; font-size: 13px; }
   #landingFaqList .faq-question .faq-icon { width: 25px; height: 25px; border-radius: 8px; background: var(--accent-tint); color: color-mix(in srgb, var(--accent) 70%, #563A0A); }
   #landingFaqList .faq-item.open .faq-question .faq-icon { background: var(--accent); color: #fff; }
   #landingFaqList .faq-answer { padding: 0 15px 15px; font-size: 12.5px; line-height: 1.65; }
-  .faq-more-toggle { display: flex; align-items: center; justify-content: center; gap: 9px; margin: 20px auto 0; padding: 10px 14px; border: 1px solid color-mix(in srgb, var(--accent) 52%, var(--border)); border-radius: 999px; background: var(--surface); color: color-mix(in srgb, var(--accent) 72%, var(--ink)); font: 700 12px 'Plus Jakarta Sans', sans-serif; cursor: pointer; transition: background .18s ease, transform .18s ease; }
+  .faq-more-toggle { display: flex; align-items: center; justify-content: center; gap: 9px; margin: 18px auto 0; padding: 10px 14px; border: 1px solid color-mix(in srgb, var(--accent) 48%, var(--border)); border-radius: 999px; background: var(--surface); color: color-mix(in srgb, var(--accent) 72%, var(--ink)); font: 700 12px 'Plus Jakarta Sans', sans-serif; cursor: pointer; transition: background .18s ease, transform .18s ease; }
   .faq-more-toggle:hover { background: var(--accent-tint); transform: translateY(-1px); }
   .faq-more-toggle svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform .18s ease; }
-  .faq-more-toggle[aria-expanded="true"] svg { transform: rotate(180deg); }
+  .faq-more-toggle[aria-expanded="false"] svg { transform: rotate(180deg); }
   @media (max-width: 650px) {
     #faq { margin: 20px 14px; padding: 52px 18px; border-radius: 22px; }
-    #landingFaqList .faq-grid { grid-template-columns: 1fr; gap: 9px; }
+    #landingFaqList .faq-grid { grid-template-columns: 1fr; gap: 10px; }
     #landingFaqList .faq-question { min-height: 52px; }
-    .faq-more-toggle { margin-top: 16px; }
+    .faq-more-toggle { margin-top: 15px; }
   }
   .icon-btn, .landing-btn, .btn, .navbar button, .sidebar button { transition-duration: .18s; }
   input:hover, select:hover, textarea:hover { border-color: color-mix(in srgb, var(--teal) 48%, var(--border)); }
@@ -4968,8 +4970,8 @@ const FAQ_ITEMS = [
 function renderFAQList(containerId) {
   const el = document.getElementById(containerId);
   if (!el) return;
-  const renderItem = (item, i) => `
-    <div class="faq-item" id="${containerId}-item-${i}">
+  const renderItem = (item, i, isExtra = false) => `
+    <div class="faq-item${isExtra ? ' faq-item-extra' : ''}" id="${containerId}-item-${i}">
       <button type="button" class="faq-question" aria-expanded="false" aria-controls="${containerId}-answer-${i}" onclick="toggleFaqItem('${containerId}', ${i})">
         <span>${escapeHtml(item.q)}</span>
         <span class="faq-icon">&#43;</span>
@@ -4979,10 +4981,9 @@ function renderFAQList(containerId) {
   if (containerId === 'landingFaqList') {
     const featuredCount = 4;
     el.innerHTML = `
-      <div class="faq-grid">${FAQ_ITEMS.slice(0, featuredCount).map(renderItem).join('')}</div>
-      <div class="faq-grid" id="landingFaqMore" hidden>${FAQ_ITEMS.slice(featuredCount).map((item, i) => renderItem(item, i + featuredCount)).join('')}</div>
-      <button type="button" class="faq-more-toggle" aria-expanded="false" aria-controls="landingFaqMore" onclick="toggleLandingFaqs(this)">
-        <span>See all ${FAQ_ITEMS.length} questions</span>
+      <div class="faq-grid">${FAQ_ITEMS.map((item, i) => renderItem(item, i, i >= featuredCount)).join('')}</div>
+      <button type="button" class="faq-more-toggle" aria-expanded="true" aria-controls="landingFaqList" onclick="toggleLandingFaqs(this)">
+        <span>Show fewer questions</span>
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
       </button>`;
     return;
@@ -4991,10 +4992,10 @@ function renderFAQList(containerId) {
 }
 
 function toggleLandingFaqs(button) {
-  const more = document.getElementById('landingFaqMore');
-  if (!more || !button) return;
+  const list = document.getElementById('landingFaqList');
+  if (!list || !button) return;
   const expanded = button.getAttribute('aria-expanded') !== 'true';
-  more.hidden = !expanded;
+  list.classList.toggle('is-compact', !expanded);
   button.setAttribute('aria-expanded', String(expanded));
   button.querySelector('span').textContent = expanded ? 'Show fewer questions' : `See all ${FAQ_ITEMS.length} questions`;
 }
