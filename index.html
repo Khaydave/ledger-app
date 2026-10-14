@@ -893,11 +893,40 @@
   .faq-more-toggle:hover { background: var(--accent-tint); transform: translateY(-1px); }
   .faq-more-toggle svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform .18s ease; }
   .faq-more-toggle[aria-expanded="false"] svg { transform: rotate(180deg); }
+  .faq-dialog-backdrop {
+    position: fixed; inset: 0; z-index: 10050; display: grid; place-items: center; padding: 20px;
+    background: rgba(16, 37, 30, .38); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+    opacity: 0; visibility: hidden; pointer-events: none;
+    transition: opacity .24s ease, visibility .24s ease;
+  }
+  .faq-dialog-backdrop.is-open { opacity: 1; visibility: visible; pointer-events: auto; }
+  .faq-dialog-panel {
+    position: relative; width: min(100%, 520px); max-height: min(78vh, 620px); overflow: auto;
+    padding: clamp(24px, 5vw, 36px); border: 1px solid color-mix(in srgb, var(--accent) 34%, var(--border));
+    border-radius: 24px; background: var(--surface); color: var(--ink);
+    box-shadow: 0 28px 90px rgba(8, 25, 19, .27); opacity: 0; transform: translateY(14px) scale(.97);
+    transition: opacity .22s ease, transform .32s cubic-bezier(.2,.75,.25,1);
+  }
+  .faq-dialog-backdrop.is-open .faq-dialog-panel { opacity: 1; transform: translateY(0) scale(1); }
+  .faq-dialog-close {
+    position: absolute; top: 14px; right: 14px; display: grid; place-items: center; width: 38px; height: 38px;
+    border: 1px solid var(--border); border-radius: 12px; background: var(--surface); color: var(--ink-soft); cursor: pointer;
+    transition: background .18s ease, color .18s ease, transform .18s ease;
+  }
+  .faq-dialog-close:hover { background: var(--accent-tint); color: var(--ink); transform: rotate(4deg); }
+  .faq-dialog-close svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+  .faq-dialog-eyebrow { margin: 0 48px 12px 0; color: color-mix(in srgb, var(--accent) 68%, var(--ink)); font: 800 10px 'Plus Jakarta Sans', sans-serif; letter-spacing: .13em; text-transform: uppercase; }
+  .faq-dialog-panel h3 { margin: 0 42px 14px 0; color: var(--ink); font: 700 clamp(20px, 4vw, 25px)/1.3 'Plus Jakarta Sans', sans-serif; letter-spacing: -.03em; }
+  .faq-dialog-answer { margin: 0; padding-top: 15px; border-top: 1px solid color-mix(in srgb, var(--accent) 28%, var(--border)); color: var(--ink-soft); font-size: 14px; line-height: 1.8; }
+  body.faq-dialog-open { overflow: hidden; }
   @media (max-width: 650px) {
     #faq { margin: 20px 14px; padding: 52px 18px; border-radius: 22px; }
     #landingFaqList .faq-grid { grid-template-columns: 1fr; gap: 10px; }
     #landingFaqList .faq-question { min-height: 52px; }
     .faq-more-toggle { margin-top: 15px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .faq-dialog-backdrop, .faq-dialog-panel, .faq-dialog-close { transition-duration: .01ms; }
   }
   .icon-btn, .landing-btn, .btn, .navbar button, .sidebar button { transition-duration: .18s; }
   input:hover, select:hover, textarea:hover { border-color: color-mix(in srgb, var(--teal) 48%, var(--border)); }
@@ -1348,6 +1377,17 @@
       <p class="section-sub">The things people usually ask before they try it.</p>
       <div class="faq-list" id="landingFaqList"></div>
     </section>
+
+    <div class="faq-dialog-backdrop" id="landingFaqDialog" aria-hidden="true" onclick="if(event.target === this) closeLandingFaqDialog()">
+      <section class="faq-dialog-panel" role="dialog" aria-modal="true" aria-labelledby="landingFaqDialogTitle" aria-describedby="landingFaqDialogAnswer" tabindex="-1">
+        <button class="faq-dialog-close" id="landingFaqDialogClose" type="button" aria-label="Close answer" onclick="closeLandingFaqDialog()">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m18 6-12 12M6 6l12 12"/></svg>
+        </button>
+        <p class="faq-dialog-eyebrow">Ledger answer</p>
+        <h3 id="landingFaqDialogTitle"></h3>
+        <p class="faq-dialog-answer" id="landingFaqDialogAnswer"></p>
+      </section>
+    </div>
 
     <section class="landing-section" style="padding-top:10px; padding-bottom:10px;">
       <div class="landing-cta-band">
@@ -4970,14 +5010,20 @@ const FAQ_ITEMS = [
 function renderFAQList(containerId) {
   const el = document.getElementById(containerId);
   if (!el) return;
-  const renderItem = (item, i, isExtra = false) => `
+  const renderItem = (item, i, isExtra = false) => {
+    const landingQuestion = containerId === 'landingFaqList';
+    const triggerAttrs = landingQuestion
+      ? 'aria-haspopup="dialog" aria-controls="landingFaqDialog"'
+      : `aria-expanded="false" aria-controls="${containerId}-answer-${i}"`;
+    return `
     <div class="faq-item${isExtra ? ' faq-item-extra' : ''}" id="${containerId}-item-${i}">
-      <button type="button" class="faq-question" aria-expanded="false" aria-controls="${containerId}-answer-${i}" onclick="toggleFaqItem('${containerId}', ${i})">
+      <button type="button" class="faq-question" ${triggerAttrs} onclick="toggleFaqItem('${containerId}', ${i}, this)">
         <span>${escapeHtml(item.q)}</span>
         <span class="faq-icon">&#43;</span>
       </button>
       <div class="faq-answer" id="${containerId}-answer-${i}">${escapeHtml(item.a)}</div>
     </div>`;
+  };
   if (containerId === 'landingFaqList') {
     const featuredCount = 4;
     el.innerHTML = `
@@ -5000,7 +5046,47 @@ function toggleLandingFaqs(button) {
   button.querySelector('span').textContent = expanded ? 'Show fewer questions' : `See all ${FAQ_ITEMS.length} questions`;
 }
 
-function toggleFaqItem(containerId, index) {
+let lastLandingFaqTrigger = null;
+
+function openLandingFaqDialog(index, trigger) {
+  const item = FAQ_ITEMS[index];
+  const dialog = document.getElementById('landingFaqDialog');
+  if (!item || !dialog) return;
+  lastLandingFaqTrigger = trigger || document.activeElement;
+  document.getElementById('landingFaqDialogTitle').textContent = item.q;
+  document.getElementById('landingFaqDialogAnswer').textContent = item.a;
+  dialog.classList.add('is-open');
+  dialog.setAttribute('aria-hidden', 'false');
+  document.body.classList.add('faq-dialog-open');
+  document.getElementById('landingFaqDialogClose').focus({ preventScroll: true });
+  document.addEventListener('keydown', handleLandingFaqDialogKeydown);
+}
+
+function closeLandingFaqDialog() {
+  const dialog = document.getElementById('landingFaqDialog');
+  if (!dialog || !dialog.classList.contains('is-open')) return;
+  dialog.classList.remove('is-open');
+  dialog.setAttribute('aria-hidden', 'true');
+  document.body.classList.remove('faq-dialog-open');
+  document.removeEventListener('keydown', handleLandingFaqDialogKeydown);
+  if (lastLandingFaqTrigger && document.contains(lastLandingFaqTrigger)) lastLandingFaqTrigger.focus({ preventScroll: true });
+  lastLandingFaqTrigger = null;
+}
+
+function handleLandingFaqDialogKeydown(event) {
+  if (event.key === 'Escape') {
+    closeLandingFaqDialog();
+  } else if (event.key === 'Tab') {
+    event.preventDefault();
+    document.getElementById('landingFaqDialogClose')?.focus();
+  }
+}
+
+function toggleFaqItem(containerId, index, trigger) {
+  if (containerId === 'landingFaqList') {
+    openLandingFaqDialog(index, trigger);
+    return;
+  }
   const item = document.getElementById(containerId + '-item-' + index);
   if (item) {
     const isOpen = item.classList.toggle('open');
