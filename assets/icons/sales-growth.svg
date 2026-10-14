@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none">
+  <defs>
+    <linearGradient id="barFront" x1="34" y1="66" x2="53" y2="101" gradientUnits="userSpaceOnUse"><stop stop-color="#6EB89A"/><stop offset="1" stop-color="#27684F"/></linearGradient>
+    <linearGradient id="barSide" x1="53" y1="70" x2="63" y2="98" gradientUnits="userSpaceOnUse"><stop stop-color="#328368"/><stop offset="1" stop-color="#194A3A"/></linearGradient>
+    <linearGradient id="gold" x1="70" y1="22" x2="99" y2="52" gradientUnits="userSpaceOnUse"><stop stop-color="#FFE7A8"/><stop offset="1" stop-color="#E6A83D"/></linearGradient>
+    <filter id="shadow" x="12" y="10" width="106" height="108" color-interpolation-filters="sRGB"><feDropShadow dx="0" dy="7" stdDeviation="5" flood-color="#173B31" flood-opacity=".2"/></filter>
+  </defs>
+  <ellipse cx="63" cy="105" rx="35" ry="7" fill="#244C3D" opacity=".13"/>
+  <g filter="url(#shadow)">
+    <path d="M25 89 78 59l24 14-53 31-24-15Z" fill="#DCECE3"/>
+    <path d="m35 77 18-10v28L35 105V77Z" fill="url(#barFront)"/><path d="m53 67 10 6v28l-10-6V67Z" fill="url(#barSide)"/>
+    <path d="m59 62 18-10v31L59 93V62Z" fill="#55A382"/><path d="m77 52 10 6v31l-10-6V52Z" fill="#286A52"/>
+    <path d="m83 48 18-10v26L83 74V48Z" fill="#83C5A2"/><path d="m101 38 10 6v26l-10-6V38Z" fill="#397E61"/>
+    <circle cx="87" cy="31" r="15" fill="url(#gold)"/><path d="M91 22c-1.5-2-7-2-8 1-1 4 9 3 8 8-1 4-7 4-10 1m5-13v17" stroke="#9B6520" stroke-width="2" stroke-linecap="round"/>
+    <path d="m30 62 18-11 12 5 22-19 13 4 14-14" stroke="#1F6B50" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="m99 27 10-1-1 10" stroke="#1F6B50" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>

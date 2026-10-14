@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none">
+  <defs>
+    <linearGradient id="stockTop" x1="34" y1="22" x2="96" y2="58" gradientUnits="userSpaceOnUse"><stop stop-color="#D8F1E5"/><stop offset="1" stop-color="#8FCBB2"/></linearGradient>
+    <linearGradient id="stockLeft" x1="32" y1="42" x2="64" y2="100" gradientUnits="userSpaceOnUse"><stop stop-color="#4B9C7F"/><stop offset="1" stop-color="#21614F"/></linearGradient>
+    <linearGradient id="stockRight" x1="64" y1="60" x2="98" y2="92" gradientUnits="userSpaceOnUse"><stop stop-color="#34866C"/><stop offset="1" stop-color="#174A3C"/></linearGradient>
+    <filter id="shadow" x="14" y="15" width="100" height="105" color-interpolation-filters="sRGB"><feDropShadow dx="0" dy="7" stdDeviation="5" flood-color="#173B31" flood-opacity=".2"/></filter>
+  </defs>
+  <ellipse cx="64" cy="105" rx="31" ry="7" fill="#244C3D" opacity=".13"/>
+  <g filter="url(#shadow)">
+    <path d="M64 23 98 42 64 62 30 42 64 23Z" fill="url(#stockTop)"/>
+    <path d="M30 42 64 62V101L30 81V42Z" fill="url(#stockLeft)"/>
+    <path d="M98 42 64 62V101L98 81V42Z" fill="url(#stockRight)"/>
+    <path d="m51 34 34 20" stroke="#F7FFF9" stroke-width="3" stroke-linecap="round" opacity=".8"/>
+    <path d="M64 62v39" stroke="#A7DCC3" stroke-width="2" opacity=".7"/>
+    <path d="m42 49 13 8v15l-13-8V49Z" fill="#EAAF4E"/>
+    <path d="m46 53 5 3" stroke="#FFF2D1" stroke-width="2" stroke-linecap="round"/>
+  </g>
+  <circle cx="101" cy="28" r="3" fill="#EAAF4E" opacity=".9"/>
+</svg>
