@@ -708,9 +708,10 @@
   :root { --radius: 16px; }
   html { scroll-behavior: smooth; }
   button, input, select { -webkit-tap-highlight-color: transparent; }
-  button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible {
-    outline: 3px solid var(--accent); outline-offset: 3px;
+  button:focus-visible, a:focus-visible {
+    outline: 3px solid var(--primary); outline-offset: 3px;
   }
+  input:focus-visible, select:focus-visible { outline: none; }
 
   /* Public landing page */
   .landing-nav { padding: 13px clamp(20px, 5vw, 72px); background: rgba(251,248,243,.94); }
