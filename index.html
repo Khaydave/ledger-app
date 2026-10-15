@@ -1220,8 +1220,24 @@
     #onboarding .auth-toggle { margin-bottom: 14px; }
     #onboarding .field-group { margin-bottom: 12px; }
     #onboarding .btn { min-height: 46px; padding-top: 11px; padding-bottom: 11px; }
-    #onboarding.signup-mode { justify-content: center; }
-    #onboarding.signup-mode .auth-fields { flex: 1 1 auto; overflow-y: auto; }
+    #onboarding.signup-mode { justify-content: flex-start; }
+    body:has(#onboarding.active.signup-mode) {
+      height: auto; min-height: 100vh; min-height: 100dvh; overflow-x: hidden; overflow-y: auto;
+    }
+    body:has(#onboarding.active.signup-mode) #app {
+      height: auto; min-height: 100vh; min-height: 100dvh; overflow: visible;
+    }
+    #onboarding.active.signup-mode {
+      flex: 1 0 auto; height: auto; min-height: 100vh; min-height: 100dvh; max-height: none;
+      justify-content: flex-start; overflow: visible;
+      padding: max(16px, env(safe-area-inset-top)) 0 max(24px, env(safe-area-inset-bottom));
+    }
+    #onboarding.signup-mode .auth-panel {
+      flex: 0 0 auto; max-height: none; margin: 16px auto; overflow: visible;
+    }
+    #onboarding.signup-mode .auth-fields {
+      flex: 0 0 auto; overflow: visible; touch-action: auto;
+    }
   }
   @media (prefers-reduced-motion: reduce) and (min-width: 860px) {
     .auth-preview-track { animation: none; }
@@ -4001,6 +4017,7 @@ function setAuthMode(mode) {
   onboarding.classList.toggle('signup-mode', mode === 'signup');
   const authFields = onboarding.querySelector('.auth-fields');
   const resetAuthScroll = () => {
+    window.scrollTo(0, 0);
     onboarding.scrollTop = 0;
     if (authFields) authFields.scrollTop = 0;
   };
