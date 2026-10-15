@@ -1175,6 +1175,8 @@
       background: var(--surface); box-shadow: 0 24px 70px rgba(31,42,36,.12); text-align: center;
     }
     .auth-panel .mark { width: 48px; height: 48px; margin-bottom: 12px; }
+    .auth-panel > .mark { display: flex; flex: 0 0 48px; visibility: visible; opacity: 1; }
+    .auth-panel > .mark img { display: block; width: 100%; height: 100%; }
     .auth-panel h1 { font-size: 26px; }
     .auth-panel > p { margin-bottom: 18px; font-size: 13px; }
     .auth-panel .auth-toggle { margin-bottom: 16px; }
@@ -1184,7 +1186,7 @@
   }
   @media (min-width: 860px) and (max-height: 760px) {
     .auth-panel { max-height: calc(100dvh - 32px); padding: 18px 30px; }
-    .auth-panel .mark { width: 42px; height: 42px; margin-bottom: 8px; }
+    .auth-panel .mark { width: 42px; height: 42px; flex-basis: 42px; margin-bottom: 8px; }
     .auth-panel > p { margin-bottom: 14px; }
     .auth-panel .auth-toggle { margin-bottom: 12px; }
     .auth-panel .field-group { margin-bottom: 10px; }
@@ -1206,6 +1208,7 @@
       border: 1px solid var(--border); border-radius: 22px; background: var(--surface); box-shadow: 0 18px 48px rgba(31,42,36,.12); text-align: center;
     }
     #onboarding .mark { width: 46px; height: 46px; margin-bottom: 12px; }
+    #onboarding .auth-panel > .mark { flex-basis: 46px; }
     #onboarding h1 { font-size: 26px; }
     #onboarding > .auth-panel > p { margin-bottom: 18px; font-size: 13px; }
     #onboarding .auth-toggle { margin-bottom: 14px; }
@@ -3981,12 +3984,12 @@ function setAuthMode(mode) {
   authMode = mode;
   const onboarding = document.getElementById('onboarding');
   onboarding.classList.toggle('signup-mode', mode === 'signup');
-  onboarding.scrollTop = 0;
   const authPanel = onboarding.querySelector('.auth-panel');
-  if (authPanel) authPanel.scrollTop = 0;
   document.getElementById('authTabLogin').classList.toggle('active', mode === 'login');
   document.getElementById('authTabSignup').classList.toggle('active', mode === 'signup');
   document.getElementById('signupFields').style.display = mode === 'signup' ? 'block' : 'none';
+  onboarding.scrollTop = 0;
+  if (authPanel) authPanel.scrollTop = 0;
   document.getElementById('continueBtn').textContent = mode === 'signup' ? t('auth_signup') : t('auth_login');
   document.getElementById('onboardHint').textContent = mode === 'signup'
     ? "Pick a shop code and password you haven't used before. Your security question helps you recover your account if you forget your password."
