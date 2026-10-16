@@ -259,6 +259,46 @@
   .search-box { position: relative; margin-bottom: 14px; }
   .search-box input { padding-left: 36px; }
   .search-box .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--ink-faint); font-size: 14px; }
+  .records-toolbar { display: flex; align-items: center; gap: 10px; margin: 0 0 15px; }
+  .records-toolbar .search-box { flex: 1 1 auto; min-width: 0; margin: 0; }
+  .records-toolbar .search-box input { min-height: 44px; padding-right: 12px; }
+  .record-view-toggle {
+    display: inline-flex; flex: 0 0 auto; gap: 3px; padding: 4px;
+    border: 1px solid var(--border); border-radius: 12px; background: var(--surface);
+  }
+  .record-view-toggle button {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    min-height: 34px; padding: 0 10px; border: 0; border-radius: 8px;
+    background: transparent; color: var(--ink-soft); font: 600 12px 'Inter', sans-serif; cursor: pointer;
+  }
+  .record-view-toggle button svg { width: 15px; height: 15px; flex: 0 0 auto; }
+  .record-view-toggle button.active { background: var(--primary-tint); color: var(--primary); }
+  .record-collection[data-view="cards"] {
+    display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 13px; align-items: stretch;
+  }
+  .record-collection[data-view="cards"] > .empty-state { grid-column: 1 / -1; }
+  .record-collection[data-view="cards"] > .list-item {
+    min-width: 0; min-height: 0; margin: 0; padding: 15px;
+    align-items: stretch; flex-direction: column; justify-content: space-between; gap: 13px;
+    border-color: color-mix(in srgb, var(--border) 88%, var(--teal));
+    border-radius: 16px; background: var(--surface); box-shadow: 0 6px 18px rgba(31,75,67,.045);
+  }
+  .record-collection[data-view="cards"] > .list-item:hover { box-shadow: 0 10px 24px rgba(31,75,67,.09); }
+  .record-collection[data-view="cards"] .li-main { width: 100%; }
+  .record-collection[data-view="cards"] .li-title { overflow-wrap: anywhere; }
+  .record-collection[data-view="cards"] .li-right {
+    display: flex; width: 100%; flex-direction: row !important; align-items: center !important;
+    justify-content: space-between; gap: 8px; flex-wrap: wrap; margin-top: auto;
+  }
+  .record-collection[data-view="cards"] .li-right > .li-tag { white-space: normal; }
+  .record-collection[data-view="cards"] .li-actions { margin-left: auto; }
+  .record-visual { display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1; }
+  .record-thumb { width: 44px; height: 44px; flex: 0 0 auto; border-radius: 10px; object-fit: cover; }
+  .record-thumb-fallback { display: grid; place-items: center; background: var(--primary-tint); color: var(--primary); }
+  .record-thumb-fallback svg { width: 22px; height: 22px; }
+  .record-collection[data-view="cards"] .record-visual { flex-direction: column; align-items: stretch; gap: 11px; }
+  .record-collection[data-view="cards"] .record-thumb { width: 100%; height: 104px; border-radius: 12px; }
+  .record-collection[data-view="cards"] .record-thumb-fallback { min-height: 104px; }
 
   /* LIST ITEMS */
   .list-item {
@@ -809,6 +849,9 @@
   .period-toggle { border-radius: 13px; }
   .modal-overlay { backdrop-filter: blur(4px); }
 
+  @media (min-width: 860px) and (max-width: 1100px) {
+    .record-collection[data-view="cards"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
   @media (min-width: 860px) {
     #app { max-width: 1600px; }
     .sidebar { width: 248px; padding: 24px 16px; }
@@ -820,6 +863,14 @@
     .steps-wrap { max-width: 760px; }
   }
   @media (max-width: 859px) {
+    .record-collection[data-view="cards"] { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .record-collection[data-view="cards"] > .list-item { padding: 11px; gap: 10px; }
+    .record-collection[data-view="cards"] .li-title { font-size: 13px; }
+    .record-collection[data-view="cards"] .li-sub { font-size: 11.5px; }
+    .record-collection[data-view="cards"] .li-tag { font-size: 10px; padding: 4px 7px; }
+    .record-collection[data-view="cards"] .record-thumb,
+    .record-collection[data-view="cards"] .record-thumb-fallback { height: 82px; min-height: 82px; }
+    .record-view-toggle button { gap: 4px; padding: 0 8px; }
     #onboarding { width: min(100% - 28px, 480px); padding: 32px 24px; border-radius: 22px; }
     .content { padding: 22px 18px 112px; }
     .topbar { padding: 16px 18px 8px; }
@@ -846,7 +897,13 @@
     .landing-cta-band { margin: 12px 14px 34px; padding: 44px 22px; border-radius: 22px; }
     .landing-footer { padding: 20px 20px 34px; }
   }
+  @media (max-width: 360px) {
+    .record-collection[data-view="cards"] { grid-template-columns: minmax(0, 1fr); }
+  }
   @media (max-width: 420px) {
+    .records-toolbar { gap: 7px; }
+    .record-view-toggle button { padding: 0 6px; font-size: 11px; }
+    .record-view-toggle button svg { width: 14px; height: 14px; }
     .stat-row { gap: 9px; }
     .stat-card { padding: 13px 11px; }
     .stat-card .label { font-size: 11px; }
@@ -1796,6 +1853,16 @@
             <button class="quick-btn secondary" onclick="openModal('debtModal')"><span class="qicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></span><span id="qaAddDebt">Add debt</span></button>
           </div>
 
+          <div class="records-toolbar" data-record-toolbar="home">
+            <div class="search-box">
+              <span class="search-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+              <input type="search" id="homeSearchInput" data-translate-placeholder="search_home_records" oninput="renderDashboard()">
+            </div>
+            <div class="record-view-toggle" role="group" aria-label="Record layout" data-view-control="home">
+              <button type="button" data-view-mode="list" onclick="setRecordView('home', 'list')" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r=".7" fill="currentColor"/><circle cx="4" cy="12" r=".7" fill="currentColor"/><circle cx="4" cy="18" r=".7" fill="currentColor"/></svg><span data-translate-text="view_list">List</span></button>
+              <button type="button" data-view-mode="cards" onclick="setRecordView('home', 'cards')" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span data-translate-text="view_cards">Cards</span></button>
+            </div>
+          </div>
           <div class="section-title" id="sectionRunningLow">Running low</div>
           <div id="lowStockList"></div>
 
@@ -1822,9 +1889,15 @@
               <div class="value" id="statStockValue">&#8358;0</div>
             </div>
           </div>
-          <div class="search-box">
-            <span class="search-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
-            <input id="stockSearchInput" placeholder="Search stock..." oninput="renderStockList()">
+<div class="records-toolbar" data-record-toolbar="stock">
+            <div class="search-box">
+              <span class="search-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+              <input type="search" id="stockSearchInput" data-translate-placeholder="search_stock_records" oninput="renderStockList()">
+            </div>
+            <div class="record-view-toggle" role="group" aria-label="Record layout" data-view-control="stock">
+              <button type="button" data-view-mode="list" onclick="setRecordView('stock', 'list')" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r=".7" fill="currentColor"/><circle cx="4" cy="12" r=".7" fill="currentColor"/><circle cx="4" cy="18" r=".7" fill="currentColor"/></svg><span data-translate-text="view_list">List</span></button>
+              <button type="button" data-view-mode="cards" onclick="setRecordView('stock', 'cards')" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span data-translate-text="view_cards">Cards</span></button>
+            </div>
           </div>
           <div id="stockList"></div>
         </div>
@@ -1871,6 +1944,16 @@
               <div class="value" id="statSalesProfit">&#8358;0</div>
             </div>
           </div>
+<div class="records-toolbar" data-record-toolbar="sales">
+            <div class="search-box">
+              <span class="search-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+              <input type="search" id="salesSearchInput" data-translate-placeholder="search_sales_records" oninput="renderSalesTab()">
+            </div>
+            <div class="record-view-toggle" role="group" aria-label="Record layout" data-view-control="sales">
+              <button type="button" data-view-mode="list" onclick="setRecordView('sales', 'list')" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r=".7" fill="currentColor"/><circle cx="4" cy="12" r=".7" fill="currentColor"/><circle cx="4" cy="18" r=".7" fill="currentColor"/></svg><span data-translate-text="view_list">List</span></button>
+              <button type="button" data-view-mode="cards" onclick="setRecordView('sales', 'cards')" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span data-translate-text="view_cards">Cards</span></button>
+            </div>
+          </div>
           <div id="salesList"></div>
         </div>
 
@@ -1884,9 +1967,15 @@
             <div class="value" id="statOrdersTotal">&#8358;0</div>
             <div class="sub" id="statOrdersTotalCount">0 pending orders</div>
           </div>
-          <div class="search-box">
-            <span class="search-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
-            <input id="orderSearchInput" placeholder="Search orders by customer..." oninput="renderOrdersList()">
+<div class="records-toolbar" data-record-toolbar="orders">
+            <div class="search-box">
+              <span class="search-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+              <input type="search" id="orderSearchInput" data-translate-placeholder="search_order_records" oninput="renderOrdersList()">
+            </div>
+            <div class="record-view-toggle" role="group" aria-label="Record layout" data-view-control="orders">
+              <button type="button" data-view-mode="list" onclick="setRecordView('orders', 'list')" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r=".7" fill="currentColor"/><circle cx="4" cy="12" r=".7" fill="currentColor"/><circle cx="4" cy="18" r=".7" fill="currentColor"/></svg><span data-translate-text="view_list">List</span></button>
+              <button type="button" data-view-mode="cards" onclick="setRecordView('orders', 'cards')" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span data-translate-text="view_cards">Cards</span></button>
+            </div>
           </div>
           <div id="ordersList"></div>
         </div>
@@ -1924,6 +2013,16 @@
             <button class="quick-btn" onclick="openModal('doOrderModal')"><span class="qicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span><span id="doQaLogOrder">Log customer order</span></button>
             <button class="quick-btn secondary" onclick="showTab('do-wholesaler')"><span class="qicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg></span><span id="doQaWholesalerList">Wholesaler list</span></button>
           </div>
+<div class="records-toolbar" data-record-toolbar="do-home">
+            <div class="search-box">
+              <span class="search-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+              <input type="search" id="doHomeSearchInput" data-translate-placeholder="search_order_records" oninput="renderDoHome()">
+            </div>
+            <div class="record-view-toggle" role="group" aria-label="Record layout" data-view-control="do-home">
+              <button type="button" data-view-mode="list" onclick="setRecordView('do-home', 'list')" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r=".7" fill="currentColor"/><circle cx="4" cy="12" r=".7" fill="currentColor"/><circle cx="4" cy="18" r=".7" fill="currentColor"/></svg><span data-translate-text="view_list">List</span></button>
+              <button type="button" data-view-mode="cards" onclick="setRecordView('do-home', 'cards')" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span data-translate-text="view_cards">Cards</span></button>
+            </div>
+          </div>
           <div class="section-title" id="doSectionRecentOrders">Recent orders</div>
           <div id="doRecentOrdersList"></div>
         </div>
@@ -1933,9 +2032,15 @@
             <h2 style="font-size:18px;" id="doOrdersTabTitle">Customer orders</h2>
             <button class="icon-btn" onclick="openModal('doOrderModal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
           </div>
-          <div class="search-box">
-            <span class="search-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
-            <input id="doOrderSearchInput" placeholder="Search by customer..." oninput="renderDoOrdersList()">
+<div class="records-toolbar" data-record-toolbar="do-orders">
+            <div class="search-box">
+              <span class="search-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+              <input type="search" id="doOrderSearchInput" data-translate-placeholder="search_order_records" oninput="renderDoOrdersList()">
+            </div>
+            <div class="record-view-toggle" role="group" aria-label="Record layout" data-view-control="do-orders">
+              <button type="button" data-view-mode="list" onclick="setRecordView('do-orders', 'list')" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r=".7" fill="currentColor"/><circle cx="4" cy="12" r=".7" fill="currentColor"/><circle cx="4" cy="18" r=".7" fill="currentColor"/></svg><span data-translate-text="view_list">List</span></button>
+              <button type="button" data-view-mode="cards" onclick="setRecordView('do-orders', 'cards')" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span data-translate-text="view_cards">Cards</span></button>
+            </div>
           </div>
           <div id="doOrdersList"></div>
         </div>
@@ -2018,6 +2123,16 @@
             <div class="label" id="statLabelOwed">Owed to you</div>
             <div class="value danger" id="statOwed">&#8358;0</div>
           </div>
+<div class="records-toolbar" data-record-toolbar="debts">
+            <div class="search-box">
+              <span class="search-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+              <input type="search" id="debtSearchInput" data-translate-placeholder="search_debt_records" oninput="renderDebtList()">
+            </div>
+            <div class="record-view-toggle" role="group" aria-label="Record layout" data-view-control="debts">
+              <button type="button" data-view-mode="list" onclick="setRecordView('debts', 'list')" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r=".7" fill="currentColor"/><circle cx="4" cy="12" r=".7" fill="currentColor"/><circle cx="4" cy="18" r=".7" fill="currentColor"/></svg><span data-translate-text="view_list">List</span></button>
+              <button type="button" data-view-mode="cards" onclick="setRecordView('debts', 'cards')" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span data-translate-text="view_cards">Cards</span></button>
+            </div>
+          </div>
           <div id="debtList"></div>
         </div>
 
@@ -2056,6 +2171,16 @@
             <div class="label" id="expensesPeriodLabel">Total expenses &mdash; this week</div>
             <div class="value danger" id="statExpensesTotal">&#8358;0</div>
             <div class="sub" id="statExpensesCount">0 expenses</div>
+          </div>
+<div class="records-toolbar" data-record-toolbar="expenses">
+            <div class="search-box">
+              <span class="search-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+              <input type="search" id="expenseSearchInput" data-translate-placeholder="search_expense_records" oninput="renderExpensesTab()">
+            </div>
+            <div class="record-view-toggle" role="group" aria-label="Record layout" data-view-control="expenses">
+              <button type="button" data-view-mode="list" onclick="setRecordView('expenses', 'list')" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r=".7" fill="currentColor"/><circle cx="4" cy="12" r=".7" fill="currentColor"/><circle cx="4" cy="18" r=".7" fill="currentColor"/></svg><span data-translate-text="view_list">List</span></button>
+              <button type="button" data-view-mode="cards" onclick="setRecordView('expenses', 'cards')" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span data-translate-text="view_cards">Cards</span></button>
+            </div>
           </div>
           <div id="expensesList"></div>
         </div>
@@ -2528,6 +2653,9 @@ let state = { products: [], sales: [], debts: [], orders: [], dropshipOrders: []
 let fbReady = false;
 let salesPeriod = 'week';
 let saleSelectedProductId = null;
+let recordViewModes = {};
+try { recordViewModes = JSON.parse(localStorage.getItem('ledger_record_view_modes_v1') || '{}') || {}; }
+catch (e) { recordViewModes = {}; }
 let authMode = 'login';
 let signupMode = 'regular';
 
@@ -2595,6 +2723,15 @@ const TRANSLATIONS = {
     nav_orders: 'Orders',
     nav_debts: 'Debts',
     nav_expenses: 'Expenses',
+    view_list: 'List',
+    view_cards: 'Cards',
+    search_home_records: 'Search low stock and recent sales...',
+    search_stock_records: 'Search stock...',
+    search_sales_records: 'Search sales...',
+    search_order_records: 'Search orders by customer...',
+    search_debt_records: 'Search customers...',
+    search_expense_records: 'Search expenses...',
+    search_no_matches: 'No records match your search.',
     'nav_do-home': 'Home',
     'nav_do-orders': 'Customer',
     'nav_do-wholesaler': 'Wholesaler',
@@ -2751,6 +2888,7 @@ const TRANSLATIONS = {
     sale_singular: 'sale',
     sale_plural: 'sales',
     label_each: 'each',
+    label_buy: 'buy',
     label_left: 'left',
     label_sold: 'sold',
     label_in_stock: 'in stock',
@@ -2850,6 +2988,15 @@ const TRANSLATIONS = {
     nav_orders: 'Commandes',
     nav_debts: 'Dettes',
     nav_expenses: 'Dépenses',
+    view_list: 'Liste',
+    view_cards: 'Cartes',
+    search_home_records: 'Rechercher le stock faible et les ventes récentes…',
+    search_stock_records: 'Rechercher dans le stock…',
+    search_sales_records: 'Rechercher des ventes…',
+    search_order_records: 'Rechercher par client…',
+    search_debt_records: 'Rechercher des clients…',
+    search_expense_records: 'Rechercher des dépenses…',
+    search_no_matches: 'Aucun résultat pour cette recherche.',
     tab_stock: 'Votre stock',
     tab_sales: 'Ventes',
     tab_orders: 'Commandes',
@@ -3000,6 +3147,7 @@ const TRANSLATIONS = {
     sale_singular: 'vente',
     sale_plural: 'ventes',
     label_each: 'chacun',
+    label_buy: 'achat',
     label_left: 'restant(s)',
     label_sold: 'vendu(s)',
     label_in_stock: 'en stock',
@@ -3099,6 +3247,15 @@ const TRANSLATIONS = {
     nav_orders: 'Pedidos',
     nav_debts: 'Deudas',
     nav_expenses: 'Gastos',
+    view_list: 'Lista',
+    view_cards: 'Tarjetas',
+    search_home_records: 'Buscar poco stock y ventas recientes…',
+    search_stock_records: 'Buscar en inventario…',
+    search_sales_records: 'Buscar ventas…',
+    search_order_records: 'Buscar por cliente…',
+    search_debt_records: 'Buscar clientes…',
+    search_expense_records: 'Buscar gastos…',
+    search_no_matches: 'No hay resultados para esta búsqueda.',
     tab_stock: 'Tu inventario',
     tab_sales: 'Ventas',
     tab_orders: 'Pedidos',
@@ -3249,6 +3406,7 @@ const TRANSLATIONS = {
     sale_singular: 'venta',
     sale_plural: 'ventas',
     label_each: 'cada uno',
+    label_buy: 'compra',
     label_left: 'restante(s)',
     label_sold: 'vendido(s)',
     label_in_stock: 'en inventario',
@@ -3348,6 +3506,15 @@ const TRANSLATIONS = {
     nav_orders: 'Bestellungen',
     nav_debts: 'Schulden',
     nav_expenses: 'Ausgaben',
+    view_list: 'Liste',
+    view_cards: 'Karten',
+    search_home_records: 'Niedrigen Bestand und aktuelle Verkäufe suchen…',
+    search_stock_records: 'Lager durchsuchen…',
+    search_sales_records: 'Verkäufe suchen…',
+    search_order_records: 'Nach Kunden suchen…',
+    search_debt_records: 'Kunden suchen…',
+    search_expense_records: 'Ausgaben suchen…',
+    search_no_matches: 'Keine passenden Einträge gefunden.',
     tab_stock: 'Dein Lager',
     tab_sales: 'Verkäufe',
     tab_orders: 'Bestellungen',
@@ -3498,6 +3665,7 @@ const TRANSLATIONS = {
     sale_singular: 'Verkauf',
     sale_plural: 'Verkäufe',
     label_each: 'pro Stück',
+    label_buy: 'Einkauf',
     label_left: 'übrig',
     label_sold: 'verkauft',
     label_in_stock: 'auf Lager',
@@ -3597,6 +3765,15 @@ const TRANSLATIONS = {
     nav_orders: '订单',
     nav_debts: '欠款',
     nav_expenses: '支出',
+    view_list: '列表',
+    view_cards: '卡片',
+    search_home_records: '搜索低库存和近期销售…',
+    search_stock_records: '搜索库存…',
+    search_sales_records: '搜索销售…',
+    search_order_records: '按客户搜索…',
+    search_debt_records: '搜索客户…',
+    search_expense_records: '搜索支出…',
+    search_no_matches: '没有匹配的记录。',
     tab_stock: '您的库存',
     tab_sales: '销售',
     tab_orders: '订单',
@@ -3747,6 +3924,7 @@ const TRANSLATIONS = {
     sale_singular: '笔销售',
     sale_plural: '笔销售',
     label_each: '每件',
+    label_buy: '进价',
     label_left: '剩余',
     label_sold: '已售',
     label_in_stock: '库存',
@@ -3847,6 +4025,12 @@ function t(key) {
 }
 
 function applyTranslations() {
+  document.querySelectorAll('[data-translate-text]').forEach(el => {
+    el.textContent = t(el.dataset.translateText);
+  });
+  document.querySelectorAll('[data-translate-placeholder]').forEach(el => {
+    el.placeholder = t(el.dataset.translatePlaceholder);
+  });
   document.querySelectorAll('.nav-btn').forEach(b => {
     const tab = b.dataset.tab;
     const icon = b.querySelector('.nicon');
@@ -5467,64 +5651,92 @@ function renderTrendBadge(elId, current, previous) {
   el.style.display = 'inline-flex';
 }
 
+function getRecordView(key) {
+  return recordViewModes[key] === 'list' ? 'list' : 'cards';
+}
+
+function syncRecordView(container, key) {
+  if (!container) return;
+  container.classList.add('record-collection');
+  container.dataset.recordView = key;
+  container.dataset.view = getRecordView(key);
+  document.querySelectorAll(`[data-view-control="${key}"] [data-view-mode]`).forEach(button => {
+    const active = button.dataset.viewMode === container.dataset.view;
+    button.classList.toggle('active', active);
+    button.setAttribute('aria-pressed', String(active));
+  });
+}
+
+function setRecordView(key, mode) {
+  if (mode !== 'list' && mode !== 'cards') return;
+  recordViewModes[key] = mode;
+  try { localStorage.setItem('ledger_record_view_modes_v1', JSON.stringify(recordViewModes)); }
+  catch (e) { /* Keep the current view for this session if storage is unavailable. */ }
+  document.querySelectorAll(`[data-record-view="${key}"]`).forEach(container => syncRecordView(container, key));
+}
+
 function renderDashboard() {
   renderGreeting('dashboardGreeting', 'dashboardDate');
 
-  const totalItems = state.products.reduce((s, p) => s + Number(p.qty), 0);
+  const totalItems = state.products.reduce((sum, product) => sum + Number(product.qty), 0);
   document.getElementById('statItems').textContent = totalItems;
 
-  const pendingOrders = state.orders.filter(o => !o.fulfilled);
-  const pendingTotal = pendingOrders.reduce((s, o) => s + Number(o.amount), 0);
+  const pendingOrders = state.orders.filter(order => !order.fulfilled);
+  const pendingTotal = pendingOrders.reduce((sum, order) => sum + Number(order.amount), 0);
   document.getElementById('statOrders').textContent = fmtMoney(pendingTotal);
   document.getElementById('statOrdersCount').textContent = pendingOrders.length + ' ' + (pendingOrders.length === 1 ? t('do_order_singular') : t('do_order_plural'));
 
   const { start: weekStart, end: weekEnd } = periodRange('week');
-  const weekSales = state.sales.filter(s => { const d = new Date(s.date); return d >= weekStart && d < weekEnd; });
-  const weekTotal = weekSales.reduce((s, x) => s + Number(x.total), 0);
+  const weekSales = state.sales.filter(sale => { const date = new Date(sale.date); return date >= weekStart && date < weekEnd; });
+  const weekTotal = weekSales.reduce((sum, sale) => sum + Number(sale.total), 0);
   document.getElementById('statSalesWeek').textContent = fmtMoney(weekTotal);
 
   const { start: lastWeekStart, end: lastWeekEnd } = periodRange('lastweek');
-  const lastWeekSales = state.sales.filter(s => { const d = new Date(s.date); return d >= lastWeekStart && d < lastWeekEnd; });
-  const lastWeekTotal = lastWeekSales.reduce((s, x) => s + Number(x.total), 0);
+  const lastWeekSales = state.sales.filter(sale => { const date = new Date(sale.date); return date >= lastWeekStart && date < lastWeekEnd; });
+  const lastWeekTotal = lastWeekSales.reduce((sum, sale) => sum + Number(sale.total), 0);
   renderTrendBadge('salesWeekTrend', weekTotal, lastWeekTotal);
 
-  const lowStock = state.products.filter(p => Number(p.qty) <= 2);
+  const query = (document.getElementById('homeSearchInput')?.value || '').trim().toLowerCase();
+  const lowStock = state.products.filter(product => Number(product.qty) <= 2 && (!query || String(product.name || '').toLowerCase().includes(query)));
   const lowEl = document.getElementById('lowStockList');
+  syncRecordView(lowEl, 'home');
   if (lowStock.length === 0) {
-    lowEl.innerHTML = emptyStateHTML('box', t('empty_no_low_stock'));
+    lowEl.innerHTML = query ? emptyStateHTML('box', t('search_no_matches')) : emptyStateHTML('box', t('empty_no_low_stock'));
   } else {
-    lowEl.innerHTML = lowStock.map(p => `
+    lowEl.innerHTML = lowStock.map(product => `
       <div class="list-item">
         <div class="li-main">
-          <div class="li-title">${escapeHtml(p.name)}</div>
-          <div class="li-sub">${fmtMoney(p.price)} ${t('label_each')}</div>
+          <div class="li-title">${escapeHtml(product.name)}</div>
+          <div class="li-sub">${fmtMoney(product.price)} ${t('label_each')}</div>
         </div>
-        <div class="li-tag low">${p.qty} ${t('label_left')}</div>
+        <div class="li-right"><div class="li-tag low">${product.qty} ${t('label_left')}</div></div>
       </div>`).join('');
   }
 
-  const recent = [...state.sales].reverse().slice(0, 5);
-  const recEl = document.getElementById('recentSalesList');
-  if (recent.length === 0) {
-    recEl.innerHTML = emptyStateHTML('receipt', t('empty_no_sales_yet'));
+  const recentSales = [...state.sales].reverse().slice(0, 5).filter(sale => !query || String(sale.productName || '').toLowerCase().includes(query));
+  const recentEl = document.getElementById('recentSalesList');
+  syncRecordView(recentEl, 'home');
+  if (recentSales.length === 0) {
+    recentEl.innerHTML = query ? emptyStateHTML('receipt', t('search_no_matches')) : emptyStateHTML('receipt', t('empty_no_sales_yet'));
   } else {
-    recEl.innerHTML = recent.map(s => `
+    recentEl.innerHTML = recentSales.map(sale => `
       <div class="list-item">
         <div class="li-main">
-          <div class="li-title">${escapeHtml(s.productName)}</div>
-          <div class="li-sub">${s.qty} ${t('label_sold')} &middot; ${new Date(s.date).toLocaleDateString()}</div>
+          <div class="li-title">${escapeHtml(sale.productName)}</div>
+          <div class="li-sub">${sale.qty} ${t('label_sold')} &middot; ${new Date(sale.date).toLocaleDateString()}</div>
         </div>
-        <div class="li-tag ok">${fmtMoney(s.total)}</div>
+        <div class="li-right"><div class="li-tag ok">${fmtMoney(sale.total)}</div></div>
       </div>`).join('');
   }
 }
 
 function renderStockList() {
   const el = document.getElementById('stockList');
+  syncRecordView(el, 'stock');
   const query = (document.getElementById('stockSearchInput')?.value || '').trim().toLowerCase();
-  const filtered = query ? state.products.filter(p => p.name.toLowerCase().includes(query)) : state.products;
+  const filtered = query ? state.products.filter(product => String(product.name || '').toLowerCase().includes(query)) : state.products;
 
-  const totalValue = state.products.reduce((s, p) => s + (Number(p.qty) * Number(p.price)), 0);
+  const totalValue = state.products.reduce((sum, product) => sum + (Number(product.qty) * Number(product.price)), 0);
   const valueEl = document.getElementById('statStockValue');
   if (valueEl) valueEl.textContent = fmtMoney(totalValue);
 
@@ -5536,22 +5748,22 @@ function renderStockList() {
     el.innerHTML = emptyStateHTML('box', t('empty_no_stock_match'));
     return;
   }
-  el.innerHTML = filtered.map(p => {
-    const low = Number(p.qty) <= 2;
-    const thumb = p.photoURL
-      ? `<img src="${p.photoURL}" style="width:44px; height:44px; border-radius:9px; object-fit:cover; margin-right:12px; flex-shrink:0;">`
-      : '';
+  el.innerHTML = filtered.map(product => {
+    const low = Number(product.qty) <= 2;
+    const thumb = product.photoURL
+      ? `<img class="record-thumb" src="${product.photoURL}" alt="${escapeHtml(product.name)}">`
+      : `<div class="record-thumb record-thumb-fallback" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="m12 3 9 5-9 5-9-5 9-5z"/><path d="M3 8v8l9 5 9-5V8M12 13v8"/></svg></div>`;
     return `
-      <div class="list-item" onclick="editStock('${p.id}')" style="cursor:pointer;">
-        <div style="display:flex; align-items:center; flex:1; min-width:0;">
+      <div class="list-item" onclick="editStock('${product.id}')" style="cursor:pointer;">
+        <div class="record-visual">
           ${thumb}
           <div class="li-main">
-            <div class="li-title">${escapeHtml(p.name)}</div>
-            <div class="li-sub">${fmtMoney(p.price)} ${t('label_each')}</div>
+            <div class="li-title">${escapeHtml(product.name)}</div>
+            <div class="li-sub">${fmtMoney(product.costPrice || 0)} ${t('label_buy')} &middot; ${fmtMoney(product.price)} ${t('label_each')}</div>
           </div>
         </div>
         <div class="li-right">
-          <div class="li-tag ${low ? 'low' : 'ok'}">${p.qty} ${t('label_in_stock')}</div>
+          <div class="li-tag ${low ? 'low' : 'ok'}">${product.qty} ${t('label_in_stock')}</div>
         </div>
       </div>`;
   }).join('');
@@ -5595,9 +5807,9 @@ function applyCustomSalesRange() {
 
 function renderSalesTab() {
   const { start, end } = periodRange(salesPeriod);
-  const filtered = state.sales.filter(s => { const d = new Date(s.date); return d >= start && d < end; });
-  const total = filtered.reduce((s, x) => s + Number(x.total), 0);
-  const grossProfit = filtered.reduce((s, x) => s + Number(x.profit || 0), 0);
+  const periodSales = state.sales.filter(sale => { const date = new Date(sale.date); return date >= start && date < end; });
+  const total = periodSales.reduce((sum, sale) => sum + Number(sale.total), 0);
+  const grossProfit = periodSales.reduce((sum, sale) => sum + Number(sale.profit || 0), 0);
   const periodExpenses = totalExpensesInRange(start, end);
   const totalProfit = grossProfit - periodExpenses;
   const label = periodLabel(salesPeriod);
@@ -5605,7 +5817,7 @@ function renderSalesTab() {
   document.getElementById('salesPeriodLabel').textContent = t('sales_total_prefix') + ' \u2014 ' + label;
   document.getElementById('salesProfitLabel').textContent = t('do_profit_prefix') + ' \u2014 ' + label;
   document.getElementById('statSalesTotal').textContent = fmtMoney(total);
-  document.getElementById('statSalesCount').textContent = filtered.length + ' ' + (filtered.length === 1 ? t('sale_singular') : t('sale_plural'));
+  document.getElementById('statSalesCount').textContent = periodSales.length + ' ' + (periodSales.length === 1 ? t('sale_singular') : t('sale_plural'));
 
   const profitEl = document.getElementById('statSalesProfit');
   if (profitEl) {
@@ -5613,24 +5825,30 @@ function renderSalesTab() {
     profitEl.className = 'value ' + (totalProfit < 0 ? 'is-loss-value' : 'is-profit-value');
   }
 
-
+  const query = (document.getElementById('salesSearchInput')?.value || '').trim().toLowerCase();
+  const filtered = periodSales.filter(sale => !query || String(sale.productName || '').toLowerCase().includes(query));
   const el = document.getElementById('salesList');
-  if (filtered.length === 0) {
+  syncRecordView(el, 'sales');
+  if (periodSales.length === 0) {
     el.innerHTML = emptyStateHTML('receipt', t('empty_no_sales_period'));
     return;
   }
-  el.innerHTML = [...filtered].reverse().map(s => {
-    const profit = Number(s.profit || 0);
+  if (filtered.length === 0) {
+    el.innerHTML = emptyStateHTML('receipt', t('search_no_matches'));
+    return;
+  }
+  el.innerHTML = [...filtered].reverse().map(sale => {
+    const profit = Number(sale.profit || 0);
     const profitClass = profit < 0 ? 'is-loss' : 'is-profit';
     const profitLabel = (profit < 0 ? '- ' : '') + fmtMoney(Math.abs(profit));
     return `
-    <div class="list-item" onclick="editSale('${s.id}')" style="cursor:pointer;">
+    <div class="list-item" onclick="editSale('${sale.id}')" style="cursor:pointer;">
       <div class="li-main">
-        <div class="li-title">${escapeHtml(s.productName)}</div>
-        <div class="li-sub">${s.qty} sold &middot; ${new Date(s.date).toLocaleDateString()}</div>
+        <div class="li-title">${escapeHtml(sale.productName)}</div>
+        <div class="li-sub">${sale.qty} ${t('label_sold')} &middot; ${new Date(sale.date).toLocaleDateString()}</div>
       </div>
-      <div class="li-right" style="flex-direction:column; align-items:flex-end; gap:2px;">
-        <div class="li-tag ok">${fmtMoney(s.total)}</div>
+      <div class="li-right">
+        <div class="li-tag ok">${fmtMoney(sale.total)}</div>
         <div class="profit-text ${profitClass}">${profitLabel}</div>
       </div>
     </div>`;
@@ -5638,17 +5856,18 @@ function renderSalesTab() {
 }
 
 function renderOrdersList() {
-  const pending = state.orders.filter(o => !o.fulfilled);
-  const total = pending.reduce((s, o) => s + Number(o.amount), 0);
+  const pending = state.orders.filter(order => !order.fulfilled);
+  const total = pending.reduce((sum, order) => sum + Number(order.amount), 0);
   document.getElementById('statOrdersTotal').textContent = fmtMoney(total);
   document.getElementById('statOrdersTotalCount').textContent = pending.length + ' ' + (pending.length === 1 ? t('label_pending_order') : t('label_pending_orders'));
 
   const query = (document.getElementById('orderSearchInput')?.value || '').trim().toLowerCase();
   const filtered = query
-    ? state.orders.filter(o => o.customer.toLowerCase().includes(query) || (o.description || '').toLowerCase().includes(query))
+    ? state.orders.filter(order => String(order.customer || '').toLowerCase().includes(query) || String(order.description || '').toLowerCase().includes(query))
     : state.orders;
 
   const el = document.getElementById('ordersList');
+  syncRecordView(el, 'orders');
   if (state.orders.length === 0) {
     el.innerHTML = emptyStateHTML('clipboard', t('empty_no_orders'));
     return;
@@ -5657,16 +5876,16 @@ function renderOrdersList() {
     el.innerHTML = emptyStateHTML('clipboard', t('empty_no_orders_match'));
     return;
   }
-  el.innerHTML = [...filtered].reverse().map(o => `
+  el.innerHTML = [...filtered].reverse().map(order => `
     <div class="list-item">
-      <div class="li-main" onclick="toggleOrderFulfilled('${o.id}')" style="cursor:pointer;">
-        <div class="li-title">${escapeHtml(o.customer)}</div>
-        <div class="li-sub">${escapeHtml(o.description || '')} &middot; ${o.fulfilled ? t('label_tap_mark_pending') : t('label_tap_mark_fulfilled')}</div>
+      <div class="li-main" onclick="toggleOrderFulfilled('${order.id}')" style="cursor:pointer;">
+        <div class="li-title">${escapeHtml(order.customer)}</div>
+        <div class="li-sub">${escapeHtml(order.description || '')} &middot; ${order.fulfilled ? t('label_tap_mark_pending') : t('label_tap_mark_fulfilled')}</div>
       </div>
       <div class="li-right">
-        <div class="li-tag ${o.fulfilled ? 'ok' : 'pending'}">${o.fulfilled ? t('label_fulfilled') : fmtMoney(o.amount)}</div>
+        <div class="li-tag ${order.fulfilled ? 'ok' : 'pending'}">${order.fulfilled ? t('label_fulfilled') : fmtMoney(order.amount)}</div>
         <div class="li-actions">
-          <div class="icon-btn small" onclick="event.stopPropagation(); deleteOrder('${o.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></div>
+          <div class="icon-btn small" onclick="event.stopPropagation(); deleteOrder('${order.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></div>
         </div>
       </div>
     </div>`).join('');
@@ -5707,24 +5926,31 @@ function activeExpensesStateKey() {
 
 function renderDebtList() {
   const debts = getActiveDebts();
-  const totalOwed = debts.filter(d => !d.paid).reduce((s, d) => s + Number(d.amount), 0);
+  const totalOwed = debts.filter(debt => !debt.paid).reduce((sum, debt) => sum + Number(debt.amount), 0);
   document.getElementById('statOwed').textContent = fmtMoney(totalOwed);
 
+  const query = (document.getElementById('debtSearchInput')?.value || '').trim().toLowerCase();
+  const filtered = query ? debts.filter(debt => String(debt.customer || '').toLowerCase().includes(query)) : debts;
   const el = document.getElementById('debtList');
+  syncRecordView(el, 'debts');
   if (debts.length === 0) {
     el.innerHTML = emptyStateHTML('wallet', t('empty_no_debts'));
     return;
   }
-  el.innerHTML = [...debts].reverse().map(d => `
+  if (filtered.length === 0) {
+    el.innerHTML = emptyStateHTML('wallet', t('search_no_matches'));
+    return;
+  }
+  el.innerHTML = [...filtered].reverse().map(debt => `
     <div class="list-item">
-      <div class="li-main" onclick="togglePaid('${d.id}')" style="cursor:pointer;">
-        <div class="li-title">${escapeHtml(d.customer)}</div>
-        <div class="li-sub">${new Date(d.date).toLocaleDateString()} &middot; ${d.paid ? t('label_tap_mark_unpaid') : t('label_tap_mark_paid')}</div>
+      <div class="li-main" onclick="togglePaid('${debt.id}')" style="cursor:pointer;">
+        <div class="li-title">${escapeHtml(debt.customer)}</div>
+        <div class="li-sub">${new Date(debt.date).toLocaleDateString()} &middot; ${debt.paid ? t('label_tap_mark_unpaid') : t('label_tap_mark_paid')}</div>
       </div>
       <div class="li-right">
-        <div class="li-tag ${d.paid ? 'paid' : 'owe'}">${d.paid ? t('label_paid') : fmtMoney(d.amount)}</div>
+        <div class="li-tag ${debt.paid ? 'paid' : 'owe'}">${debt.paid ? t('label_paid') : fmtMoney(debt.amount)}</div>
         <div class="li-actions">
-          <div class="icon-btn small" onclick="event.stopPropagation(); deleteDebt('${d.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></div>
+          <div class="icon-btn small" onclick="event.stopPropagation(); deleteDebt('${debt.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2-2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></div>
         </div>
       </div>
     </div>`).join('');
@@ -6112,33 +6338,44 @@ function expenseCategoryLabel(cat) {
 
 function renderExpensesTab() {
   const { start, end } = expensesPeriodRangeFor(expensesPeriod);
-  const filtered = expensesInRange(start, end);
-  const total = filtered.reduce((s, x) => s + Number(x.amount || 0), 0);
+  const periodExpensesList = expensesInRange(start, end);
+  const total = periodExpensesList.reduce((sum, expense) => sum + Number(expense.amount || 0), 0);
 
   let label;
   if (expensesPeriod === 'custom' && expensesCustomStart && expensesCustomEnd) {
-    const opts = { month: 'short', day: 'numeric', year: 'numeric' };
-    label = new Date(expensesCustomStart).toLocaleDateString(undefined, opts) + ' \u2013 ' + new Date(expensesCustomEnd).toLocaleDateString(undefined, opts);
+    const options = { month: 'short', day: 'numeric', year: 'numeric' };
+    label = new Date(expensesCustomStart).toLocaleDateString(undefined, options) + ' \u2013 ' + new Date(expensesCustomEnd).toLocaleDateString(undefined, options);
   } else {
     label = doPeriodLabel(expensesPeriod);
   }
 
   document.getElementById('expensesPeriodLabel').textContent = t('expenses_total_prefix') + ' \u2014 ' + label;
   document.getElementById('statExpensesTotal').textContent = fmtMoney(total);
-  document.getElementById('statExpensesCount').textContent = filtered.length + ' ' + (filtered.length === 1 ? t('expense_singular') : t('expense_plural'));
+  document.getElementById('statExpensesCount').textContent = periodExpensesList.length + ' ' + (periodExpensesList.length === 1 ? t('expense_singular') : t('expense_plural'));
 
+  const query = (document.getElementById('expenseSearchInput')?.value || '').trim().toLowerCase();
+  const filtered = periodExpensesList.filter(expense => {
+    if (!query) return true;
+    const haystack = [expense.description, expenseCategoryLabel(expense.category), expense.date, expense.amount].join(' ').toLowerCase();
+    return haystack.includes(query);
+  });
   const el = document.getElementById('expensesList');
-  if (filtered.length === 0) {
+  syncRecordView(el, 'expenses');
+  if (periodExpensesList.length === 0) {
     el.innerHTML = emptyStateHTML('receipt', t('expenses_empty'));
     return;
   }
-  el.innerHTML = [...filtered].reverse().map(x => `
-    <div class="list-item" onclick="editExpense('${x.id}')" style="cursor:pointer;">
+  if (filtered.length === 0) {
+    el.innerHTML = emptyStateHTML('receipt', t('search_no_matches'));
+    return;
+  }
+  el.innerHTML = [...filtered].reverse().map(expense => `
+    <div class="list-item" onclick="editExpense('${expense.id}')" style="cursor:pointer;">
       <div class="li-main">
-        <div class="li-title">${escapeHtml(x.description || expenseCategoryLabel(x.category))}</div>
-        <div class="li-sub">${expenseCategoryLabel(x.category)} &middot; ${new Date(x.date).toLocaleDateString()}</div>
+        <div class="li-title">${escapeHtml(expense.description || expenseCategoryLabel(expense.category))}</div>
+        <div class="li-sub">${expenseCategoryLabel(expense.category)} &middot; ${new Date(expense.date).toLocaleDateString()}</div>
       </div>
-      <div class="li-tag owe">${fmtMoney(x.amount)}</div>
+      <div class="li-right"><div class="li-tag owe">${fmtMoney(expense.amount)}</div></div>
     </div>`).join('');
 }
 
@@ -6356,21 +6593,19 @@ function renderDoHome() {
   renderGreeting('doGreeting', 'doGreetingDate');
 
   const orders = state.dropshipOrders || [];
-  const pending = orders.filter(o => o.stage === 'pending');
-  const pendingValue = pending.reduce((s, o) => s + Number(o.sellPrice || 0), 0);
-
-  const unpaidCustomer = orders.filter(o => !o.customerPaid).reduce((s, o) => s + Number(o.sellPrice || 0), 0);
-  const notYetDelivered = orders.filter(o => o.stage !== 'delivered' && o.costPrice != null);
-  const owedWholesaler = notYetDelivered.reduce((s, o) => s + Number(o.costPrice || 0), 0);
+  const pending = orders.filter(order => order.stage === 'pending');
+  const pendingValue = pending.reduce((sum, order) => sum + Number(order.sellPrice || 0), 0);
+  const unpaidCustomer = orders.filter(order => !order.customerPaid).reduce((sum, order) => sum + Number(order.sellPrice || 0), 0);
+  const notYetDelivered = orders.filter(order => order.stage !== 'delivered' && order.costPrice != null);
+  const owedWholesaler = notYetDelivered.reduce((sum, order) => sum + Number(order.costPrice || 0), 0);
 
   const { start: weekStart, end: weekEnd } = periodRange('week');
-  const weekOrders = orders.filter(o => new Date(o.date) >= weekStart && o.costPrice != null);
-  const weekGrossProfit = weekOrders.reduce((s, o) => s + (Number(o.sellPrice || 0) - Number(o.costPrice || 0)), 0);
+  const weekOrders = orders.filter(order => new Date(order.date) >= weekStart && order.costPrice != null);
+  const weekGrossProfit = weekOrders.reduce((sum, order) => sum + (Number(order.sellPrice || 0) - Number(order.costPrice || 0)), 0);
   const weekProfit = weekGrossProfit - totalExpensesInRange(weekStart, weekEnd);
-
   const { start: lastWeekStart, end: lastWeekEnd } = periodRange('lastweek');
-  const lastWeekOrders = orders.filter(o => { const d = new Date(o.date); return d >= lastWeekStart && d < lastWeekEnd && o.costPrice != null; });
-  const lastWeekGrossProfit = lastWeekOrders.reduce((s, o) => s + (Number(o.sellPrice || 0) - Number(o.costPrice || 0)), 0);
+  const lastWeekOrders = orders.filter(order => { const date = new Date(order.date); return date >= lastWeekStart && date < lastWeekEnd && order.costPrice != null; });
+  const lastWeekGrossProfit = lastWeekOrders.reduce((sum, order) => sum + (Number(order.sellPrice || 0) - Number(order.costPrice || 0)), 0);
   const lastWeekProfit = lastWeekGrossProfit - totalExpensesInRange(lastWeekStart, lastWeekEnd);
   renderTrendBadge('doProfitWeekTrend', weekProfit, lastWeekProfit);
 
@@ -6380,28 +6615,30 @@ function renderDoHome() {
   document.getElementById('doStatOwedWholesaler').textContent = fmtMoney(owedWholesaler);
   document.getElementById('doStatProfitWeek').textContent = (weekProfit < 0 ? '- ' : '') + fmtMoney(Math.abs(weekProfit));
 
+  const query = (document.getElementById('doHomeSearchInput')?.value || '').trim().toLowerCase();
+  const recent = [...orders].reverse().slice(0, 5).filter(order => !query || `${order.customer} ${order.description}`.toLowerCase().includes(query));
   const recentEl = document.getElementById('doRecentOrdersList');
-  const recent = [...orders].reverse().slice(0, 5);
+  syncRecordView(recentEl, 'do-home');
   if (recent.length === 0) {
-    recentEl.innerHTML = emptyStateHTML('clipboard', t('do_empty_no_orders'));
+    recentEl.innerHTML = query ? emptyStateHTML('clipboard', t('search_no_matches')) : emptyStateHTML('clipboard', t('do_empty_no_orders'));
   } else {
-    recentEl.innerHTML = recent.map(o => {
-      const badge = doOrderStageBadge(o);
-      const thumb = o.photoURL
-        ? `<img src="${o.photoURL}" style="width:40px; height:40px; border-radius:9px; object-fit:cover; margin-right:12px; flex-shrink:0;">`
-        : '';
+    recentEl.innerHTML = recent.map(order => {
+      const badge = doOrderStageBadge(order);
+      const thumb = order.photoURL
+        ? `<img class="record-thumb" src="${order.photoURL}" alt="${escapeHtml(order.description || '')}">`
+        : `<div class="record-thumb record-thumb-fallback" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 11h6M9 15h4"/></svg></div>`;
       return `
-        <div class="list-item" onclick="editDoOrder('${o.id}')" style="cursor:pointer;">
-          <div style="display:flex; align-items:center; flex:1; min-width:0;">
+        <div class="list-item" onclick="editDoOrder('${order.id}')" style="cursor:pointer;">
+          <div class="record-visual">
             ${thumb}
             <div class="li-main">
-              <div class="li-title">${escapeHtml(o.customer)}</div>
-              <div class="li-sub">${o.qty || 1} &times; ${escapeHtml(o.description)}</div>
+              <div class="li-title">${escapeHtml(order.customer)}</div>
+              <div class="li-sub">${order.qty || 1} &times; ${escapeHtml(order.description)}</div>
             </div>
           </div>
           <div class="li-right">
             <div class="li-tag ${badge.cls}">${badge.label}</div>
-            <div class="profit-text" style="color:var(--ink-soft);">${fmtMoney(o.sellPrice)}</div>
+            <div class="profit-text" style="color:var(--ink-soft);">${fmtMoney(order.sellPrice)}</div>
           </div>
         </div>`;
     }).join('');
@@ -6412,10 +6649,11 @@ function renderDoOrdersList() {
   const query = (document.getElementById('doOrderSearchInput')?.value || '').trim().toLowerCase();
   const orders = state.dropshipOrders || [];
   const filtered = query
-    ? orders.filter(o => o.customer.toLowerCase().includes(query) || o.description.toLowerCase().includes(query))
+    ? orders.filter(order => String(order.customer || '').toLowerCase().includes(query) || String(order.description || '').toLowerCase().includes(query))
     : orders;
 
   const el = document.getElementById('doOrdersList');
+  syncRecordView(el, 'do-orders');
   if (orders.length === 0) {
     el.innerHTML = emptyStateHTML('clipboard', t('do_empty_no_orders_tap'));
     return;
@@ -6424,24 +6662,24 @@ function renderDoOrdersList() {
     el.innerHTML = emptyStateHTML('clipboard', t('do_empty_no_orders_match'));
     return;
   }
-  el.innerHTML = [...filtered].reverse().map(o => {
-    const badge = doOrderStageBadge(o);
-    const thumb = o.photoURL
-      ? `<img src="${o.photoURL}" style="width:40px; height:40px; border-radius:9px; object-fit:cover; margin-right:12px; flex-shrink:0;">`
-      : '';
+  el.innerHTML = [...filtered].reverse().map(order => {
+    const badge = doOrderStageBadge(order);
+    const thumb = order.photoURL
+      ? `<img class="record-thumb" src="${order.photoURL}" alt="${escapeHtml(order.description || '')}">`
+      : `<div class="record-thumb record-thumb-fallback" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 11h6M9 15h4"/></svg></div>`;
     return `
-      <div class="list-item" onclick="editDoOrder('${o.id}')" style="cursor:pointer;">
-        <div style="display:flex; align-items:center; flex:1; min-width:0;">
+      <div class="list-item" onclick="editDoOrder('${order.id}')" style="cursor:pointer;">
+        <div class="record-visual">
           ${thumb}
           <div class="li-main">
-            <div class="li-title">${escapeHtml(o.customer)}</div>
-            <div class="li-sub">${o.qty || 1} &times; ${escapeHtml(o.description)}</div>
+            <div class="li-title">${escapeHtml(order.customer)}</div>
+            <div class="li-sub">${order.qty || 1} &times; ${escapeHtml(order.description)}</div>
           </div>
         </div>
         <div class="li-right">
           <div class="li-tag ${badge.cls}">${badge.label}</div>
-          <div class="li-tag ${o.customerPaid ? 'paid' : 'owe'}" onclick="event.stopPropagation(); toggleDoOrderPaid('${o.id}')" style="cursor:pointer;">${o.customerPaid ? t('label_paid') : t('label_unpaid')}</div>
-          <div class="profit-text" style="color:var(--ink-soft);">${fmtMoney(o.sellPrice)}</div>
+          <div class="li-tag ${order.customerPaid ? 'paid' : 'owe'}" onclick="event.stopPropagation(); toggleDoOrderPaid('${order.id}')" style="cursor:pointer;">${order.customerPaid ? t('label_paid') : t('label_unpaid')}</div>
+          <div class="profit-text" style="color:var(--ink-soft);">${fmtMoney(order.sellPrice)}</div>
         </div>
       </div>`;
   }).join('');
