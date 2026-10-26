@@ -515,7 +515,7 @@
       display: flex; flex-direction: column;
       width: var(--sidebar-w); flex-shrink: 0;
       background: var(--surface); border-right: 1px solid var(--border);
-      padding: 20px 14px; min-height: 100vh; position: sticky; top: 0;
+      padding: 20px 14px; height: 100%; min-height: 0; position: relative;
     }
     .sidebar .brand { display: flex; align-items: center; gap: 10px; padding: 4px 8px 24px; }
     .sidebar .brand .mark { width: 32px; height: 32px; border-radius: 9px; margin: 0; }
@@ -854,8 +854,85 @@
   }
   @media (min-width: 860px) {
     #app { max-width: 1600px; }
-    .sidebar { width: 248px; padding: 24px 16px; }
-    .content { max-width: 1180px; padding: 36px 52px 60px; }
+    body:has(#mainScreen.active) {
+      width: 100%; height: 100vh; height: 100dvh; overflow: hidden;
+    }
+    body:has(#mainScreen.active) #app {
+      width: 100%; max-width: 1600px; height: 100vh; height: 100dvh;
+      min-height: 0; overflow: hidden;
+    }
+    #mainScreen.active {
+      flex: 1 1 auto; height: 100%; min-height: 0; overflow: hidden;
+    }
+    .sidebar {
+      width: 248px; height: 100vh; height: 100dvh; min-height: 0; align-self: flex-start;
+      padding: 20px 16px; transition: width .22s ease, padding .22s ease;
+    }
+    .sidebar-footer { width: 100%; margin-top: auto; flex: 0 0 auto; padding-top: 12px; }
+    .sidebar .brand { gap: 8px; align-items: center; padding: 4px 9px 24px; }
+    .sidebar .brand-home {
+      display: flex; align-items: center; gap: 10px; min-width: 0; width: auto; flex: 1;
+      padding: 0; margin: 0; background: transparent; color: var(--ink); border: 0;
+      text-align: left; cursor: pointer;
+    }
+    .sidebar .brand-home:hover { background: transparent; color: var(--primary); }
+    .sidebar .brand-home:focus-visible, .sidebar-toggle:focus-visible {
+      outline: 2px solid var(--teal); outline-offset: 3px;
+    }
+    .sidebar .brand .mark { position: relative; display: grid; place-items: center; flex: 0 0 32px; overflow: visible; }
+    .sidebar .brand .mark img { display: block; width: 100%; height: 100%; transition: opacity .16s ease; }
+    .sidebar .brand .brand-expand-icon { display: none; width: 19px; height: 19px; }
+    .sidebar .brand .brand-expand-tooltip {
+      position: absolute; left: calc(100% + 12px); top: 50%; z-index: 70;
+      padding: 6px 9px; border-radius: 7px; background: var(--ink); color: var(--surface);
+      font: 500 12px/1.2 'Inter', sans-serif; white-space: nowrap; opacity: 0; visibility: hidden;
+      transform: translate(-4px, -50%); transition: opacity .16s ease, transform .16s ease, visibility .16s;
+      pointer-events: none;
+    }
+    .sidebar .brand .brand-expand-tooltip::before {
+      content: ''; position: absolute; right: 100%; top: 50%; border: 5px solid transparent;
+      border-right-color: var(--ink); transform: translateY(-50%);
+    }
+    .sidebar .sidebar-toggle {
+      display: grid; place-items: center; flex: 0 0 34px; width: 34px; min-width: 34px; height: 34px;
+      padding: 0; margin: 0; border: 0; border-radius: 9px;
+      color: var(--ink); background: transparent; cursor: pointer;
+      transition: background .15s ease, color .15s ease;
+    }
+    .sidebar .sidebar-toggle:hover { background: var(--surface-hover); color: var(--primary); }
+    .sidebar .sidebar-toggle svg { display: block; width: 19px; height: 19px; }
+    .sidebar .nav-btn { overflow: hidden; white-space: nowrap; }
+    .sidebar .nav-btn .nicon { flex: 0 0 20px; }
+    #mainScreen.sidebar-collapsed .sidebar { width: 84px; padding: 20px 8px; }
+    #mainScreen.sidebar-collapsed .sidebar .brand { justify-content: center; gap: 0; padding-left: 0; padding-right: 0; }
+    #mainScreen.sidebar-collapsed .sidebar .brand-home { position: relative; flex: 0 0 40px; width: 40px; height: 40px; justify-content: center; }
+    #mainScreen.sidebar-collapsed .sidebar .brand .mark { flex: 0 0 32px; }
+    #mainScreen.sidebar-collapsed .sidebar .brand-name { display: none; }
+    #mainScreen.sidebar-collapsed .sidebar .sidebar-toggle { display: none; }
+    #mainScreen.sidebar-collapsed .sidebar .brand-home:hover .mark img,
+    #mainScreen.sidebar-collapsed .sidebar .brand-home:focus-visible .mark img { opacity: 0; }
+    #mainScreen.sidebar-collapsed .sidebar .brand-home:hover .brand-expand-icon,
+    #mainScreen.sidebar-collapsed .sidebar .brand-home:focus-visible .brand-expand-icon { display: block; position: absolute; }
+    #mainScreen.sidebar-collapsed .sidebar .brand-home:hover .brand-expand-tooltip,
+    #mainScreen.sidebar-collapsed .sidebar .brand-home:focus-visible .brand-expand-tooltip {
+      opacity: 1; visibility: visible; transform: translate(0, -50%);
+    }
+    #mainScreen.sidebar-collapsed .sidebar button.nav-btn,
+    #mainScreen.sidebar-collapsed .sidebar > button,
+    #mainScreen.sidebar-collapsed .sidebar-footer > button {
+      justify-content: center; gap: 0; padding-left: 0; padding-right: 0; font-size: 0;
+    }
+    #mainScreen.sidebar-collapsed .sidebar .nicon { font-size: 17px; }
+    #mainScreen.sidebar-collapsed .sidebar > button:not(.nav-btn) .nicon,
+    #mainScreen.sidebar-collapsed .sidebar-footer > button:not(.nav-btn) .nicon { font-size: 17px; }
+    .workspace-main {
+      display: flex; flex: 1 1 0%; flex-direction: column; min-width: 0; min-height: 0;
+      height: 100%; overflow: hidden;
+    }
+    .content {
+      max-width: 1180px; min-height: 0; overflow-y: auto; overflow-x: hidden;
+      overscroll-behavior-y: contain; padding: 36px 52px 60px;
+    }
     .topbar { max-width: 1284px; width: 100%; margin: 0 auto; padding: 26px 52px 0; }
     .stat-row { gap: 16px; }
     .quick-actions { grid-template-columns: repeat(4, minmax(0, 1fr)); }
@@ -1305,6 +1382,81 @@
     box-shadow: 0 20px 52px rgba(0, 0, 0, .28);
   }
   body.dark .landing-cta-band::before { opacity: .1; }
+
+  /* Ledger Overview */
+  .overview-heading { display:flex; align-items:flex-end; justify-content:space-between; gap:24px; margin-bottom:22px; }
+  .overview-eyebrow { color:var(--primary); font-size:12px; font-weight:700; margin-bottom:7px; }
+  .overview-heading h2 { margin:0; }
+  .overview-heading p { margin:7px 0 0; color:var(--ink-soft); font-size:13px; }
+  .overview-range { display:flex; flex:0 0 auto; align-items:center; gap:3px; padding:4px; border:1px solid var(--border); border-radius:12px; background:var(--surface); }
+  .overview-range button { min-width:44px; padding:8px 9px; border:0; border-radius:8px; color:var(--ink-soft); background:transparent; font:600 12px 'Inter',sans-serif; cursor:pointer; transition:background .15s,color .15s,box-shadow .15s; }
+  .overview-range button:hover { color:var(--primary); background:var(--surface-hover); }
+  .overview-range button.active { color:#fff; background:var(--primary); box-shadow:0 2px 5px rgba(31,75,67,.18); }
+  body.dark .overview-range button.active { color:#fff; background:#28584e; box-shadow:0 2px 7px rgba(0,0,0,.24); }
+  .overview-range button:focus-visible { outline:2px solid var(--teal); outline-offset:2px; }
+  .overview-metrics { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:13px; margin-bottom:14px; }
+  .overview-metric { min-width:0; padding:17px 18px; border:1px solid var(--border); border-radius:16px; background:var(--surface); box-shadow:0 7px 22px rgba(31,42,36,.035); }
+  .overview-metric-primary { color:#fff; border-color:transparent; background:var(--primary-dark); }
+  body.dark .overview-metric-primary { background:#28584e; }
+  .overview-metric-label { color:var(--ink-soft); font-size:12px; font-weight:600; }
+  .overview-metric-primary .overview-metric-label,.overview-metric-primary .overview-metric-note { color:rgba(255,255,255,.78); }
+  .overview-metric-value { margin-top:10px; color:var(--ink); font:700 clamp(20px,2vw,27px) 'Plus Jakarta Sans',sans-serif; letter-spacing:-.035em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .overview-metric-primary .overview-metric-value { color:#fff; }
+  .overview-metric-note { margin-top:7px; color:var(--ink-faint); font-size:11.5px; }
+  .overview-main-grid { display:grid; grid-template-columns:minmax(0,1.65fr) minmax(260px,.9fr); gap:14px; margin-bottom:14px; }
+  .overview-panel { min-width:0; border:1px solid var(--border); border-radius:17px; background:var(--surface); box-shadow:0 7px 22px rgba(31,42,36,.035); }
+  .overview-chart-panel,.overview-snapshot-panel,.overview-activity-panel { padding:19px 20px; }
+  .overview-panel-head { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; }
+  .overview-panel-head h3 { color:var(--ink); font:700 15px 'Plus Jakarta Sans',sans-serif; letter-spacing:-.02em; }
+  .overview-panel-head p { margin:5px 0 0; color:var(--ink-faint); font-size:11.5px; }
+  .overview-live-dot { width:9px; height:9px; flex:0 0 9px; margin-top:4px; border-radius:50%; background:var(--teal); box-shadow:0 0 0 4px var(--teal-tint); }
+  .overview-chart { min-height:198px; margin-top:18px; }
+  .overview-chart svg { display:block; width:100%; height:190px; overflow:visible; }
+  .overview-chart-grid { stroke:var(--border); stroke-width:1; stroke-dasharray:4 5; }
+  .overview-chart-area { fill:url(#overviewAreaGradient); }
+  .overview-chart-line { fill:none; stroke:var(--teal); stroke-width:3; stroke-linecap:round; stroke-linejoin:round; }
+  .overview-chart-point { fill:var(--surface); stroke:var(--primary); stroke-width:2.5; }
+  .overview-chart-labels { display:flex; justify-content:space-between; color:var(--ink-faint); font-size:10.5px; margin:0 2px; }
+  .overview-snapshot { display:grid; gap:0; margin-top:12px; }
+  .overview-snapshot-row { display:flex; justify-content:space-between; align-items:center; gap:12px; padding:12px 0; border-top:1px solid var(--border); }
+  .overview-snapshot-row:first-child { border-top:0; }
+  .overview-snapshot-label { color:var(--ink-soft); font-size:12px; }
+  .overview-snapshot-value { color:var(--ink); font-size:13px; font-weight:700; text-align:right; }
+  .overview-snapshot-value.warn { color:var(--danger); }
+  .overview-activity-panel { margin-bottom:20px; }
+  .overview-activity { margin-top:13px; }
+  .overview-activity-row { display:grid; grid-template-columns:34px minmax(0,1fr) auto; align-items:center; gap:11px; padding:11px 0; border-top:1px solid var(--border); }
+  .overview-activity-row:first-child { border-top:0; }
+  .overview-activity-icon { display:grid; place-items:center; width:32px; height:32px; border-radius:10px; color:var(--primary); background:var(--primary-tint); }
+  .overview-activity-icon svg { width:16px; height:16px; }
+  .overview-activity-title { color:var(--ink); font-size:12.5px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .overview-activity-meta { margin-top:3px; color:var(--ink-faint); font-size:10.5px; }
+  .overview-activity-amount { color:var(--ink); font-size:12px; font-weight:700; white-space:nowrap; }
+  .overview-empty { display:grid; place-items:center; min-height:140px; padding:20px; color:var(--ink-faint); font-size:12px; text-align:center; }
+  .overview-period-note { color:var(--ink-faint); font-size:11px; }
+  @media (max-width:1100px) {
+    .overview-metrics { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    .overview-main-grid { grid-template-columns:minmax(0,1.35fr) minmax(230px,.9fr); }
+  }
+  @media (max-width:859px) {
+    .overview-heading { align-items:stretch; flex-direction:column; gap:14px; margin-bottom:16px; }
+    .overview-range { width:100%; justify-content:space-between; overflow-x:auto; }
+    .overview-range button { min-width:40px; padding:8px 6px; }
+    .overview-metrics { gap:9px; margin-bottom:10px; }
+    .overview-metric { padding:13px 13px; border-radius:14px; }
+    .overview-metric-value { font-size:clamp(18px,5vw,23px); margin-top:8px; }
+    .overview-metric-note { font-size:10.5px; }
+    .overview-main-grid { grid-template-columns:1fr; gap:10px; margin-bottom:10px; }
+    .overview-chart-panel,.overview-snapshot-panel,.overview-activity-panel { padding:15px; }
+    .overview-chart { min-height:160px; }
+    .overview-chart svg { height:152px; }
+    .overview-activity-row { grid-template-columns:32px minmax(0,1fr) auto; gap:9px; }
+    .overview-activity-amount { font-size:11px; }
+  }
+  @media (max-width:380px) {
+    .navbar button { font-size:8.5px; gap:2px; padding:7px 1px; }
+    .navbar .nicon svg { width:17px; height:17px; }
+  }
 </style>
 </head>
 <body>
@@ -1792,31 +1944,34 @@
 
     <div class="sidebar">
       <div class="brand">
-        <div class="mark"><img src="data:image/png;base64,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" alt="Ledger logo"></div>
-        <div class="brand-name">Ledger</div>
+        <button type="button" class="brand-home" onclick="handleSidebarBrandClick()" aria-label="Ledger home" title="Go to Home"><div class="mark"><img src="data:image/png;base64,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" alt="Ledger logo"><svg class="brand-expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></svg></div><span class="brand-name">Ledger</span><span class="brand-expand-tooltip" role="tooltip">Expand</span></button>
+        <button type="button" class="sidebar-toggle" onclick="toggleDesktopSidebar()" aria-label="Collapse sidebar" aria-expanded="true" title="Collapse sidebar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></svg></button>
       </div>
       <div id="navRegular">
-        <button class="nav-btn active" data-tab="home" onclick="showTab('home')"><span class="nicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></svg></span>Home</button>
-        <button class="nav-btn" data-tab="stock" onclick="showTab('stock')"><span class="nicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg></span>Stock</button>
-        <button class="nav-btn" data-tab="sales" onclick="showTab('sales')"><span class="nicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg></span>Sales</button>
-        <button class="nav-btn" data-tab="orders" onclick="showTab('orders')"><span class="nicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2"/><rect x="9" y="2" width="6" height="4" rx="1"/><path d="M9 11h6"/><path d="M9 15h4"/></svg></span>Orders</button>
-        <button class="nav-btn" data-tab="debts" onclick="showTab('debts')"><span class="nicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></span>Debts</button>
-        <button class="nav-btn" data-tab="expenses" onclick="showTab('expenses')"><span class="nicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h12v18l-2-1.5L14 20l-2-1.5L10 20l-2-1.5L6 20V2z"/><path d="M9 7h6"/><path d="M9 11h6"/></svg></span>Expenses</button>
+        <button class="nav-btn" title="Overview" data-tab="overview" onclick="showTab('overview')"><span class="nicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M9 21V9"/><path d="M13 13h4M13 17h4"/></svg></span>Overview</button>
+          <button class="nav-btn active" title="Home" data-tab="home" onclick="showTab('home')"><span class="nicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></svg></span>Home</button>
+        <button class="nav-btn" title="Stock" data-tab="stock" onclick="showTab('stock')"><span class="nicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg></span>Stock</button>
+        <button class="nav-btn" title="Sales" data-tab="sales" onclick="showTab('sales')"><span class="nicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg></span>Sales</button>
+        <button class="nav-btn" title="Orders" data-tab="orders" onclick="showTab('orders')"><span class="nicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2"/><rect x="9" y="2" width="6" height="4" rx="1"/><path d="M9 11h6"/><path d="M9 15h4"/></svg></span>Orders</button>
+        <button class="nav-btn" title="Debts" data-tab="debts" onclick="showTab('debts')"><span class="nicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></span>Debts</button>
+        <button class="nav-btn" title="Expenses" data-tab="expenses" onclick="showTab('expenses')"><span class="nicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h12v18l-2-1.5L14 20l-2-1.5L10 20l-2-1.5L6 20V2z"/><path d="M9 7h6"/><path d="M9 11h6"/></svg></span>Expenses</button>
       </div>
       <div id="navDropship" style="display:none;">
-        <button class="nav-btn active" data-tab="do-home" onclick="showTab('do-home')"><span class="nicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></svg></span>Home</button>
-        <button class="nav-btn" data-tab="do-orders" onclick="showTab('do-orders')"><span class="nicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2"/><rect x="9" y="2" width="6" height="4" rx="1"/><path d="M9 11h6"/><path d="M9 15h4"/></svg></span>Customer Orders</button>
-        <button class="nav-btn" data-tab="do-wholesaler" onclick="showTab('do-wholesaler')"><span class="nicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg></span>Wholesaler List</button>
-        <button class="nav-btn" data-tab="do-profit" onclick="showTab('do-profit')"><span class="nicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg></span>Profit</button>
+        <button class="nav-btn" title="Overview" data-tab="overview" onclick="showTab('overview')"><span class="nicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M9 21V9"/><path d="M13 13h4M13 17h4"/></svg></span>Overview</button>
+          <button class="nav-btn active" data-tab="do-home" onclick="showTab('do-home')"><span class="nicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></svg></span>Home</button>
+        <button class="nav-btn" title="Customer Orders" data-tab="do-orders" onclick="showTab('do-orders')"><span class="nicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2"/><rect x="9" y="2" width="6" height="4" rx="1"/><path d="M9 11h6"/><path d="M9 15h4"/></svg></span>Customer Orders</button>
+        <button class="nav-btn" title="Wholesaler List" data-tab="do-wholesaler" onclick="showTab('do-wholesaler')"><span class="nicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg></span>Wholesaler List</button>
+        <button class="nav-btn" title="Profit" data-tab="do-profit" onclick="showTab('do-profit')"><span class="nicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg></span>Profit</button>
         <button class="nav-btn" data-tab="debts" onclick="showTab('debts')"><span class="nicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></span>Debts</button>
         <button class="nav-btn" data-tab="expenses" onclick="showTab('expenses')"><span class="nicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h12v18l-2-1.5L14 20l-2-1.5L10 20l-2-1.5L6 20V2z"/><path d="M9 7h6"/><path d="M9 11h6"/></svg></span>Expenses</button>
       </div>
-      <div style="flex:1;"></div>
-      <button onclick="openProfileModal()"><span class="nicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>Profile</button>
-      <button class="nav-btn" data-tab="settings" onclick="showTab('settings')"><span class="nicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>Settings</button>
+      <div class="sidebar-footer">
+      <button title="Profile" aria-label="Profile" onclick="openProfileModal()"><span class="nicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>Profile</button>
+      <button class="nav-btn" title="Settings" data-tab="settings" onclick="showTab('settings')"><span class="nicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>Settings</button>
+      </div>
     </div>
 
-    <div style="flex:1; display:flex; flex-direction:column; min-width:0;">
+    <div class="workspace-main" style="flex:1; display:flex; flex-direction:column; min-width:0;">
       <div class="topbar">
         <div class="shopname"><img src="data:image/png;base64,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" style="width:18px; height:18px; object-fit:contain; border-radius:5px; vertical-align:-3px; margin-right:5px;" alt="Ledger">Ledger for <b id="shopNameLabel"></b></div>
         <div class="topbar-actions">
@@ -1826,6 +1981,62 @@
       </div>
 
       <div class="content">
+        <div id="tab-overview" class="tabpanel" style="display:none;">
+          <div class="overview-heading">
+            <div>
+              <div class="overview-eyebrow" data-translate-text="overview_eyebrow">Business at a glance</div>
+              <h2 data-translate-text="overview_title">Overview</h2>
+              <p data-translate-text="overview_subtitle">A clear picture of your business, using your Ledger records.</p>
+            </div>
+            <div class="overview-range" role="group" aria-label="Overview time range">
+              <button type="button" data-range="1h" onclick="setOverviewRange('1h')">1H</button>
+              <button type="button" data-range="4h" onclick="setOverviewRange('4h')">4H</button>
+              <button type="button" data-range="24h" onclick="setOverviewRange('24h')">24H</button>
+              <button type="button" data-range="72h" onclick="setOverviewRange('72h')">72H</button>
+              <button type="button" data-range="7d" onclick="setOverviewRange('7d')">7D</button>
+              <button type="button" data-range="30d" onclick="setOverviewRange('30d')">30D</button>
+            </div>
+          </div>
+          <div class="overview-metrics">
+            <article class="overview-metric overview-metric-primary">
+              <div class="overview-metric-label" data-translate-text="overview_revenue">Sales revenue</div>
+              <div class="overview-metric-value" id="overviewRevenue">—</div>
+              <div class="overview-metric-note" id="overviewRevenueNote"></div>
+            </article>
+            <article class="overview-metric">
+              <div class="overview-metric-label" data-translate-text="overview_profit">Profit after expenses</div>
+              <div class="overview-metric-value" id="overviewProfit">—</div>
+              <div class="overview-metric-note" id="overviewProfitNote"></div>
+            </article>
+            <article class="overview-metric">
+              <div class="overview-metric-label" data-translate-text="overview_expenses">Expenses</div>
+              <div class="overview-metric-value" id="overviewExpenses">—</div>
+              <div class="overview-metric-note" id="overviewExpensesNote"></div>
+            </article>
+            <article class="overview-metric">
+              <div class="overview-metric-label" data-translate-text="overview_debt_payments">Debt payments</div>
+              <div class="overview-metric-value" id="overviewDebtPayments">—</div>
+              <div class="overview-metric-note" id="overviewDebtPaymentsNote"></div>
+            </article>
+          </div>
+          <div class="overview-main-grid">
+            <section class="overview-panel overview-chart-panel">
+              <div class="overview-panel-head">
+                <div><h3 data-translate-text="overview_sales_trend">Sales over time</h3><p id="overviewChartCaption"></p></div>
+                <span class="overview-live-dot" aria-hidden="true"></span>
+              </div>
+              <div id="overviewChart" class="overview-chart"></div>
+            </section>
+            <section class="overview-panel overview-snapshot-panel">
+              <div class="overview-panel-head"><div><h3 data-translate-text="overview_now">Right now</h3><p data-translate-text="overview_snapshot_note">Current business snapshot</p></div></div>
+              <div id="overviewSnapshot" class="overview-snapshot"></div>
+            </section>
+          </div>
+          <section class="overview-panel overview-activity-panel">
+            <div class="overview-panel-head"><div><h3 data-translate-text="overview_recent_activity">Recent activity</h3><p id="overviewActivityCaption"></p></div></div>
+            <div id="overviewActivity" class="overview-activity"></div>
+          </section>
+        </div>
         <div id="tab-home" class="tabpanel">
           <div class="dashboard-greeting">
             <div class="greeting-text" id="dashboardGreeting">Good morning</div>
@@ -2251,6 +2462,7 @@
 
       <div class="navbar">
         <div id="navRegularMobile" style="display:flex; flex:1;">
+          <button class="nav-btn" title="Overview" data-tab="overview" onclick="showTab('overview')"><span class="nicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M9 21V9"/><path d="M13 13h4M13 17h4"/></svg></span>Overview</button>
           <button class="nav-btn active" data-tab="home" onclick="showTab('home')"><span class="nicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></svg></span>Home</button>
           <button class="nav-btn" data-tab="stock" onclick="showTab('stock')"><span class="nicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg></span>Stock</button>
           <button class="nav-btn" data-tab="sales" onclick="showTab('sales')"><span class="nicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg></span>Sales</button>
@@ -2259,6 +2471,7 @@
           <button class="nav-btn" data-tab="expenses" onclick="showTab('expenses')"><span class="nicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h12v18l-2-1.5L14 20l-2-1.5L10 20l-2-1.5L6 20V2z"/><path d="M9 7h6"/><path d="M9 11h6"/></svg></span>Expenses</button>
         </div>
         <div id="navDropshipMobile" style="display:none; flex:1;">
+          <button class="nav-btn" title="Overview" data-tab="overview" onclick="showTab('overview')"><span class="nicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M9 21V9"/><path d="M13 13h4M13 17h4"/></svg></span>Overview</button>
           <button class="nav-btn active" data-tab="do-home" onclick="showTab('do-home')"><span class="nicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></svg></span>Home</button>
           <button class="nav-btn" data-tab="do-orders" onclick="showTab('do-orders')"><span class="nicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2"/><rect x="9" y="2" width="6" height="4" rx="1"/><path d="M9 11h6"/><path d="M9 15h4"/></svg></span>Customer</button>
           <button class="nav-btn" data-tab="do-wholesaler" onclick="showTab('do-wholesaler')"><span class="nicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg></span>Wholesaler</button>
@@ -2654,6 +2867,8 @@ let fbReady = false;
 let salesPeriod = 'week';
 let saleSelectedProductId = null;
 let recordViewModes = {};
+let overviewRange = '24h';
+try { const savedOverviewRange = localStorage.getItem('ledger_overview_range_v1'); if (['1h','4h','24h','72h','7d','30d'].includes(savedOverviewRange)) overviewRange = savedOverviewRange; } catch (_) {}
 try { recordViewModes = JSON.parse(localStorage.getItem('ledger_record_view_modes_v1') || '{}') || {}; }
 catch (e) { recordViewModes = {}; }
 let authMode = 'login';
@@ -2717,6 +2932,45 @@ const COUNTRY_CODES = [
 
 const TRANSLATIONS = {
   en: {
+    nav_overview: 'Overview',
+    overview_eyebrow: 'Business at a glance',
+    overview_title: 'Overview',
+    overview_subtitle: 'A clear picture of your business, using your Ledger records.',
+    overview_revenue: 'Sales revenue',
+    overview_order_value: 'Customer order value',
+    overview_profit: 'Profit after expenses',
+    overview_expenses: 'Expenses',
+    overview_debt_payments: 'Debt payments',
+    overview_sales_trend: 'Sales over time',
+    overview_orders_trend: 'Customer orders over time',
+    overview_now: 'Right now',
+    overview_snapshot_note: 'Current business snapshot',
+    overview_recent_activity: 'Recent activity',
+    overview_open_orders: 'Open orders',
+    overview_debts_owed: 'Outstanding debts',
+    overview_low_stock: 'Low stock items',
+    overview_stock_value: 'Stock value',
+    overview_orders_to_deliver: 'Orders to deliver',
+    overview_customer_balance: 'Unpaid customer orders',
+    overview_wholesaler_due: 'Due to wholesalers',
+    overview_logged_debts: 'Unpaid logged debts',
+    overview_sales_count: 'sales in this period',
+    overview_orders_count: 'orders in this period',
+    overview_expense_count: 'expenses in this period',
+    overview_payments_count: 'payments marked paid in this period',
+    overview_activity_count: 'events',
+    overview_no_sales: 'No sales recorded in this period yet.',
+    overview_no_activity: 'No activity recorded in this period yet.',
+    overview_sale_event: 'Sale',
+    overview_order_event: 'Order',
+    overview_expense_event: 'Expense',
+    overview_debt_added_event: 'Debt added',
+    overview_debt_paid_event: 'Debt marked paid',
+    overview_snapshot_current: 'Current',
+    overview_gross_profit: 'Gross profit',
+    overview_profit_after_logged_expenses: 'After logged expenses',
+    overview_sales_source_note: 'Revenue from records saved in this period',
+    overview_costs_missing: 'Some order costs are not entered yet',
     nav_home: 'Home',
     nav_stock: 'Stock',
     nav_sales: 'Sales',
@@ -4339,9 +4593,9 @@ function enterMainScreen() {
   renderAll();
 
   const currentMode = (state.settings && state.settings.mode) || 'regular';
-  const defaultTab = currentMode === 'dropshipper' ? 'do-home' : 'home';
+  const defaultTab = 'overview';
   const hashTab = (location.hash || '').replace('#', '');
-  const validTabs = ['home', 'stock', 'sales', 'orders', 'debts', 'settings', 'do-home', 'do-orders', 'do-wholesaler', 'do-profit'];
+  const validTabs = ['overview', 'home', 'stock', 'sales', 'orders', 'debts', 'expenses', 'settings', 'do-home', 'do-orders', 'do-wholesaler', 'do-profit'];
   const startTab = validTabs.includes(hashTab) ? hashTab : defaultTab;
   showTab(startTab, true);
   history.replaceState({ tab: startTab }, '', '#' + startTab);
@@ -4368,7 +4622,7 @@ async function switchAppMode(mode) {
   state.settings = { ...(state.settings || {}), mode };
   await saveState('settings');
   applyModeUI();
-  const defaultTab = mode === 'dropshipper' ? 'do-home' : 'home';
+  const defaultTab = 'overview';
   showTab(defaultTab);
   toast(mode === 'dropshipper' ? 'Switched to Dropshipper mode' : 'Switched to Regular seller mode');
 }
@@ -5063,7 +5317,43 @@ async function confirmDeleteAccount() {
 
 let lastActiveTabBeforeSettings = 'home';
 
-const ALL_TAB_IDS = ['home', 'stock', 'sales', 'orders', 'debts', 'expenses', 'do-home', 'do-orders', 'do-wholesaler', 'do-profit'];
+function showHomeFromLogo() {
+  const mode = (state.settings && state.settings.mode) || 'regular';
+  showTab(mode === 'dropshipper' ? 'do-home' : 'home');
+}
+
+function applyDesktopSidebarState(collapsed) {
+  const main = document.getElementById('mainScreen');
+  const toggle = document.querySelector('.sidebar-toggle');
+  const brand = document.querySelector('.sidebar .brand-home');
+  if (!main || !toggle || !brand) return;
+  main.classList.toggle('sidebar-collapsed', collapsed);
+  toggle.setAttribute('aria-expanded', String(!collapsed));
+  toggle.setAttribute('aria-label', collapsed ? 'Expand sidebar' : 'Collapse sidebar');
+  toggle.title = collapsed ? 'Expand sidebar' : 'Collapse sidebar';
+  brand.setAttribute('aria-label', collapsed ? 'Expand sidebar' : 'Ledger home');
+  brand.title = collapsed ? 'Expand sidebar' : 'Go to Home';
+}
+
+function handleSidebarBrandClick() {
+  const isDesktop = window.matchMedia('(min-width: 860px)').matches;
+  const isCollapsed = document.getElementById('mainScreen')?.classList.contains('sidebar-collapsed');
+  if (isDesktop && isCollapsed) {
+    toggleDesktopSidebar();
+    return;
+  }
+  showHomeFromLogo();
+}
+
+function toggleDesktopSidebar() {
+  const collapsed = !document.getElementById('mainScreen')?.classList.contains('sidebar-collapsed');
+  applyDesktopSidebarState(collapsed);
+  try { localStorage.setItem('ledger_desktop_sidebar_collapsed_v1', String(collapsed)); } catch (_) {}
+}
+
+try { applyDesktopSidebarState(localStorage.getItem('ledger_desktop_sidebar_collapsed_v1') === 'true'); } catch (_) {}
+
+const ALL_TAB_IDS = ['overview', 'home', 'stock', 'sales', 'orders', 'debts', 'expenses', 'do-home', 'do-orders', 'do-wholesaler', 'do-profit'];
 
 function showTab(name, skipHistory) {
   if (name === 'settings') {
@@ -5099,6 +5389,7 @@ function showTab(name, skipHistory) {
   void activeEl.offsetWidth;
   activeEl.classList.add('tab-enter');
 
+  if (name === 'overview') renderOverview();
   if (name === 'stock') renderStockList();
   if (name === 'sales') renderSalesTab();
   if (name === 'orders') renderOrdersList();
@@ -5522,6 +5813,7 @@ function openFaqModal() {
 }
 
 function renderAll() {
+  renderOverview();
   renderDashboard();
   renderStockList();
   renderSalesTab();
@@ -5532,6 +5824,184 @@ function renderAll() {
   renderDoOrdersList();
   renderDoWholesalerList();
   renderDoProfitTab();
+}
+
+const OVERVIEW_RANGES = {
+  '1h': { label: '1H', duration: 60 * 60 * 1000, bins: 12 },
+  '4h': { label: '4H', duration: 4 * 60 * 60 * 1000, bins: 16 },
+  '24h': { label: '24H', duration: 24 * 60 * 60 * 1000, bins: 24 },
+  '72h': { label: '72H', duration: 72 * 60 * 60 * 1000, bins: 24 },
+  '7d': { label: '7D', duration: 7 * 24 * 60 * 60 * 1000, bins: 7 },
+  '30d': { label: '30D', duration: 30 * 24 * 60 * 60 * 1000, bins: 30 }
+};
+
+function setOverviewRange(range) {
+  if (!OVERVIEW_RANGES[range]) return;
+  overviewRange = range;
+  try { localStorage.setItem('ledger_overview_range_v1', range); } catch (_) {}
+  renderOverview();
+}
+
+function overviewDate(value) {
+  if (!value) return null;
+  let date;
+  if (value instanceof Date) date = value;
+  else if (typeof value.toDate === 'function') date = value.toDate();
+  else date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function overviewMoney(value) {
+  return fmtMoney(Number.isFinite(Number(value)) ? Number(value) : 0);
+}
+
+function renderOverview() {
+  const panel = document.getElementById('tab-overview');
+  if (!panel) return;
+  const range = OVERVIEW_RANGES[overviewRange] || OVERVIEW_RANGES['24h'];
+  const now = new Date();
+  const start = new Date(now.getTime() - range.duration);
+  const withinRange = value => {
+    const date = overviewDate(value);
+    return date && date >= start && date <= now;
+  };
+  const dropship = isDropshipMode();
+  const sales = dropship ? [] : (state.sales || []).filter(sale => withinRange(sale.date));
+  const orders = dropship
+    ? (state.dropshipOrders || []).filter(order => withinRange(order.date))
+    : (state.orders || []).filter(order => withinRange(order.date));
+  const expenses = getActiveExpenses().filter(expense => withinRange(expense.date));
+  const debts = getActiveDebts();
+  const transactions = dropship ? orders : sales;
+  const revenue = dropship
+    ? orders.reduce((sum, order) => sum + Number(order.sellPrice || 0), 0)
+    : sales.reduce((sum, sale) => sum + Number(sale.total || 0), 0);
+  const grossProfit = dropship
+    ? orders.reduce((sum, order) => sum + (order.costPrice == null ? 0 : Number(order.sellPrice || 0) - Number(order.costPrice || 0)), 0)
+    : sales.reduce((sum, sale) => sum + Number(sale.profit || 0), 0);
+  const expenseTotal = expenses.reduce((sum, expense) => sum + Number(expense.amount || 0), 0);
+  const debtPayments = debts.filter(debt => debt.paid && withinRange(debt.paidAt))
+    .map(debt => ({ amount: debt.amount }));
+  if (dropship) {
+    (state.dropshipOrders || []).filter(order => order.customerPaid && withinRange(order.customerPaidAt))
+      .forEach(order => debtPayments.push({ amount: order.sellPrice }));
+  }
+  const debtPaidTotal = debtPayments.reduce((sum, payment) => sum + Number(payment.amount || 0), 0);
+  const netProfit = grossProfit - expenseTotal;
+
+  document.querySelectorAll('.overview-range button').forEach(button => {
+    const active = button.dataset.range === overviewRange;
+    button.classList.toggle('active', active);
+    button.setAttribute('aria-pressed', String(active));
+  });
+  document.querySelector('[data-translate-text="overview_revenue"]').textContent = t(dropship ? 'overview_order_value' : 'overview_revenue');
+  document.querySelector('[data-translate-text="overview_sales_trend"]').textContent = t(dropship ? 'overview_orders_trend' : 'overview_sales_trend');
+  document.getElementById('overviewRevenue').textContent = overviewMoney(revenue);
+  document.getElementById('overviewRevenueNote').textContent = `${transactions.length} ${t(dropship ? 'overview_orders_count' : 'overview_sales_count')}`;
+  document.getElementById('overviewProfit').textContent = overviewMoney(netProfit);
+  const ordersMissingCost = dropship ? orders.filter(order => order.costPrice == null).length : 0;
+  document.getElementById('overviewProfitNote').textContent = ordersMissingCost ? `${ordersMissingCost} ${t('overview_costs_missing')}` : t('overview_profit_after_logged_expenses');
+  document.getElementById('overviewExpenses').textContent = overviewMoney(expenseTotal);
+  document.getElementById('overviewExpensesNote').textContent = `${expenses.length} ${t('overview_expense_count')}`;
+  document.getElementById('overviewDebtPayments').textContent = overviewMoney(debtPaidTotal);
+  document.getElementById('overviewDebtPaymentsNote').textContent = `${debtPayments.length} ${t('overview_payments_count')}`;
+
+  const snapshot = document.getElementById('overviewSnapshot');
+  let snapshotRows;
+  if (dropship) {
+    const allOrders = state.dropshipOrders || [];
+    const openOrders = allOrders.filter(order => order.stage !== 'delivered');
+    const unpaidOrders = allOrders.filter(order => !order.customerPaid);
+    const wholesalerDue = allOrders.filter(order => order.stage !== 'delivered' && order.costPrice != null)
+      .reduce((sum, order) => sum + Number(order.costPrice || 0), 0);
+    const unpaidDebts = debts.filter(debt => !debt.paid).reduce((sum, debt) => sum + Number(debt.amount || 0), 0);
+    snapshotRows = [
+      [t('overview_orders_to_deliver'), String(openOrders.length), false],
+      [t('overview_customer_balance'), overviewMoney(unpaidOrders.reduce((sum, order) => sum + Number(order.sellPrice || 0), 0)), true],
+      [t('overview_wholesaler_due'), overviewMoney(wholesalerDue), wholesalerDue > 0],
+      [t('overview_logged_debts'), overviewMoney(unpaidDebts), unpaidDebts > 0]
+    ];
+  } else {
+    const openOrders = (state.orders || []).filter(order => !order.fulfilled);
+    const unpaidDebts = debts.filter(debt => !debt.paid).reduce((sum, debt) => sum + Number(debt.amount || 0), 0);
+    const lowStock = (state.products || []).filter(product => Number(product.qty || 0) <= 2);
+    const stockValue = (state.products || []).reduce((sum, product) => sum + Number(product.qty || 0) * Number(product.price || 0), 0);
+    snapshotRows = [
+      [t('overview_open_orders'), String(openOrders.length), openOrders.length > 0],
+      [t('overview_debts_owed'), overviewMoney(unpaidDebts), unpaidDebts > 0],
+      [t('overview_low_stock'), String(lowStock.length), lowStock.length > 0],
+      [t('overview_stock_value'), overviewMoney(stockValue), false]
+    ];
+  }
+  snapshot.innerHTML = snapshotRows.map(([label, value, warn]) => `
+    <div class="overview-snapshot-row"><span class="overview-snapshot-label">${escapeHtml(label)}</span><span class="overview-snapshot-value${warn ? ' warn' : ''}">${escapeHtml(value)}</span></div>`).join('');
+
+  const buckets = Array(range.bins).fill(0);
+  const step = range.duration / range.bins;
+  transactions.forEach(record => {
+    const date = overviewDate(record.date);
+    if (!date || date < start || date > now) return;
+    const index = Math.min(range.bins - 1, Math.floor((date.getTime() - start.getTime()) / step));
+    buckets[index] += Number(dropship ? record.sellPrice || 0 : record.total || 0);
+  });
+  const width = 640, top = 12, bottom = 146, left = 8, right = 632;
+  const maxValue = Math.max(1, ...buckets);
+  const points = buckets.map((value, index) => {
+    const x = left + (right - left) * index / Math.max(1, buckets.length - 1);
+    const y = bottom - (value / maxValue) * (bottom - top);
+    return [x, y];
+  });
+  const line = points.map(point => `${point[0].toFixed(1)},${point[1].toFixed(1)}`).join(' ');
+  const area = `M ${points[0][0].toFixed(1)} ${bottom} L ${points.map(point => `${point[0].toFixed(1)} ${point[1].toFixed(1)}`).join(' L ')} L ${points[points.length - 1][0].toFixed(1)} ${bottom} Z`;
+  const middle = new Date((start.getTime() + now.getTime()) / 2);
+  const shortTime = date => date.toLocaleTimeString([], { hour: 'numeric', minute: range.duration <= 4 * 60 * 60 * 1000 ? '2-digit' : undefined });
+  const shortDate = date => date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+  const labels = range.duration <= 72 * 60 * 60 * 1000
+    ? [shortTime(start), shortTime(middle), shortTime(now)]
+    : [shortDate(start), shortDate(middle), shortDate(now)];
+  document.getElementById('overviewChartCaption').textContent = `${range.label} · ${start.toLocaleString()} – ${now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}`;
+  const chart = document.getElementById('overviewChart');
+  chart.innerHTML = `<svg viewBox="0 0 ${width} 164" role="img" aria-label="${escapeHtml(t('overview_sales_trend'))}">
+    <defs><linearGradient id="overviewAreaGradient" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--teal)" stop-opacity=".24"/><stop offset="100%" stop-color="var(--teal)" stop-opacity="0"/></linearGradient></defs>
+    <line class="overview-chart-grid" x1="0" y1="42" x2="640" y2="42"/><line class="overview-chart-grid" x1="0" y1="94" x2="640" y2="94"/><line class="overview-chart-grid" x1="0" y1="146" x2="640" y2="146"/>
+    <path class="overview-chart-area" d="${area}"/><polyline class="overview-chart-line" points="${line}"/><circle class="overview-chart-point" cx="${points[points.length - 1][0].toFixed(1)}" cy="${points[points.length - 1][1].toFixed(1)}" r="4.5"/>
+    </svg><div class="overview-chart-labels"><span>${escapeHtml(labels[0])}</span><span>${escapeHtml(labels[1])}</span><span>${escapeHtml(labels[2])}</span></div>`;
+  if (!transactions.length) chart.insertAdjacentHTML('beforeend', `<div class="overview-period-note">${escapeHtml(t('overview_no_sales'))}</div>`);
+
+  const activity = [];
+  const addActivity = (dateValue, title, detail, amount, kind) => {
+    const date = overviewDate(dateValue);
+    if (date && date >= start && date <= now) activity.push({ date, title, detail, amount: Number(amount || 0), kind });
+  };
+  if (dropship) {
+    (state.dropshipOrders || []).forEach(order => {
+      addActivity(order.date, order.customer || t('overview_order_event'), `${t('overview_order_event')} · ${order.description || order.stage || ''}`, order.sellPrice, 'order');
+      if (order.customerPaid && order.customerPaidAt) addActivity(order.customerPaidAt, order.customer || t('overview_debt_paid_event'), t('overview_debt_paid_event'), order.sellPrice, 'payment');
+    });
+  } else {
+    (state.sales || []).forEach(sale => addActivity(sale.date, sale.productName || t('overview_sale_event'), `${t('overview_sale_event')} · ${Number(sale.qty || 0)} ${t('label_sold')}`, sale.total, 'sale'));
+    (state.orders || []).forEach(order => addActivity(order.date, order.customer || t('overview_order_event'), t('overview_order_event'), order.amount, 'order'));
+  }
+  expenses.forEach(expense => addActivity(expense.date, expense.description || expense.category || t('overview_expense_event'), t('overview_expense_event'), -Number(expense.amount || 0), 'expense'));
+  debts.forEach(debt => {
+    addActivity(debt.date, debt.customer || t('overview_debt_added_event'), t('overview_debt_added_event'), debt.amount, 'debt');
+    if (debt.paid && debt.paidAt) addActivity(debt.paidAt, debt.customer || t('overview_debt_paid_event'), t('overview_debt_paid_event'), debt.amount, 'payment');
+  });
+  activity.sort((a, b) => b.date - a.date);
+  const activityEl = document.getElementById('overviewActivity');
+  document.getElementById('overviewActivityCaption').textContent = `${range.label} · ${activity.length} ${t('overview_activity_count')}`;
+  const activityIcons = {
+    sale: '<path d="M4 5h16v14H4z"/><path d="M8 9h8M8 13h5"/>',
+    order: '<path d="M5 4h14v17H5z"/><path d="M9 9h6M9 13h6M9 17h4"/>',
+    expense: '<path d="M6 3h12v18l-2-1.5L14 21l-2-1.5L10 21l-2-1.5L6 21z"/><path d="M9 8h6M9 12h6"/>',
+    debt: '<path d="M3 6h18v13H3z"/><path d="M3 10h18M7 15h4"/>',
+    payment: '<circle cx="12" cy="12" r="9"/><path d="m8 12 2.5 2.5L16 9"/>'
+  };
+  activityEl.innerHTML = activity.slice(0, 12).map(item => `
+    <div class="overview-activity-row"><span class="overview-activity-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${activityIcons[item.kind]}</svg></span>
+      <div><div class="overview-activity-title">${escapeHtml(item.title)}</div><div class="overview-activity-meta">${escapeHtml(item.detail)} · ${escapeHtml(item.date.toLocaleString([], { month:'short', day:'numeric', hour:'numeric', minute:'2-digit' }))}</div></div>
+      <div class="overview-activity-amount">${item.amount < 0 ? '−' : ''}${overviewMoney(Math.abs(item.amount))}</div></div>`).join('');
+  if (!activity.length) activityEl.innerHTML = `<div class="overview-empty">${escapeHtml(t('overview_no_activity'))}</div>`;
 }
 
 function periodStartDate(period) {
@@ -6259,6 +6729,7 @@ async function togglePaid(id) {
   const debt = getActiveDebts().find(d => d.id === id);
   if (!debt) return;
   debt.paid = !debt.paid;
+  debt.paidAt = debt.paid ? new Date().toISOString() : null;
   await saveState(activeDebtsStateKey());
   renderAll();
   toast(debt.paid ? 'Marked as paid' : 'Marked as unpaid');
@@ -6566,6 +7037,7 @@ async function toggleDoOrderPaid(id) {
   const order = state.dropshipOrders.find(o => o.id === id);
   if (!order) return;
   order.customerPaid = !order.customerPaid;
+  order.customerPaidAt = order.customerPaid ? new Date().toISOString() : null;
   await saveState('dropshipOrders');
   renderAll();
   toast(order.customerPaid ? 'Marked as paid' : 'Marked as unpaid');
