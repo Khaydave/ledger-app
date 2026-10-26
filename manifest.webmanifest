@@ -1,0 +1,15 @@
+{
+  "id": "./",
+  "name": "Ledger — Sales, Stock & Debts",
+  "short_name": "Ledger",
+  "description": "Track your stock, sales, orders, debts and expenses.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#F5F8F6",
+  "theme_color": "#1F4B43",
+  "icons": [
+    { "src": "assets/pwa-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "assets/pwa-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}
