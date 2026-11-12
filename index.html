@@ -926,7 +926,7 @@
       width: 100%; height: 100vh; height: 100dvh; overflow: hidden;
     }
     body:has(#mainScreen.active) #app {
-      width: 100%; max-width: 1600px; height: 100vh; height: 100dvh;
+      width: 100%; max-width: none; height: 100vh; height: 100dvh;
       min-height: 0; overflow: hidden;
     }
     #mainScreen.active {
@@ -996,12 +996,19 @@
     .workspace-main {
       display: flex; flex: 1 1 0%; flex-direction: column; min-width: 0; min-height: 0;
       height: 100%; overflow: hidden;
+      --workspace-padding: clamp(24px, 3.5vw, 52px);
     }
-    .content {
-      max-width: 1180px; min-height: 0; overflow-y: auto; overflow-x: hidden;
-      overscroll-behavior-y: contain; padding: 36px 52px 60px;
+    /* Fill the workspace in both sidebar states; share header and content edges. */
+    .workspace-main > .content {
+      width: 100%; max-width: none; min-height: 0; overflow-y: auto; overflow-x: hidden;
+      scrollbar-gutter: stable;
+      overscroll-behavior-y: contain; padding: 36px var(--workspace-padding) 60px;
     }
-    .topbar { max-width: 1284px; width: 100%; margin: 0 auto; padding: 26px 52px 0; }
+    .workspace-main > .topbar {
+      max-width: none; width: 100%; margin: 0;
+      padding: 26px var(--workspace-padding) 0;
+      overflow-y: hidden; scrollbar-gutter: stable;
+    }
     .stat-row { gap: 16px; }
     .quick-actions { grid-template-columns: repeat(4, minmax(0, 1fr)); }
     .landing-hero { grid-template-columns: minmax(0, 1.05fr) minmax(390px, .95fr); gap: 48px; }
