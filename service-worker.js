@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ledger-pwa-shell-v3-mobile-nav';
+const CACHE_NAME = 'ledger-pwa-shell-v4-home-nav';
 const INDEX_URL = new URL('./index.html', self.location).href;
 const SHELL_URLS = [
   INDEX_URL,
