@@ -1536,6 +1536,44 @@
     .navbar button { font-size:8.5px; gap:2px; padding:7px 1px; }
     .navbar .nicon svg { width:17px; height:17px; }
   }
+
+  /* Four destinations on mobile, with the remaining sections in More. */
+  .mobile-more-sheet { padding: 0; border: 1px solid var(--border); border-bottom: 0; border-radius: 26px 26px 0 0; margin: 0; top: auto; bottom: 0; width: 100%; max-width: none; max-height: min(82dvh, 670px); color: var(--ink); background: var(--surface); overflow-y: auto; overscroll-behavior: contain; box-shadow: 0 -18px 60px rgba(15,40,30,.18); }
+  .mobile-more-sheet[open] { animation: moreSheetIn .28s cubic-bezier(.16,1,.3,1); }
+  .mobile-more-sheet::backdrop { background: rgba(12,29,23,.42); backdrop-filter: blur(5px); }
+  .mobile-more-sheet.more-closing { animation: moreSheetOut .18s ease-in forwards; }
+  .mobile-more-sheet.more-closing::backdrop { opacity: 0; transition: opacity .18s; }
+  .mobile-more-header { padding: 10px 22px 16px; touch-action: pan-x; }
+  .mobile-more-handle { width: 38px; height: 4px; border-radius: 4px; background: var(--border); margin: 0 auto 18px; }
+  .mobile-more-title-row { display: flex; align-items: center; justify-content: space-between; }
+  .mobile-more-title-row h2 { margin: 0; font: 700 22px 'Plus Jakarta Sans',sans-serif; letter-spacing: -.035em; }
+  .mobile-more-close { width: 36px; height: 36px; display: grid; place-items: center; border: 1px solid var(--border); border-radius: 50%; background: var(--bg); color: var(--ink-soft); cursor: pointer; }
+  .mobile-more-close svg { width: 17px; height: 17px; }
+  .mobile-more-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; padding: 0 20px 20px; }
+  .mobile-more-item { position: relative; display: flex; align-items: center; gap: 11px; min-height: 76px; padding: 14px 12px; border: 1px solid var(--border); border-radius: 15px; color: var(--ink); background: var(--bg); font: 600 13px 'Inter',sans-serif; text-align: left; cursor: pointer; }
+  .mobile-more-item .nicon { display: grid; place-items: center; flex: 0 0 36px; width: 36px; height: 36px; border-radius: 11px; color: var(--primary); background: var(--primary-tint); }
+  .mobile-more-item svg { width: 21px; height: 21px; }
+  .mobile-more-item.active { border-color: var(--teal); background: var(--primary-tint); color: var(--primary); }
+  .mobile-more-label { min-width: 0; overflow-wrap: anywhere; }
+  .mobile-more-count { display: block; margin-top: 4px; font-size: 11px; font-weight: 500; color: var(--ink-soft); }
+  .mobile-more-account { padding-top: 16px; padding-bottom: calc(24px + env(safe-area-inset-bottom)); border-top: 1px solid var(--border); }
+  .mobile-more-account .mobile-more-item { min-height: 62px; background: transparent; }
+  .mobile-more-open .content { overflow: hidden; }
+  .mobile-more-open { overflow: hidden; }
+  @keyframes moreSheetIn { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  @keyframes moreSheetOut { to { transform: translateY(100%); } }
+  @media(max-width:859px) {
+    .navbar button { font-size: 11px; gap: 5px; font-weight: 600; padding: 7px 5px; }
+    .navbar .nicon { position: relative; display: grid; place-items: center; width: 48px; height: 28px; border-radius: 16px; }
+    .navbar .nicon svg { width: 21px; height: 21px; }
+    .navbar button.active .nicon { background: var(--primary-tint); }
+    .navbar .more-attention { position: absolute; top: 0; right: 5px; min-width: 14px; height: 14px; padding: 0 3px; display: grid; place-items: center; border: 2px solid var(--surface); border-radius: 9px; background: var(--primary); color: var(--surface); font: 700 8px 'Inter',sans-serif; }
+    .navbar .more-attention[hidden] { display: none; }
+    .mobile-more-sheet button:focus-visible, .navbar button:focus-visible { outline: 2px solid var(--teal); outline-offset: 3px; }
+  }
+  @media(min-width:860px) { .mobile-more-sheet { display: none; } }
+  @media(prefers-reduced-motion:reduce) { .mobile-more-sheet[open], .mobile-more-sheet.more-closing { animation: none; } }
+
 </style>
 </head>
 <body>
@@ -2568,25 +2606,31 @@
       <div class="navbar">
         <div id="navRegularMobile" style="display:flex; flex:1;">
           <button class="nav-btn" title="Overview" data-tab="overview" onclick="showTab('overview')"><span class="nicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M9 21V9"/><path d="M13 13h4M13 17h4"/></svg></span>Overview</button>
-          <button class="nav-btn active" data-tab="home" onclick="showTab('home')"><span class="nicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></svg></span>Home</button>
           <button class="nav-btn" data-tab="stock" onclick="showTab('stock')"><span class="nicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg></span>Stock</button>
           <button class="nav-btn" data-tab="sales" onclick="showTab('sales')"><span class="nicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg></span>Sales</button>
-          <button class="nav-btn" data-tab="orders" onclick="showTab('orders')"><span class="nicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2"/><rect x="9" y="2" width="6" height="4" rx="1"/><path d="M9 11h6"/><path d="M9 15h4"/></svg></span>Orders</button>
-          <button class="nav-btn" data-tab="debts" onclick="showTab('debts')"><span class="nicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></span>Debts</button>
-          <button class="nav-btn" data-tab="expenses" onclick="showTab('expenses')"><span class="nicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h12v18l-2-1.5L14 20l-2-1.5L10 20l-2-1.5L6 20V2z"/><path d="M9 7h6"/><path d="M9 11h6"/></svg></span>Expenses</button>
+          <button type="button" class="mobile-more-trigger" onclick="openMobileMore()" aria-haspopup="dialog" aria-controls="mobileMoreSheet" aria-expanded="false"><span class="nicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg><span class="more-attention" hidden></span></span><span data-translate-text="nav_more">More</span></button>
+
         </div>
         <div id="navDropshipMobile" style="display:none; flex:1;">
           <button class="nav-btn" title="Overview" data-tab="overview" onclick="showTab('overview')"><span class="nicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M9 21V9"/><path d="M13 13h4M13 17h4"/></svg></span>Overview</button>
-          <button class="nav-btn active" data-tab="do-home" onclick="showTab('do-home')"><span class="nicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></svg></span>Home</button>
+          <button class="nav-btn" data-tab="do-home" onclick="showTab('do-home')"><span class="nicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></svg></span>Home</button>
           <button class="nav-btn" data-tab="do-orders" onclick="showTab('do-orders')"><span class="nicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2"/><rect x="9" y="2" width="6" height="4" rx="1"/><path d="M9 11h6"/><path d="M9 15h4"/></svg></span>Customer</button>
-          <button class="nav-btn" data-tab="do-wholesaler" onclick="showTab('do-wholesaler')"><span class="nicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg></span>Wholesaler</button>
-          <button class="nav-btn" data-tab="do-profit" onclick="showTab('do-profit')"><span class="nicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg></span>Profit</button>
-          <button class="nav-btn" data-tab="debts" onclick="showTab('debts')"><span class="nicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></span>Debts</button>
-          <button class="nav-btn" data-tab="expenses" onclick="showTab('expenses')"><span class="nicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h12v18l-2-1.5L14 20l-2-1.5L10 20l-2-1.5L6 20V2z"/><path d="M9 7h6"/><path d="M9 11h6"/></svg></span>Expenses</button>
+          <button type="button" class="mobile-more-trigger" onclick="openMobileMore()" aria-haspopup="dialog" aria-controls="mobileMoreSheet" aria-expanded="false"><span class="nicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg><span class="more-attention" hidden></span></span><span data-translate-text="nav_more">More</span></button>
+
         </div>
       </div>
     </div>
   </div>
+
+
+  <dialog id="mobileMoreSheet" class="mobile-more-sheet" aria-labelledby="mobileMoreTitle">
+    <div class="mobile-more-header" id="mobileMoreDrag">
+      <div class="mobile-more-handle" aria-hidden="true"></div>
+      <div class="mobile-more-title-row"><h2 id="mobileMoreTitle" data-translate-text="nav_more">More</h2><button type="button" class="mobile-more-close" onclick="closeMobileMore()" aria-label="Close menu" autofocus><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
+    </div>
+    <div class="mobile-more-grid" id="mobileMoreLinks"></div>
+    <div class="mobile-more-grid mobile-more-account" id="mobileMoreAccount"></div>
+  </dialog>
 
   <button id="fabButton" class="fab" style="display:none;" onclick="handleFabClick()">
     <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
@@ -3049,6 +3093,7 @@ const COUNTRY_CODES = [
 
 const TRANSLATIONS = {
   en: {
+    nav_more: 'More',
     nav_overview: 'Overview',
     overview_eyebrow: 'Business at a glance',
     overview_title: 'Overview',
@@ -3353,6 +3398,7 @@ const TRANSLATIONS = {
     contactUsLabel: 'Contact Us'
   },
   fr: {
+    nav_more: 'Plus',
     nav_home: 'Accueil',
     nav_stock: 'Stock',
     nav_sales: 'Ventes',
@@ -3612,6 +3658,7 @@ const TRANSLATIONS = {
     contactUsLabel: 'Nous contacter'
   },
   es: {
+    nav_more: 'Más',
     nav_home: 'Inicio',
     nav_stock: 'Inventario',
     nav_sales: 'Ventas',
@@ -3871,6 +3918,7 @@ const TRANSLATIONS = {
     contactUsLabel: 'Contáctanos'
   },
   de: {
+    nav_more: 'Mehr',
     nav_home: 'Start',
     nav_stock: 'Lager',
     nav_sales: 'Verkäufe',
@@ -4130,6 +4178,7 @@ const TRANSLATIONS = {
     contactUsLabel: 'Kontakt'
   },
   zh: {
+    nav_more: '更多',
     nav_home: '首页',
     nav_stock: '库存',
     nav_sales: '销售',
@@ -5472,7 +5521,93 @@ try { applyDesktopSidebarState(localStorage.getItem('ledger_desktop_sidebar_coll
 
 const ALL_TAB_IDS = ['overview', 'home', 'stock', 'sales', 'orders', 'debts', 'expenses', 'do-home', 'do-orders', 'do-wholesaler', 'do-profit'];
 
+
+let mobileActiveTab = 'overview';
+let mobileMoreCloseTimer = null;
+function mobileMoreCounts() {
+  const orders = isDropshipMode() ? (state.dropshipOrders || []).filter(o => o.stage !== 'delivered').length : (state.orders || []).filter(o => !o.fulfilled).length;
+  const debts = (getActiveDebts() || []).filter(d => !d.paid).length;
+  return { orders, debts };
+}
+function mobilePrimaryTabs() {
+  return isDropshipMode() ? ['overview', 'do-home', 'do-orders'] : ['overview', 'stock', 'sales'];
+}
+function syncMobileNavigation() {
+  const sheet = document.getElementById('mobileMoreSheet');
+  const counts = mobileMoreCounts();
+  const hiddenCount = counts.debts + (isDropshipMode() ? 0 : counts.orders);
+  document.querySelectorAll('.mobile-more-trigger').forEach(button => {
+    button.classList.toggle('active', sheet.open || !mobilePrimaryTabs().includes(mobileActiveTab));
+    button.setAttribute('aria-expanded', String(sheet.open));
+    const badge = button.querySelector('.more-attention');
+    badge.hidden = hiddenCount === 0;
+    badge.textContent = hiddenCount > 9 ? '9+' : hiddenCount;
+    badge.setAttribute('aria-label', hiddenCount + ' pending orders or unpaid debts');
+  });
+  document.querySelectorAll('.navbar .nav-btn').forEach(button => {
+    if (button.dataset.tab === mobileActiveTab) button.setAttribute('aria-current', 'page');
+    else button.removeAttribute('aria-current');
+  });
+}
+function renderMobileMore() {
+  const tabs = isDropshipMode() ? ['do-wholesaler', 'do-profit', 'debts', 'expenses'] : ['home', 'orders', 'debts', 'expenses'];
+  const counts = mobileMoreCounts();
+  const item = (tab, label, action, count) => {
+    const original = document.querySelector('.sidebar [data-tab="' + tab + '"] .nicon');
+    const icon = original ? original.innerHTML : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 22v-3a8 8 0 0 1 16 0v3"/></svg>';
+    return '<button type="button" class="mobile-more-item' + (tab === mobileActiveTab ? ' active' : '') + '" onclick="' + action + '"' + (tab === mobileActiveTab ? ' aria-current="page"' : '') + '><span class="nicon" aria-hidden="true">' + icon + '</span><span class="mobile-more-label">' + escapeHtml(label) + (count ? '<span class="mobile-more-count">' + count + '</span>' : '') + '</span></button>';
+  };
+  document.getElementById('mobileMoreLinks').innerHTML = tabs.map(tab => {
+    const key = ['do-wholesaler','do-profit'].includes(tab) && TRANSLATIONS.en['nav_' + tab + '_full'] ? 'nav_' + tab + '_full' : 'nav_' + tab;
+    const count = tab === 'orders' ? counts.orders : tab === 'debts' ? counts.debts : 0;
+    return item(tab, t(key), "navigateMobileMore('" + tab + "')", count);
+  }).join('');
+  document.getElementById('mobileMoreAccount').innerHTML = item('profile', t('profile_title_normal'), 'closeMobileMore(function(){ openProfileModal(false); })') + item('settings', t('nav_settings'), "navigateMobileMore('settings')");
+}
+function openMobileMore() {
+  if (!matchMedia('(max-width:859px)').matches) return;
+  clearTimeout(mobileMoreCloseTimer);
+  const sheet = document.getElementById('mobileMoreSheet');
+  sheet.classList.remove('more-closing');
+  renderMobileMore();
+  if (!sheet.open) sheet.showModal();
+  document.body.classList.add('mobile-more-open');
+  syncMobileNavigation();
+}
+function closeMobileMore(afterClose, immediate) {
+  const sheet = document.getElementById('mobileMoreSheet');
+  if (!sheet.open) { if (typeof afterClose === 'function') afterClose(); return; }
+  clearTimeout(mobileMoreCloseTimer);
+  const finish = () => {
+    sheet.close(); sheet.classList.remove('more-closing');
+    document.body.classList.remove('mobile-more-open');
+    syncMobileNavigation();
+    if (typeof afterClose === 'function') afterClose();
+  };
+  if (immediate || matchMedia('(prefers-reduced-motion:reduce)').matches) finish();
+  else { sheet.classList.add('more-closing'); mobileMoreCloseTimer = setTimeout(finish, 180); }
+}
+function navigateMobileMore(tab) { closeMobileMore(() => showTab(tab)); }
+const mobileMoreSheet = document.getElementById('mobileMoreSheet');
+mobileMoreSheet.addEventListener('cancel', event => { event.preventDefault(); closeMobileMore(); });
+mobileMoreSheet.addEventListener('click', event => {
+  if (event.target !== mobileMoreSheet) return;
+  const rect = mobileMoreSheet.getBoundingClientRect();
+  if (event.clientY < rect.top || event.clientX < rect.left || event.clientX > rect.right || event.clientY > rect.bottom) closeMobileMore();
+});
+let morePointerStart = null;
+const mobileMoreDrag = document.getElementById('mobileMoreDrag');
+mobileMoreDrag.addEventListener('pointerdown', event => { if (event.target.closest('button')) return; morePointerStart = { x: event.clientX, y: event.clientY }; mobileMoreDrag.setPointerCapture(event.pointerId); });
+mobileMoreDrag.addEventListener('pointerup', event => {
+  if (morePointerStart && event.clientY - morePointerStart.y > 55 && Math.abs(event.clientX - morePointerStart.x) < 90) closeMobileMore();
+  morePointerStart = null;
+});
+mobileMoreDrag.addEventListener('pointercancel', () => { morePointerStart = null; });
+matchMedia('(min-width:860px)').addEventListener('change', event => { if (event.matches) closeMobileMore(null, true); });
+
 function showTab(name, skipHistory) {
+  closeMobileMore(null, true);
+  mobileActiveTab = name;
   if (name === 'settings') {
     const current = ALL_TAB_IDS.find(
       t => document.getElementById('tab-' + t).style.display === 'block'
@@ -5519,6 +5654,7 @@ function showTab(name, skipHistory) {
   if (name === 'do-profit') renderDoProfitTab();
 
   updateFab(name);
+  syncMobileNavigation();
 
   if (!skipHistory && shopCode) {
     history.pushState({ tab: name }, '', '#' + name);
@@ -5930,6 +6066,7 @@ function openFaqModal() {
 }
 
 function renderAll() {
+  syncMobileNavigation();
   renderOverview();
   renderDashboard();
   renderStockList();
